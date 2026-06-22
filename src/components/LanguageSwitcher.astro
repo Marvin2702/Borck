@@ -1,0 +1,78 @@
+---
+import { languages, locales, defaultLang, localizedPath, type Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+// Aktuellen sprachneutralen Pfad ermitteln (Locale-Präfix entfernen).
+const segments = Astro.url.pathname.split('/').filter(Boolean);
+if (segments[0] && (locales as string[]).includes(segments[0]) && segments[0] !== defaultLang) {
+  segments.shift();
+}
+const pageKey = segments.join('/');
+---
+
+<div class="lang" data-lang>
+  <button type="button" class="lang-btn" aria-haspopup="true" aria-expanded="false">
+    <span aria-hidden="true">🌐</span> {lang.toUpperCase()}
+  </button>
+  <ul class="lang-menu" role="menu">
+    {locales.map((l) => (
+      <li role="none">
+        <a role="menuitem" href={localizedPath(pageKey, l)} hreflang={l}
+           class={l === lang ? 'is-active' : ''} lang={l}>
+          {languages[l]}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .lang { position: relative; }
+  .lang-btn {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    background: transparent; border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.35rem 0.7rem;
+    font: inherit; font-size: 0.85rem; font-weight: 600;
+    color: var(--text); cursor: pointer;
+  }
+  .lang-btn:hover { border-color: var(--c-aqua-300); color: var(--brand); }
+  .lang-menu {
+    position: absolute; right: 0; top: calc(100% + 6px);
+    list-style: none; margin: 0; padding: 0.35rem;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; box-shadow: var(--shadow-md);
+    min-width: 150px; opacity: 0; transform: translateY(-6px);
+    pointer-events: none; transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 120;
+  }
+  .lang[data-open] .lang-menu { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .lang-menu a {
+    display: block; padding: 0.5rem 0.7rem; border-radius: 8px;
+    text-decoration: none; color: var(--text); font-size: 0.92rem;
+  }
+  .lang-menu a:hover { background: var(--c-aqua-100); }
+  .lang-menu a.is-active { color: var(--brand); font-weight: 700; }
+  @media (max-width: 860px) {
+    .lang-menu { position: static; opacity: 1; transform: none; pointer-events: auto; box-shadow: none; margin-top: 0.4rem; }
+    .lang-btn { display: none; }
+  }
+</style>
+
+<script>
+  // Dropdown per Klick (Desktop). Mobil ist die Liste ohnehin offen.
+  document.querySelectorAll('[data-lang]').forEach((el) => {
+    const btn = el.querySelector('.lang-btn');
+    btn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = el.hasAttribute('data-open');
+      document.querySelectorAll('[data-lang]').forEach((x) => x.removeAttribute('data-open'));
+      if (!open) el.setAttribute('data-open', '');
+      btn.setAttribute('aria-expanded', String(!open));
+    });
+  });
+  document.addEventListener('click', () => {
+    document.querySelectorAll('[data-lang]').forEach((x) => x.removeAttribute('data-open'));
+  });
+</script>

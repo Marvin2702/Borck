@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import ApartmentDetailView from '../../components/ApartmentDetailView.astro';
+
+export async function getStaticPaths() {
+  const apartments = await getCollection('apartments');
+  return apartments.map((apartment) => ({
+    params: { slug: apartment.id },
+    props: { apartment },
+  }));
+}
+
+const { apartment } = Astro.props;
+---
+<ApartmentDetailView lang="de" apartment={apartment} />

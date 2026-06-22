@@ -1,0 +1,123 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+import { getLangFromUrl, useTranslations, alternateLinks, hreflangCode } from '../i18n/utils';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Sprachneutraler Slug für hreflang, z. B. '' (Start) oder 'apartments'. */
+  pageKey?: string;
+  image?: string;
+  /** Zusätzliche JSON-LD-Objekte (z. B. Apartment/Offer je Detailseite). */
+  jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { title, description, pageKey = '', image, jsonLd = [], noindex = false } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const canonical = new URL(Astro.url.pathname, site.domain).href;
+// TODO: og-default.svg durch echtes 1200x630-JPG mit Profifoto ersetzen.
+const ogImage = new URL(image ?? '/images/og-default.svg', site.domain).href;
+const alternates = alternateLinks(pageKey, site.domain);
+
+// JSON-LD: LodgingBusiness als globale Org-Auszeichnung (reguläres Schema —
+// bewusst KEIN Google-VacationRental, da invite-only; s. Plan §5).
+const lodging = {
+  '@context': 'https://schema.org',
+  '@type': 'LodgingBusiness',
+  '@id': `${site.domain}/#lodging`,
+  name: site.name,
+  description,
+  url: site.domain,
+  telephone: site.phone,
+  email: site.email,
+  priceRange: site.priceRange,
+  image: ogImage,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    postalCode: site.address.postalCode,
+    addressLocality: site.address.city,
+    addressRegion: site.address.region,
+    addressCountry: site.address.country,
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: site.rating.value,
+    reviewCount: site.rating.count,
+    bestRating: 5,
+  },
+  petsAllowed: true,
+};
+const allJsonLd = [lodging, ...jsonLd];
+---
+
+<!doctype html>
+<html lang={hreflangCode(lang)}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    {/* hreflang-Alternates über alle Sprachen + x-default */}
+    {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+
+    {/* Open Graph / Twitter */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={hreflangCode(lang).replace('-', '_')} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#155e6e" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {/* Schriften: Fraunces (Headlines) — preconnect für schnelleren LCP */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap"
+    />
+
+    {/* Strukturierte Daten */}
+    {allJsonLd.map((obj) => (
+      <script type="application/ld+json" set:html={JSON.stringify(obj)} />
+    ))}
+  </head>
+  <body>
+    <a href="#main" class="skip-link">{t('nav.home')}</a>
+    <Header lang={lang} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+
+    <style>
+      .skip-link {
+        position: absolute;
+        left: -999px;
+        top: 0;
+        background: var(--brand-strong);
+        color: #fff;
+        padding: 0.6rem 1rem;
+        z-index: 200;
+        border-radius: 0 0 8px 0;
+      }
+      .skip-link:focus { left: 0; }
+    </style>
+  </body>
+</html>

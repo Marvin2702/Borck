@@ -1,0 +1,18 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import ApartmentDetailView from '../../../components/ApartmentDetailView.astro';
+import { locales, defaultLang, type Lang } from '../../../i18n/utils';
+
+export async function getStaticPaths() {
+  const apartments = await getCollection('apartments');
+  const langs = locales.filter((l) => l !== defaultLang);
+  return langs.flatMap((lang) =>
+    apartments.map((apartment) => ({
+      params: { lang, slug: apartment.id },
+      props: { lang, apartment },
+    }))
+  );
+}
+const { lang, apartment } = Astro.props as { lang: Lang; apartment: CollectionEntry<'apartments'> };
+---
+<ApartmentDetailView lang={lang} apartment={apartment} />

@@ -1,0 +1,27 @@
+---
+import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const bookHref = localizedPath('apartments', lang) + '#buchung';
+---
+<section class="cta-banner">
+  <div class="container cta-inner">
+    <div>
+      <h2 class="cta-title">{t('cta.banner.title')}</h2>
+      <p class="cta-text">{t('cta.banner.text')}</p>
+    </div>
+    <a href={bookHref} class="btn btn--gold btn--lg">{t('nav.book')}</a>
+  </div>
+</section>
+
+<style>
+  .cta-banner { background: linear-gradient(135deg, var(--c-aqua-700), var(--c-aqua-900)); color: #fff; }
+  .cta-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1.5rem; flex-wrap: wrap;
+    padding-block: clamp(2.2rem, 1.5rem + 3vw, 3.5rem);
+  }
+  .cta-title { color: #fff; margin: 0 0 0.3rem; }
+  .cta-text { color: rgba(255, 255, 255, 0.85); margin: 0; max-width: 48ch; }
+</style>

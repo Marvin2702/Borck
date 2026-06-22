@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const waText = encodeURIComponent(t('contact.whatsapp.msg'));
+const title = `${t('contact.title')} – ${site.name} Büsum`;
+---
+<BaseLayout title={title} description={t('contact.subtitle')} pageKey="kontakt">
+  <section class="section">
+    <div class="container-narrow">
+      <p class="eyebrow">{site.tagline}</p>
+      <h1>{t('contact.title')}</h1>
+      <p class="lead">{t('contact.subtitle')}</p>
+
+      <div class="contact-grid">
+        <a class="contact-card" href={`tel:${site.phone.replace(/\s/g, '')}`}>
+          <span class="ci">☎</span>
+          <span class="cl">{t('contact.phone')}</span>
+          <strong>{site.phoneDisplay}</strong>
+        </a>
+        <a class="contact-card" href={`https://wa.me/${site.whatsapp}?text=${waText}`} target="_blank" rel="noopener">
+          <span class="ci">💬</span>
+          <span class="cl">{t('contact.whatsapp')}</span>
+          <strong>{t('nav.book')}</strong>
+        </a>
+        <a class="contact-card" href={`mailto:${site.email}`}>
+          <span class="ci">✉</span>
+          <span class="cl">{t('contact.email')}</span>
+          <strong>{site.email}</strong>
+        </a>
+        <div class="contact-card">
+          <span class="ci">📍</span>
+          <span class="cl">{site.name}</span>
+          <strong>{site.address.postalCode} {site.address.city}</strong>
+        </div>
+      </div>
+
+      {/* TODO: Google-Maps-Embed der exakten Lage einsetzen (Lazy-iFrame). */}
+      <div class="map-placeholder" aria-hidden="true">
+        <span>Karte / Anfahrt — Google-Maps-Embed folgt</span>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); margin: 2rem 0; }
+  .contact-card {
+    display: grid; gap: 0.25rem;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 1.3rem 1.4rem;
+    text-decoration: none; color: var(--text); box-shadow: var(--shadow-sm);
+  }
+  a.contact-card:hover { border-color: var(--c-aqua-300); transform: translateY(-2px); }
+  .ci { font-size: 1.4rem; }
+  .cl { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .contact-card strong { color: var(--brand-strong); font-size: 1.1rem; }
+  .map-placeholder {
+    margin-top: 1.5rem; height: 280px; border-radius: var(--radius-lg);
+    display: grid; place-items: center; color: var(--text-muted);
+    background: repeating-linear-gradient(45deg, var(--c-aqua-100), var(--c-aqua-100) 18px, var(--c-sand-100) 18px, var(--c-sand-100) 36px);
+    border: 1px dashed var(--c-aqua-300);
+  }
+  @media (max-width: 600px) { .contact-grid { grid-template-columns: 1fr; } }
+</style>

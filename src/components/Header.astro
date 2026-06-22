@@ -1,0 +1,112 @@
+---
+import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const nav = [
+  { key: 'apartments', label: t('nav.apartments') },
+  { key: 'lage', label: t('nav.location') },
+  { key: 'ueber-uns', label: t('nav.about') },
+  { key: 'kontakt', label: t('nav.contact') },
+];
+const home = localizedPath('', lang);
+const bookHref = localizedPath('apartments', lang) + '#buchung';
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href={home} class="brand" aria-label={site.name}>
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <span class="brand-name">{site.name}</span>
+    </a>
+
+    <input type="checkbox" id="navtoggle" class="navtoggle" aria-hidden="true" />
+    <label for="navtoggle" class="burger" aria-label="Menü">
+      <span></span><span></span><span></span>
+    </label>
+
+    <nav class="site-nav" aria-label="Hauptnavigation">
+      {nav.map((item) => (
+        <a href={localizedPath(item.key, lang)} class="nav-link">{item.label}</a>
+      ))}
+      <LanguageSwitcher lang={lang} />
+      <a href={bookHref} class="btn btn--gold nav-cta">{t('nav.book')}</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250, 247, 241, 0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 68px;
+  }
+  .brand { display: inline-flex; align-items: center; gap: 0.55rem; text-decoration: none; }
+  .brand-mark { color: var(--c-gold); font-size: 1.25rem; }
+  .brand-name {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: var(--brand-strong);
+    letter-spacing: -0.01em;
+  }
+  .site-nav { display: flex; align-items: center; gap: 1.4rem; }
+  .nav-link {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 500;
+    font-size: 0.98rem;
+    transition: color 0.15s ease;
+  }
+  .nav-link:hover { color: var(--brand); }
+  .nav-cta { font-size: 0.92rem; padding: 0.6rem 1.1rem; }
+
+  .navtoggle, .burger { display: none; }
+
+  @media (max-width: 860px) {
+    .burger {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 8px;
+    }
+    .burger span {
+      width: 26px; height: 2px; background: var(--brand-strong);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .site-nav {
+      position: absolute;
+      top: 100%;
+      left: 0; right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.4rem;
+      background: var(--c-sand-50);
+      padding: 1rem 1.2rem 1.4rem;
+      border-bottom: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .navtoggle:checked ~ .site-nav { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .nav-link { padding: 0.6rem 0.2rem; border-bottom: 1px solid var(--line); }
+    .nav-cta { margin-top: 0.6rem; justify-content: center; }
+  }
+</style>

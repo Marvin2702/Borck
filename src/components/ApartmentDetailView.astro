@@ -1,0 +1,103 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BookingWidget from './BookingWidget.astro';
+import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+interface Props { lang: Lang; apartment: CollectionEntry<'apartments'> }
+const { lang, apartment } = Astro.props;
+const t = useTranslations(lang);
+const d = apartment.data;
+const { Content } = await render(apartment);
+
+const title = `${d.name} – ${t('apartments.title')} ${site.name} Büsum`;
+const description = `${d.summary} ${d.persons} ${t('apartments.persons')}, ${d.view}.`;
+
+// JSON-LD: Apartment + (sofern Preis vorhanden) Offer. Reguläres Schema.org.
+const apartmentLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Apartment',
+  name: `${site.name} – ${d.name}`,
+  description: d.summary,
+  occupancy: { '@type': 'QuantitativeValue', maxValue: d.persons },
+  numberOfBedrooms: d.bedrooms,
+  ...(d.size_qm
+    ? { floorSize: { '@type': 'QuantitativeValue', value: d.size_qm, unitCode: 'MTK' } }
+    : {}),
+  amenityFeature: d.features.map((f) => ({ '@type': 'LocationFeatureSpecification', name: f })),
+  ...(d.price_from
+    ? {
+        offers: {
+          '@type': 'Offer',
+          price: d.price_from,
+          priceCurrency: 'EUR',
+          availability: 'https://schema.org/InStock',
+          url: new URL(localizedPath(`apartments/${apartment.id}`, lang), site.domain).href,
+        },
+      }
+    : {}),
+};
+---
+<BaseLayout
+  title={title}
+  description={description}
+  pageKey={`apartments/${apartment.id}`}
+  image={d.heroImage}
+  jsonLd={[apartmentLd]}
+>
+  <article>
+    <header class="apt-hero" style={`--a:${d.accent}`}>
+      <div class="container apt-hero-inner">
+        <a class="back" href={localizedPath('apartments', lang)}>← {t('apartments.title')}</a>
+        <p class="eyebrow">{d.view}</p>
+        <h1>{d.name}</h1>
+        <p class="lead">{d.summary}</p>
+        <ul class="apt-facts">
+          <li><strong>{d.persons}</strong> {t('apartments.persons')}</li>
+          {d.bedrooms && <li><strong>{d.bedrooms}</strong> Schlafzimmer</li>}
+          {d.size_qm && <li><strong>{d.size_qm}</strong> m²</li>}
+          {d.price_from && <li>{t('apartments.from')} <strong>{d.price_from} €</strong>/{t('apartments.night')}</li>}
+        </ul>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="container detail-grid">
+        <div class="detail-body">
+          <Content />
+        </div>
+        <aside class="detail-aside">
+          <h2 class="aside-title">{t('apartments.features')}</h2>
+          <ul class="feature-list">
+            {d.features.map((f) => <li>✓ {f}</li>)}
+          </ul>
+          {d.dogFriendly && <p class="dog-badge">🐾 {t('usp.pets.title')}</p>}
+          <a href="#buchung" class="btn btn--gold" style="margin-top:1rem;width:100%;justify-content:center">
+            {t('nav.book')}
+          </a>
+        </aside>
+      </div>
+    </section>
+
+    <BookingWidget lang={lang} smoobuId={d.smoobu_id} apartmentName={d.name} />
+  </article>
+</BaseLayout>
+
+<style>
+  .apt-hero { background: linear-gradient(150deg, color-mix(in srgb, var(--a) 22%, white), var(--c-sand-50)); border-bottom: 1px solid var(--line); }
+  .apt-hero-inner { padding-block: clamp(2rem, 1.2rem + 4vw, 4rem); }
+  .apt-hero h1 { color: color-mix(in srgb, var(--a) 70%, black); }
+  .apt-hero .eyebrow { color: color-mix(in srgb, var(--a) 65%, black); }
+  .back { display: inline-block; margin-bottom: 1rem; text-decoration: none; font-weight: 600; color: var(--brand); }
+  .apt-facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; padding: 0; margin: 1.2rem 0 0; color: var(--text-muted); }
+  .apt-facts strong { color: var(--text); }
+  .detail-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; align-items: start; }
+  .detail-body { font-size: 1.05rem; }
+  .detail-aside { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); position: sticky; top: 90px; }
+  .aside-title { font-size: 1.2rem; margin-top: 0; }
+  .feature-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.55rem; }
+  .feature-list li { color: var(--text); }
+  .dog-badge { margin-top: 1rem; color: var(--brand); font-weight: 600; }
+  @media (max-width: 820px) { .detail-grid { grid-template-columns: 1fr; } .detail-aside { position: static; } }
+</style>

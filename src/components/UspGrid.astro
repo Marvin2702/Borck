@@ -1,0 +1,45 @@
+---
+import { useTranslations, type Lang } from '../i18n/utils';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const items = [
+  { icon: '✓', title: t('usp.direct.title'), text: t('usp.direct.text') },
+  { icon: '◈', title: t('usp.host.title'), text: t('usp.host.text') },
+  { icon: '≈', title: t('usp.location.title'), text: t('usp.location.text') },
+  { icon: '🐾', title: t('usp.pets.title'), text: t('usp.pets.text') },
+];
+---
+<section class="section usp-section">
+  <div class="container">
+    <div class="usp-grid">
+      {items.map((i) => (
+        <div class="usp">
+          <span class="usp-icon" aria-hidden="true">{i.icon}</span>
+          <h3 class="usp-title">{i.title}</h3>
+          <p class="usp-text">{i.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .usp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
+  .usp {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 1.6rem 1.4rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .usp-icon {
+    display: inline-grid; place-items: center;
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--c-aqua-100); color: var(--brand);
+    font-size: 1.3rem; margin-bottom: 0.9rem;
+  }
+  .usp-title { font-size: 1.18rem; margin: 0 0 0.4rem; }
+  .usp-text { color: var(--text-muted); margin: 0; font-size: 0.95rem; }
+  @media (max-width: 900px) { .usp-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .usp-grid { grid-template-columns: 1fr; } }
+</style>

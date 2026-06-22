@@ -1,0 +1,74 @@
+---
+import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { apartment: CollectionEntry<'apartments'>; lang: Lang }
+const { apartment, lang } = Astro.props;
+const t = useTranslations(lang);
+const d = apartment.data;
+const href = localizedPath(`apartments/${apartment.id}`, lang);
+const accent = d.accent;
+---
+
+<article class="card apt">
+  <a href={href} class="apt-media" aria-label={d.name}>
+    {d.heroImage ? (
+      <img src={d.heroImage} alt={d.name} width="640" height="420" loading="lazy" decoding="async" />
+    ) : (
+      <span class="apt-placeholder" style={`--a:${accent}`}>
+        <span class="apt-gem" aria-hidden="true">◈</span>
+      </span>
+    )}
+    <span class="apt-badge" style={`--a:${accent}`}>{d.view}</span>
+    {d.dogFriendly && <span class="apt-dog" title="Hundefreundlich" aria-hidden="true">🐾</span>}
+  </a>
+
+  <div class="apt-body">
+    <h3 class="apt-name">{d.name}</h3>
+    <p class="apt-summary">{d.summary}</p>
+    <ul class="apt-meta">
+      <li><strong>{d.persons}</strong> {t('apartments.persons')}</li>
+      {d.size_qm && <li><strong>{d.size_qm}</strong> m²</li>}
+      {d.bedrooms && <li><strong>{d.bedrooms}</strong> {d.bedrooms === 1 ? 'Schlafzimmer' : 'Schlafzimmer'}</li>}
+    </ul>
+    <div class="apt-foot">
+      {d.price_from
+        ? <span class="apt-price">{t('apartments.from')} <strong>{d.price_from} €</strong> / {t('apartments.night')}</span>
+        : <span class="apt-price apt-price--tbd">{t('apartments.from')} <strong>—</strong></span>}
+      <a href={href} class="btn btn--ghost apt-link">{t('apartments.details')} →</a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .apt { display: flex; flex-direction: column; }
+  .apt:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .apt-media { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; }
+  .apt-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+  .apt:hover .apt-media img { transform: scale(1.05); }
+  .apt-placeholder {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(120% 120% at 20% 10%, color-mix(in srgb, var(--a) 55%, white), var(--a) 70%, color-mix(in srgb, var(--a) 70%, black));
+  }
+  .apt-gem { font-size: 2.6rem; color: rgba(255, 255, 255, 0.85); }
+  .apt-badge {
+    position: absolute; left: 12px; bottom: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    color: color-mix(in srgb, var(--a) 75%, black);
+    font-weight: 700; font-size: 0.78rem;
+    padding: 0.3rem 0.7rem; border-radius: 999px;
+  }
+  .apt-dog { position: absolute; right: 12px; top: 12px; background: rgba(255,255,255,0.9); border-radius: 999px; padding: 0.2rem 0.4rem; font-size: 0.9rem; }
+  .apt-body { padding: 1.2rem 1.3rem 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+  .apt-name { margin: 0; font-size: 1.4rem; }
+  .apt-summary { color: var(--text-muted); margin: 0; font-size: 0.95rem; flex: 1; }
+  .apt-meta { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin: 0.4rem 0; padding: 0; font-size: 0.9rem; color: var(--text-muted); }
+  .apt-meta strong { color: var(--text); }
+  .apt-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-top: 0.4rem; flex-wrap: wrap; }
+  .apt-price { font-size: 0.95rem; color: var(--text-muted); }
+  .apt-price strong { color: var(--brand-strong); font-size: 1.05rem; }
+  .apt-price--tbd strong { color: var(--text-muted); }
+  .apt-link { padding: 0.5rem 0.9rem; font-size: 0.9rem; }
+</style>

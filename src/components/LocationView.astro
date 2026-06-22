@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBanner from './CtaBanner.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Lokalisierte Reiseführer-Highlights (Topical-Authority-Baustein für SEO).
+const highlights: Record<Lang, { icon: string; title: string; text: string }[]> = {
+  de: [
+    { icon: '🌊', title: 'Strand & Perlebucht', text: 'Sandstrand, Familienlagune und Promenade – nur wenige Schritte vom Deich.' },
+    { icon: '🥾', title: 'Wattwanderung', text: 'Geführte Touren ins UNESCO-Weltnaturerbe Wattenmeer direkt vor Büsum.' },
+    { icon: '⚓', title: 'Hafen & Krabben', text: 'Fischkutter, frische Nordseekrabben und Hafenflair zum Schlendern.' },
+    { icon: '🐑', title: 'Deich & Radwege', text: 'Endlose Deichwege zum Wandern und Radeln, mit Schafen und Weitblick.' },
+  ],
+  en: [
+    { icon: '🌊', title: 'Beach & lagoon', text: 'Sandy beach, family lagoon and promenade – steps from the dyke.' },
+    { icon: '🥾', title: 'Mudflat walks', text: 'Guided tours into the UNESCO World Heritage Wadden Sea off Büsum.' },
+    { icon: '⚓', title: 'Harbour & shrimp', text: 'Fishing cutters, fresh North Sea shrimp and harbour atmosphere.' },
+    { icon: '🐑', title: 'Dyke & cycle paths', text: 'Endless dyke paths for walking and cycling, with sheep and wide views.' },
+  ],
+  nl: [
+    { icon: '🌊', title: 'Strand & lagune', text: 'Zandstrand, familielagune en promenade – op een paar passen van de dijk.' },
+    { icon: '🥾', title: 'Wadlopen', text: 'Geleide tochten in het UNESCO-werelderfgoed Waddenzee bij Büsum.' },
+    { icon: '⚓', title: 'Haven & garnalen', text: 'Viskotters, verse Noordzeegarnalen en echte havensfeer.' },
+    { icon: '🐑', title: 'Dijk & fietspaden', text: 'Eindeloze dijkpaden om te wandelen en fietsen, met schapen en weids uitzicht.' },
+  ],
+  da: [
+    { icon: '🌊', title: 'Strand & lagune', text: 'Sandstrand, familielagune og promenade – få skridt fra diget.' },
+    { icon: '🥾', title: 'Vadehavsvandring', text: 'Guidede ture i UNESCO-verdensarven Vadehavet ud for Büsum.' },
+    { icon: '⚓', title: 'Havn & rejer', text: 'Fiskekuttere, friske Nordsørejer og ægte havnestemning.' },
+    { icon: '🐑', title: 'Dige & cykelstier', text: 'Endeløse digestier til gåture og cykling, med får og vid udsigt.' },
+  ],
+};
+const cards = highlights[lang];
+const title = `${t('location.title')} – ${site.name} Büsum`;
+---
+<BaseLayout title={title} description={t('location.subtitle')} pageKey="lage">
+  <section class="section">
+    <div class="container-narrow text-center">
+      <p class="eyebrow">{site.tagline}</p>
+      <h1>{t('location.title')}</h1>
+      <p class="lead mx-auto">{t('location.subtitle')}</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="hl-grid">
+        {cards.map((c) => (
+          <div class="hl card">
+            <span class="hl-icon" aria-hidden="true">{c.icon}</span>
+            <h3>{c.title}</h3>
+            <p>{c.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  <CtaBanner lang={lang} />
+</BaseLayout>
+
+<style>
+  .hl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
+  .hl { padding: 1.5rem 1.4rem; }
+  .hl-icon { font-size: 1.8rem; }
+  .hl h3 { margin: 0.6rem 0 0.3rem; font-size: 1.15rem; }
+  .hl p { color: var(--text-muted); margin: 0; font-size: 0.95rem; }
+  @media (max-width: 900px) { .hl-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .hl-grid { grid-template-columns: 1fr; } }
+</style>

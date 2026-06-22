@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from './Hero.astro';
+import UspGrid from './UspGrid.astro';
+import ApartmentCard from './ApartmentCard.astro';
+import Reviews from './Reviews.astro';
+import CtaBanner from './CtaBanner.astro';
+import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
+
+const title = `${site.name} Büsum – ${t('hero.title')}`;
+const description = t('hero.subtitle');
+---
+<BaseLayout title={title} description={description} pageKey="" >
+  <Hero lang={lang} />
+  <UspGrid lang={lang} />
+
+  <section class="section" id="apartments-preview">
+    <div class="container">
+      <div class="sec-head">
+        <p class="eyebrow">{t('apartments.title')}</p>
+        <h2>{t('apartments.subtitle')}</h2>
+      </div>
+      <div class="apt-grid">
+        {apartments.map((a) => <ApartmentCard apartment={a} lang={lang} />)}
+      </div>
+      <div class="text-center" style="margin-top:2rem">
+        <a href={localizedPath('apartments', lang)} class="btn btn--ghost btn--lg">{t('apartments.all')}</a>
+      </div>
+    </div>
+  </section>
+
+  <Reviews lang={lang} />
+  <CtaBanner lang={lang} />
+</BaseLayout>
+
+<style>
+  .sec-head { text-align: center; margin-bottom: 2.4rem; }
+  .apt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  @media (max-width: 960px) { .apt-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .apt-grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBanner from './CtaBanner.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Lokalisierter Marken-/Konzepttext. Gastgeber-Story TODO (echte Angaben).
+const intro: Record<Lang, string> = {
+  de: 'Haus Aquamarin ist ein familiengeführtes Haus mit sieben individuell gestalteten Ferienapartments – jedes nach einem Edelstein benannt. Wir vermieten direkt, ohne Zwischenhändler, und sind persönlich für unsere Gäste da.',
+  en: 'Haus Aquamarin is a family-run house with seven individually designed holiday apartments – each named after a gemstone. We rent directly, without middlemen, and are personally there for our guests.',
+  nl: 'Haus Aquamarin is een familiebedrijf met zeven individueel ingerichte vakantieappartementen – elk vernoemd naar een edelsteen. Wij verhuren rechtstreeks, zonder tussenpersonen, en staan persoonlijk voor onze gasten klaar.',
+  da: 'Haus Aquamarin er et familiedrevet hus med syv individuelt indrettede ferielejligheder – hver opkaldt efter en ædelsten. Vi udlejer direkte, uden mellemled, og er personligt til stede for vores gæster.',
+};
+const title = `${t('about.title')} – ${site.name} Büsum`;
+---
+<BaseLayout title={title} description={intro[lang]} pageKey="ueber-uns">
+  <section class="section">
+    <div class="container-narrow">
+      <p class="eyebrow">{site.tagline}</p>
+      <h1>{t('about.title')}</h1>
+      <p class="lead">{intro[lang]}</p>
+
+      <div class="host card">
+        <div class="host-avatar" aria-hidden="true">◈</div>
+        <div>
+          {/* TODO: echte Gastgeber-Story, Namen, Foto und persönlicher Text.
+              Eine signierte Story ist laut Wettbewerbsanalyse ein starker
+              Marken- und Vertrauenshebel (SPO-Best-Practice). */}
+          <p><em>Hier folgt Ihre persönliche Gastgeber-Geschichte: Wer Sie sind,
+            warum Büsum, was Gäste bei Ihnen erwartet. (Platzhalter – bitte
+            ergänzen, idealerweise mit Foto und Unterschrift.)</em></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <CtaBanner lang={lang} />
+</BaseLayout>
+
+<style>
+  .host { display: grid; grid-template-columns: auto 1fr; gap: 1.4rem; align-items: center; padding: 1.6rem; margin-top: 2rem; }
+  .host-avatar {
+    width: 88px; height: 88px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 2rem; color: #fff;
+    background: linear-gradient(140deg, var(--c-aqua-500), var(--c-aqua-900));
+  }
+  .host em { color: var(--text-muted); }
+  @media (max-width: 520px) { .host { grid-template-columns: 1fr; text-align: center; } .host-avatar { margin-inline: auto; } }
+</style>

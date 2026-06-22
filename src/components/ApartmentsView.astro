@@ -1,0 +1,65 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ApartmentCard from './ApartmentCard.astro';
+import BookingWidget from './BookingWidget.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
+
+const title = `${t('apartments.title')} – ${site.name} Büsum`;
+const description = t('apartments.subtitle');
+---
+<BaseLayout title={title} description={description} pageKey="apartments">
+  <section class="section page-head">
+    <div class="container-narrow text-center">
+      <p class="eyebrow">{site.tagline}</p>
+      <h1>{t('apartments.title')}</h1>
+      <p class="lead mx-auto">{t('apartments.subtitle')}</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="apt-grid">
+        {apartments.map((a) => <ApartmentCard apartment={a} lang={lang} />)}
+      </div>
+    </div>
+  </section>
+
+  <BookingWidget lang={lang} />
+
+  <section class="section">
+    <div class="container-narrow">
+      <h2>{t('apartments.features')} &amp; Optionen</h2>
+      <table class="extras">
+        <tbody>
+          {site.extras.map((e) => (
+            <tr>
+              <td>{e.label}</td>
+              <td class="extras-price">{e.price.toFixed(2).replace('.', ',')} €</td>
+              <td class="extras-unit">{e.unit}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="muted-note">{t('apartments.priceNote')}</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head { padding-bottom: 1.5rem; }
+  .apt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  @media (max-width: 960px) { .apt-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .apt-grid { grid-template-columns: 1fr; } }
+  .extras { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+  .extras td { padding: 0.8rem 0.5rem; border-bottom: 1px solid var(--line); }
+  .extras-price { font-weight: 700; color: var(--brand-strong); white-space: nowrap; }
+  .extras-unit { color: var(--text-muted); text-align: right; }
+  .muted-note { color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem; }
+</style>

@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from 'astro:content';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const entries = (await getCollection('reviews')).sort(
+  (a, b) => (b.data.date ?? '').localeCompare(a.data.date ?? '')
+);
+const reviews = await Promise.all(
+  entries.map(async (r) => ({ data: r.data, Content: (await render(r)).Content }))
+);
+---
+<section class="section section--alt reviews">
+  <div class="container">
+    <div class="reviews-head">
+      <p class="eyebrow">{t('reviews.title')}</p>
+      <h2>{t('reviews.subtitle')}</h2>
+    </div>
+    <div class="reviews-grid">
+      {reviews.map(({ data, Content }) => (
+        <figure class="review card">
+          <div class="review-stars" aria-label={`${data.rating}/5`}>
+            {'★'.repeat(data.rating)}<span class="dim">{'★'.repeat(5 - data.rating)}</span>
+          </div>
+          <blockquote class="review-text"><Content /></blockquote>
+          <figcaption class="review-cap">
+            <strong>{data.author}</strong>
+            <span>{data.apartment ? `${data.apartment} · ` : ''}{t('reviews.source')}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .reviews-head { text-align: center; margin-bottom: 2.4rem; }
+  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  .review { padding: 1.5rem 1.5rem 1.3rem; display: flex; flex-direction: column; gap: 0.8rem; }
+  .review-stars { color: var(--c-gold); letter-spacing: 2px; font-size: 1.05rem; }
+  .review-stars .dim { color: var(--c-sand-200); }
+  .review-text { margin: 0; font-style: italic; color: var(--text); }
+  .review-text :global(p) { margin: 0; }
+  .review-cap { display: flex; flex-direction: column; gap: 0.1rem; font-size: 0.9rem; }
+  .review-cap span { color: var(--text-muted); }
+  @media (max-width: 900px) { .reviews-grid { grid-template-columns: 1fr; } }
+</style>
