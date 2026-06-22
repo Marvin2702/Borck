@@ -3,10 +3,14 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 // Live-Domain für absolute URLs (Sitemap, hreflang, OpenGraph, JSON-LD).
-const SITE = 'https://www.nordsee-buesum-fewo.de';
+// SITE/BASE per Env überschreibbar: GitHub Pages (Unterpfad) setzt sie im
+// Workflow; ohne Env greift die Produktions-Domain am Root.
+const SITE = process.env.SITE || 'https://www.nordsee-buesum-fewo.de';
+const BASE = process.env.BASE || '/';
 
 export default defineConfig({
   site: SITE,
+  base: BASE,
   // Mehrsprachigkeit: DE = Root, EN/NL/DA mit Sprach-Präfix.
   // Architektur sprach-agnostisch — weitere Locales sind ein 1-Zeilen-Eintrag.
   i18n: {

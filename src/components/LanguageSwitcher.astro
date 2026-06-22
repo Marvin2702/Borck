@@ -1,15 +1,11 @@
 ---
-import { languages, locales, defaultLang, localizedPath, type Lang } from '../i18n/utils';
+import { languages, locales, localizedPath, pageKeyFromUrl, type Lang } from '../i18n/utils';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 
-// Aktuellen sprachneutralen Pfad ermitteln (Locale-Präfix entfernen).
-const segments = Astro.url.pathname.split('/').filter(Boolean);
-if (segments[0] && (locales as string[]).includes(segments[0]) && segments[0] !== defaultLang) {
-  segments.shift();
-}
-const pageKey = segments.join('/');
+// Aktuellen sprachneutralen Pfad ermitteln (Base + Locale-Präfix entfernt).
+const pageKey = pageKeyFromUrl(Astro.url);
 ---
 
 <div class="lang" data-lang>

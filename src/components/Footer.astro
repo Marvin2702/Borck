@@ -48,7 +48,7 @@ const legal = [
       <h3>{t('footer.legal')}</h3>
       <ul>
         {/* Rechtstexte zentral auf Deutsch (rechtlich verbindliche Originale). */}
-        {legal.map((i) => <li><a href={`/${i.key}`}>{i.label}</a></li>)}
+        {legal.map((i) => <li><a href={localizedPath(i.key, 'de')}>{i.label}</a></li>)}
       </ul>
     </nav>
   </div>
