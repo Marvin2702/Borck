@@ -118,6 +118,8 @@ const breadcrumbLd = {
       </section>
     )}
 
+    <BookingWidget lang={lang} smoobuId={d.smoobu_id} apartmentName={d.name} />
+
     <section class="section">
       <div class="container detail-grid">
         <div class="detail-body">
@@ -137,8 +139,6 @@ const breadcrumbLd = {
     </section>
 
     <GoodToKnow lang={lang} />
-
-    <BookingWidget lang={lang} smoobuId={d.smoobu_id} apartmentName={d.name} />
 
     <div class="sticky-cta">
       <span class="sticky-price">

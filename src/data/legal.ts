@@ -74,9 +74,9 @@ export const legal = {
 <p><strong>Empfänger:</strong> Google Ireland Limited (und ggf. Google LLC, USA)<br><strong>Drittlandtransfer (USA):</strong> Es kann nicht ausgeschlossen werden, dass Daten in die USA übertragen werden. Dafür werden – soweit erforderlich – geeignete Garantien (z. B. Standardvertragsklauseln) eingesetzt.<br><strong>Speicherdauer:</strong> gemäß den Einstellungen in Google Analytics.</p>
 
 <h3>10) Inhalte und Dienste Dritter (z. B. Karten, Videos, Widgets)</h3>
-<p>Ich kann auf der Website Inhalte oder Dienste von Drittanbietern einbinden (z. B. Karten, Videos, Social-Media-Elemente, Bewertungs- oder Buchungsfunktionen). Beim Laden solcher Inhalte kann es sein, dass Daten (z. B. IP-Adresse) an den jeweiligen Anbieter übertragen werden.</p>
-<p>Wenn für die Einbindung eine Einwilligung erforderlich ist, erfolgt das Laden erst nach Einwilligung bzw. über eine Vorschaltlösung (z. B. 2-Klick-Lösung).</p>
-<p><strong>Rechtsgrundlagen:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung) oder Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse), je nach Einbindung.</p>
+<p>Ich binde auf der Website Inhalte oder Dienste von Drittanbietern ein (z. B. das Smoobu-Buchungstool und die Standortkarte Google Maps). Beim Laden solcher Inhalte werden Daten (z. B. IP-Adresse) an den jeweiligen Anbieter übertragen.</p>
+<p>Funktionsnotwendige Einbindungen – insbesondere das Buchungstool (Smoobu) und die Standortkarte (Google Maps) – werden geladen, um dir Verfügbarkeit, Buchung und Anfahrt unkompliziert anzuzeigen. Reine Statistik- oder Marketing-Dienste (z. B. Google Analytics) werden ausschließlich nach deiner Einwilligung geladen, die du jederzeit widerrufen kannst.</p>
+<p><strong>Rechtsgrundlagen:</strong> Art. 6 Abs. 1 lit. b DSGVO (Anbahnung/Durchführung des Beherbergungsvertrags, z. B. Buchungstool), Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Anfahrtsanzeige) und Art. 6 Abs. 1 lit. a DSGVO (Einwilligung, z. B. Statistik).</p>
 
 <h3>11) Empfänger / Auftragsverarbeiter</h3>
 <p>Ich setze Dienstleister ein, die Daten in meinem Auftrag verarbeiten (z. B. Smoobu als Hosting-/Websiteanbieter, ggf. Google für Analysedienste nach Einwilligung). Mit solchen Dienstleistern bestehen – soweit erforderlich – Verträge zur Auftragsverarbeitung gemäß Art. 28 DSGVO.</p>

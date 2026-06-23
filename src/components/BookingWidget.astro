@@ -36,7 +36,6 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
         data-phonelabel={site.phoneDisplay}
         data-wa={`https://wa.me/${site.whatsapp}?text=${waText}`}
       >
-        <button type="button" class="btn btn--gold booking-activate">{t('booking.fallback')}</button>
         <p class="booking-hint">{t('booking.placeholder')}</p>
       </div>
     ) : (
@@ -112,6 +111,13 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
           baseUrl: base,
           target: `#${targetId}`,
         });
+        // Smoobu-iFrame nachträglich mit Titel versehen (A11y: frame-title).
+        let tries = 0;
+        const ti = setInterval(() => {
+          const f = el.querySelector('iframe') as HTMLIFrameElement | null;
+          if (f) { if (!f.title) f.title = 'Buchungskalender'; clearInterval(ti); }
+          else if (++tries > 40) clearInterval(ti);
+        }, 250);
       } else {
         showFallback(el);
       }
@@ -122,8 +128,12 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
     setTimeout(() => showFallback(el), 8000);
   }
 
-  // Erst auf Klick laden (Nutzeraktion = DSGVO-konform, schützt zudem CWV/INP).
+  // Automatisch laden, sobald der Kalender in Sichtnähe kommt (kein Klick nötig).
+  // Lazy via IntersectionObserver schützt weiterhin CWV/INP beim Initial-Load.
   document.querySelectorAll<HTMLElement>('.booking-embed').forEach((el) => {
-    el.querySelector('.booking-activate')?.addEventListener('click', () => initSmoobu(el));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { initSmoobu(el); io.disconnect(); } });
+    }, { rootMargin: '500px' });
+    io.observe(el);
   });
 </script>

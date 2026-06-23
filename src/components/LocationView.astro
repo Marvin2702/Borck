@@ -48,12 +48,6 @@ const highlights: Record<Lang, { icon: string; title: string; text: string }[]> 
   ],
 };
 const cards = highlights[lang];
-const mapLoad: Record<Lang, string> = {
-  de: 'Karte laden (Google Maps – dabei werden Daten an Google übertragen)',
-  en: 'Load map (Google Maps – data will be sent to Google)',
-  nl: 'Kaart laden (Google Maps – hierbij worden gegevens naar Google verzonden)',
-  da: 'Indlæs kort (Google Maps – data sendes til Google)',
-};
 const title = `${t('location.title')} · ${site.name} Büsum`;
 ---
 <BaseLayout title={title} description={t('location.subtitle')} pageKey="lage">
@@ -80,13 +74,13 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
   <section class="section section--alt" style="padding-top:0">
     <div class="container-narrow">
       <h2 class="text-center">{t('nav.location')}</h2>
-      <div
-        class="map-embed"
-        data-map
-        data-src="https://www.google.com/maps?q=Gro%C3%9Fe%20Tiefe%2031%2C%2025761%20B%C3%BCsum&output=embed"
-        data-title={`Karte ${site.name} Büsum`}
-      >
-        <button type="button" class="map-load" data-map-load>{mapLoad[lang]}</button>
+      <div class="map-embed">
+        <iframe
+          title={`Karte ${site.name} Büsum`}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=Gro%C3%9Fe%20Tiefe%2031%2C%2025761%20B%C3%BCsum&output=embed"
+        ></iframe>
       </div>
       <p class="text-center map-addr">{site.name} · {site.address.street} · {site.address.postalCode} {site.address.city}</p>
     </div>
@@ -106,26 +100,5 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
 
   .map-embed { aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--line); margin-top: 1rem; }
   .map-embed :global(iframe) { width: 100%; height: 100%; border: 0; display: block; }
-  .map-load {
-    width: 100%; height: 100%; border: 0; cursor: pointer;
-    display: grid; place-items: center; text-align: center; padding: 1.5rem;
-    color: var(--brand-strong); font: inherit; font-weight: 600;
-    background: repeating-linear-gradient(45deg, var(--c-aqua-100), var(--c-aqua-100) 18px, var(--c-sand-100) 18px, var(--c-sand-100) 36px);
-  }
-  .map-load:hover { background: var(--c-aqua-100); }
   .map-addr { color: var(--text-muted); margin-top: 0.8rem; }
 </style>
-
-<script>
-  document.querySelectorAll<HTMLElement>('[data-map]').forEach((el) => {
-    el.querySelector('[data-map-load]')?.addEventListener('click', () => {
-      const iframe = document.createElement('iframe');
-      iframe.src = el.dataset.src || '';
-      iframe.title = el.dataset.title || 'Karte';
-      iframe.loading = 'lazy';
-      iframe.referrerPolicy = 'no-referrer-when-downgrade';
-      el.innerHTML = '';
-      el.appendChild(iframe);
-    });
-  });
-</script>
