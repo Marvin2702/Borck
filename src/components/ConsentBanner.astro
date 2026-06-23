@@ -6,9 +6,9 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 
 const txt: Record<Lang, { text: string; more: string; accept: string; decline: string }> = {
-  de: { text: 'Wir nutzen Statistik-Cookies, um die Website zu verbessern. Nur mit Ihrer Einwilligung.', more: 'Datenschutz', accept: 'Akzeptieren', decline: 'Ablehnen' },
+  de: { text: 'Wir nutzen Statistik-Cookies, um die Website zu verbessern. Nur mit deiner Einwilligung.', more: 'Datenschutz', accept: 'Akzeptieren', decline: 'Ablehnen' },
   en: { text: 'We use statistics cookies to improve the website. Only with your consent.', more: 'Privacy', accept: 'Accept', decline: 'Decline' },
-  nl: { text: 'We gebruiken statistiek-cookies om de website te verbeteren. Alleen met uw toestemming.', more: 'Privacy', accept: 'Accepteren', decline: 'Weigeren' },
+  nl: { text: 'We gebruiken statistiek-cookies om de website te verbeteren. Alleen met je toestemming.', more: 'Privacy', accept: 'Accepteren', decline: 'Weigeren' },
   da: { text: 'Vi bruger statistik-cookies for at forbedre websitet. Kun med dit samtykke.', more: 'Privatliv', accept: 'Acceptér', decline: 'Afvis' },
 };
 const c = txt[lang];
