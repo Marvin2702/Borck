@@ -3,6 +3,7 @@ import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/uti
 import { priceFrom } from '../data/prices';
 import { trApt } from '../data/apartments-i18n';
 import Img from './Img.astro';
+import { site } from '../data/site';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props { apartment: CollectionEntry<'apartments'>; lang: Lang }
@@ -15,6 +16,8 @@ const price = priceFrom(d.smoobu_id, d.price_from);
 const tr = trApt(apartment.id, lang);
 const view = tr?.view ?? d.view;
 const summary = tr?.summary ?? d.summary;
+// 1-Klick-Buchung: direkt zur Smoobu-Buchungsseite dieses Apartments.
+const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_id}` : href;
 ---
 
 <article class="card apt" data-apt
@@ -34,7 +37,7 @@ const summary = tr?.summary ?? d.summary;
   </a>
 
   <div class="apt-body">
-    <h3 class="apt-name">{d.name}</h3>
+    <h3 class="apt-name"><a href={href}>{d.name}</a></h3>
     <p class="apt-summary">{summary}</p>
     <ul class="apt-meta">
       <li><strong>{d.persons}</strong> {t('apartments.persons')}</li>
@@ -45,7 +48,10 @@ const summary = tr?.summary ?? d.summary;
       {price
         ? <span class="apt-price">{t('apartments.from')} <strong>{price} €</strong> / {t('apartments.night')}</span>
         : <span class="apt-price apt-price--tbd">{t('apartments.priceDynamic')}</span>}
-      <a href={href} class="btn btn--ghost apt-link">{t('apartments.details')} →</a>
+      <div class="apt-actions">
+        <a href={href} class="btn btn--ghost apt-details">{t('apartments.details')}</a>
+        <a href={bookUrl} class="btn btn--gold apt-book" target="_blank" rel="noopener">{t('cta.bookNow')}</a>
+      </div>
     </div>
   </div>
 </article>
@@ -73,12 +79,16 @@ const summary = tr?.summary ?? d.summary;
   .apt-dog { position: absolute; right: 12px; top: 12px; background: rgba(255,255,255,0.9); border-radius: 999px; padding: 0.2rem 0.4rem; font-size: 0.9rem; }
   .apt-body { padding: 1.2rem 1.3rem 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
   .apt-name { margin: 0; font-size: 1.4rem; }
+  .apt-name a { color: inherit; text-decoration: none; }
+  .apt-name a:hover { color: var(--brand); }
   .apt-summary { color: var(--text-muted); margin: 0; font-size: 0.95rem; flex: 1; }
   .apt-meta { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin: 0.4rem 0; padding: 0; font-size: 0.9rem; color: var(--text-muted); }
   .apt-meta strong { color: var(--text); }
-  .apt-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-top: 0.4rem; flex-wrap: wrap; }
+  .apt-foot { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.5rem; }
   .apt-price { font-size: 0.95rem; color: var(--text-muted); }
   .apt-price strong { color: var(--brand-strong); font-size: 1.05rem; }
   .apt-price--tbd strong { color: var(--text-muted); }
-  .apt-link { padding: 0.5rem 0.9rem; font-size: 0.9rem; }
+  .apt-actions { display: flex; gap: 0.5rem; }
+  .apt-details { padding: 0.6rem 0.9rem; font-size: 0.9rem; }
+  .apt-book { flex: 1; justify-content: center; }
 </style>

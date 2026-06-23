@@ -18,6 +18,8 @@ const { Content } = await render(apartment);
 const origin = Astro.site ?? new URL(site.domain);
 const detailUrl = new URL(localizedPath(`apartments/${apartment.id}`, lang), origin).href;
 const price = priceFrom(d.smoobu_id, d.price_from);
+// 1-Klick-Buchung: direkt zur Smoobu-Buchungsseite dieses Apartments.
+const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_id}` : '#buchung';
 
 const tr = trApt(apartment.id, lang);
 const view = tr?.view ?? d.view;
@@ -131,8 +133,8 @@ const breadcrumbLd = {
             {d.features.map((f) => <li>✓ {trFeature(f, lang)}</li>)}
           </ul>
           {d.dogFriendly && <p class="dog-badge">🐾 {t('usp.pets.title')}</p>}
-          <a href="#buchung" class="btn btn--gold" style="margin-top:1rem;width:100%;justify-content:center">
-            {t('nav.book')}
+          <a href={bookUrl} target="_blank" rel="noopener" class="btn btn--gold" style="margin-top:1rem;width:100%;justify-content:center">
+            {t('cta.bookNow')}
           </a>
         </aside>
       </div>
@@ -144,7 +146,7 @@ const breadcrumbLd = {
       <span class="sticky-price">
         {price ? <span>{t('apartments.from')} <strong>{price} €</strong></span> : <strong>{d.name}</strong>}
       </span>
-      <a href="#buchung" class="btn btn--gold">{t('nav.book')}</a>
+      <a href={bookUrl} target="_blank" rel="noopener" class="btn btn--gold">{t('cta.bookNow')}</a>
     </div>
 
     <div class="lightbox" data-lightbox hidden>

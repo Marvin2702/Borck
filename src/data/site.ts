@@ -76,6 +76,8 @@ export const site = {
 
   // Smoobu-Account-ID (Booking-Tool-iFrame: .../booking-tool/iframe/{userId}/{apartmentId}).
   smoobuUserId: '40536',
+  // Direkte Smoobu-Buchungsseite (1-Klick): + "?apartmentId={id}" für ein Apartment.
+  smoobuBookingPage: 'https://booking.smoobu.com/9A40536',
   // Optionale Sammel-/Such-Buchungsmaschine über alle Objekte (falls vorhanden).
   smoobuGroupId: '' as string,
 } as const;

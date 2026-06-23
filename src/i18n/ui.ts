@@ -98,6 +98,7 @@ export const ui = {
     'lang.label': 'Sprache',
     'cta.banner.title': 'Bereit für Büsum?',
     'cta.banner.text': 'Prüf jetzt die Verfügbarkeit. Du buchst direkt beim Gastgeber.',
+    'cta.bookNow': 'Jetzt buchen',
   },
 
   en: {
@@ -182,6 +183,7 @@ export const ui = {
     'lang.label': 'Language',
     'cta.banner.title': 'Ready for Büsum?',
     'cta.banner.text': 'Check availability now. You book directly with the host.',
+    'cta.bookNow': 'Book now',
   },
 
   nl: {
@@ -266,6 +268,7 @@ export const ui = {
     'lang.label': 'Taal',
     'cta.banner.title': 'Klaar voor Büsum?',
     'cta.banner.text': 'Controleer nu de beschikbaarheid. Je boekt rechtstreeks bij de gastheer.',
+    'cta.bookNow': 'Nu boeken',
   },
 
   da: {
@@ -350,6 +353,7 @@ export const ui = {
     'lang.label': 'Sprog',
     'cta.banner.title': 'Klar til Büsum?',
     'cta.banner.text': 'Tjek ledigheden nu. Du booker direkte hos værten.',
+    'cta.bookNow': 'Book nu',
   },
 } as const;
 
