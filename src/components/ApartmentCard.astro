@@ -1,6 +1,7 @@
 ---
 import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { priceFrom } from '../data/prices';
+import { trApt } from '../data/apartments-i18n';
 import Img from './Img.astro';
 import type { CollectionEntry } from 'astro:content';
 
@@ -11,6 +12,9 @@ const d = apartment.data;
 const href = localizedPath(`apartments/${apartment.id}`, lang);
 const accent = d.accent;
 const price = priceFrom(d.smoobu_id, d.price_from);
+const tr = trApt(apartment.id, lang);
+const view = tr?.view ?? d.view;
+const summary = tr?.summary ?? d.summary;
 ---
 
 <article class="card apt" data-apt
@@ -19,19 +23,19 @@ const price = priceFrom(d.smoobu_id, d.price_from);
   data-seaview={d.view.toLowerCase().includes('meerblick') ? '1' : '0'}>
   <a href={href} class="apt-media" aria-label={d.name}>
     {d.heroImage ? (
-      <Img src={d.heroImage} alt={`Ferienwohnung ${d.name} in Büsum, ${d.view}`} width={640} height={400} loading="lazy" sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw" />
+      <Img src={d.heroImage} alt={`${t('apartments.holidayApt')} ${d.name}, ${view}`} width={640} height={400} loading="lazy" sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw" />
     ) : (
       <span class="apt-placeholder" style={`--a:${accent}`}>
         <span class="apt-gem" aria-hidden="true">◈</span>
       </span>
     )}
-    <span class="apt-badge" style={`--a:${accent}`}>{d.view}</span>
+    <span class="apt-badge" style={`--a:${accent}`}>{view}</span>
     {d.dogFriendly && <span class="apt-dog" title="Hundefreundlich" aria-hidden="true">🐾</span>}
   </a>
 
   <div class="apt-body">
     <h3 class="apt-name">{d.name}</h3>
-    <p class="apt-summary">{d.summary}</p>
+    <p class="apt-summary">{summary}</p>
     <ul class="apt-meta">
       <li><strong>{d.persons}</strong> {t('apartments.persons')}</li>
       {d.size_qm && <li><strong>{d.size_qm}</strong> m²</li>}

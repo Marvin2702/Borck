@@ -5,6 +5,7 @@ import BookingWidget from './BookingWidget.astro';
 import Img from './Img.astro';
 import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { priceFrom } from '../data/prices';
+import { trApt, trFeature } from '../data/apartments-i18n';
 import { site } from '../data/site';
 
 interface Props { lang: Lang; apartment: CollectionEntry<'apartments'> }
@@ -17,15 +18,20 @@ const origin = Astro.site ?? new URL(site.domain);
 const detailUrl = new URL(localizedPath(`apartments/${apartment.id}`, lang), origin).href;
 const price = priceFrom(d.smoobu_id, d.price_from);
 
-const title = `Ferienwohnung ${d.name} · ${site.name} Büsum`;
-const description = `Ferienwohnung ${d.name} in Büsum: ${d.summary} Für ${d.persons} ${t('apartments.persons')}, ${d.view}.`;
+const tr = trApt(apartment.id, lang);
+const view = tr?.view ?? d.view;
+const summary = tr?.summary ?? d.summary;
+const apt = t('apartments.holidayApt');
+
+const title = `${apt} ${d.name} · ${site.name} Büsum`;
+const description = `${apt} ${d.name} in Büsum: ${summary} ${d.persons} ${t('apartments.persons')}, ${view}.`;
 
 // JSON-LD: Apartment (+ Offer, falls Preis). Reguläres Schema.org.
 const apartmentLd: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'Apartment',
   name: `${site.name} · ${d.name}`,
-  description: d.summary,
+  description: summary,
   url: detailUrl,
   image: d.gallery.map((g) => new URL(withBase(g), origin).href),
   occupancy: { '@type': 'QuantitativeValue', maxValue: d.persons },
@@ -43,7 +49,7 @@ const apartmentLd: Record<string, unknown> = {
   ...(d.size_qm
     ? { floorSize: { '@type': 'QuantitativeValue', value: d.size_qm, unitCode: 'MTK' } }
     : {}),
-  amenityFeature: d.features.map((f) => ({ '@type': 'LocationFeatureSpecification', name: f })),
+  amenityFeature: d.features.map((f) => ({ '@type': 'LocationFeatureSpecification', name: trFeature(f, lang) })),
   ...(price
     ? {
         offers: {
@@ -79,9 +85,9 @@ const breadcrumbLd = {
     <header class="apt-hero" style={`--a:${d.accent}`}>
       <div class="container apt-hero-inner">
         <a class="back" href={localizedPath('apartments', lang)}>← {t('apartments.title')}</a>
-        <p class="eyebrow">{d.view}</p>
+        <p class="eyebrow">{view}</p>
         <h1>{d.name}</h1>
-        <p class="lead">{d.summary}</p>
+        <p class="lead">{summary}</p>
         <ul class="apt-facts">
           <li><strong>{d.persons}</strong> {t('apartments.persons')}</li>
           {d.bedrooms && <li><strong>{d.bedrooms}</strong> {d.bedrooms === 1 ? t('apartments.bedroom') : t('apartments.bedrooms')}</li>}
@@ -97,7 +103,7 @@ const breadcrumbLd = {
           <div class={`apt-gallery count-${Math.min(d.gallery.length, 3)}`}>
             {d.gallery.map((src, i) => (
               <figure class={i === 0 ? 'g-main' : ''} data-lightbox-item>
-                <Img src={src} alt={`Ferienwohnung ${d.name} in Büsum, Ansicht ${i + 1}`}
+                <Img src={src} alt={`${apt} ${d.name}, ${view} (${i + 1})`}
                      width={1200} height={800}
                      loading={i === 0 ? 'eager' : 'lazy'}
                      fetchpriority={i === 0 ? 'high' : undefined}
@@ -112,12 +118,12 @@ const breadcrumbLd = {
     <section class="section">
       <div class="container detail-grid">
         <div class="detail-body">
-          <Content />
+          {tr?.description ? <p>{tr.description}</p> : <Content />}
         </div>
         <aside class="detail-aside">
           <h2 class="aside-title">{t('apartments.features')}</h2>
           <ul class="feature-list">
-            {d.features.map((f) => <li>✓ {f}</li>)}
+            {d.features.map((f) => <li>✓ {trFeature(f, lang)}</li>)}
           </ul>
           {d.dogFriendly && <p class="dog-badge">🐾 {t('usp.pets.title')}</p>}
           <a href="#buchung" class="btn btn--gold" style="margin-top:1rem;width:100%;justify-content:center">
