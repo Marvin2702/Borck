@@ -1,5 +1,6 @@
 ---
 import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
+import { priceFrom } from '../data/prices';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props { apartment: CollectionEntry<'apartments'>; lang: Lang }
@@ -8,9 +9,13 @@ const t = useTranslations(lang);
 const d = apartment.data;
 const href = localizedPath(`apartments/${apartment.id}`, lang);
 const accent = d.accent;
+const price = priceFrom(d.smoobu_id, d.price_from);
 ---
 
-<article class="card apt">
+<article class="card apt" data-apt
+  data-persons={d.persons}
+  data-dog={d.dogFriendly ? '1' : '0'}
+  data-seaview={d.view.toLowerCase().includes('meerblick') ? '1' : '0'}>
   <a href={href} class="apt-media" aria-label={d.name}>
     {d.heroImage ? (
       <img src={withBase(d.heroImage)} alt={`Ferienwohnung ${d.name} in Büsum – ${d.view}`} width="640" height="400" loading="lazy" decoding="async" />
@@ -32,8 +37,8 @@ const accent = d.accent;
       {d.bedrooms && <li><strong>{d.bedrooms}</strong> {d.bedrooms === 1 ? t('apartments.bedroom') : t('apartments.bedrooms')}</li>}
     </ul>
     <div class="apt-foot">
-      {d.price_from
-        ? <span class="apt-price">{t('apartments.from')} <strong>{d.price_from} €</strong> / {t('apartments.night')}</span>
+      {price
+        ? <span class="apt-price">{t('apartments.from')} <strong>{price} €</strong> / {t('apartments.night')}</span>
         : <span class="apt-price apt-price--tbd">{t('apartments.priceDynamic')}</span>}
       <a href={href} class="btn btn--ghost apt-link">{t('apartments.details')} →</a>
     </div>

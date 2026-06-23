@@ -24,9 +24,24 @@ const description = t('apartments.subtitle');
 
   <section class="section" style="padding-top:0">
     <div class="container">
-      <div class="apt-grid">
+      <div class="apt-filter" role="group" aria-label={t('filter.label')}>
+        <div class="filter-group" data-filter="persons">
+          <span class="filter-legend">{t('apartments.persons')}</span>
+          <button type="button" class="filter-pill is-active" data-value="0">{t('filter.all')}</button>
+          <button type="button" class="filter-pill" data-value="2">2+</button>
+          <button type="button" class="filter-pill" data-value="4">4+</button>
+          <button type="button" class="filter-pill" data-value="5">5</button>
+        </div>
+        <div class="filter-toggles">
+          <button type="button" class="filter-pill" data-toggle="dog" aria-pressed="false">🐾 {t('filter.dog')}</button>
+          <button type="button" class="filter-pill" data-toggle="seaview" aria-pressed="false">🌊 {t('filter.seaview')}</button>
+        </div>
+      </div>
+
+      <div class="apt-grid" data-apt-grid>
         {apartments.map((a) => <ApartmentCard apartment={a} lang={lang} />)}
       </div>
+      <p class="filter-none" data-filter-none hidden>{t('filter.none')}</p>
     </div>
   </section>
 
@@ -59,4 +74,66 @@ const description = t('apartments.subtitle');
   .extras-price { font-weight: 700; color: var(--brand-strong); white-space: nowrap; }
   .extras-unit { color: var(--text-muted); text-align: right; }
   .muted-note { color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem; }
+
+  .apt-filter { display: flex; flex-wrap: wrap; gap: 0.8rem 1.6rem; align-items: center; justify-content: center; margin-bottom: 1.8rem; }
+  .filter-group, .filter-toggles { display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  .filter-legend { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 0.2rem; }
+  .filter-pill {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 0.45rem 0.95rem; font: inherit; font-size: 0.9rem; font-weight: 600;
+    color: var(--text); cursor: pointer; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .filter-pill:hover { border-color: var(--c-aqua-300); }
+  .filter-pill.is-active { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .filter-none { text-align: center; color: var(--text-muted); cursor: pointer; text-decoration: underline; margin-top: 1.5rem; }
 </style>
+
+<script>
+  const grid = document.querySelector('[data-apt-grid]');
+  if (grid) {
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>('[data-apt]'));
+    const none = document.querySelector<HTMLElement>('[data-filter-none]');
+    const state: Record<string, number | boolean> = { persons: 0, dog: false, seaview: false };
+
+    const apply = () => {
+      let visible = 0;
+      cards.forEach((c) => {
+        const persons = Number(c.dataset.persons) || 0;
+        const ok =
+          persons >= (state.persons as number) &&
+          (!state.dog || c.dataset.dog === '1') &&
+          (!state.seaview || c.dataset.seaview === '1');
+        c.style.display = ok ? '' : 'none';
+        if (ok) visible++;
+      });
+      if (none) none.hidden = visible !== 0;
+    };
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter="persons"] .filter-pill').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-filter="persons"] .filter-pill').forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        state.persons = Number(btn.dataset.value) || 0;
+        apply();
+      });
+    });
+    document.querySelectorAll<HTMLButtonElement>('[data-toggle]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.toggle as string;
+        state[key] = !state[key];
+        btn.classList.toggle('is-active', state[key] as boolean);
+        btn.setAttribute('aria-pressed', String(state[key]));
+        apply();
+      });
+    });
+    none?.addEventListener('click', () => {
+      state.persons = 0; state.dog = false; state.seaview = false;
+      document.querySelectorAll('.filter-pill').forEach((b) => {
+        b.classList.remove('is-active');
+        if (b.hasAttribute('aria-pressed')) b.setAttribute('aria-pressed', 'false');
+      });
+      document.querySelector('[data-filter="persons"] [data-value="0"]')?.classList.add('is-active');
+      apply();
+    });
+  }
+</script>

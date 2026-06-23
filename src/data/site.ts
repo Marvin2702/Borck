@@ -59,6 +59,11 @@ export const site = {
     ustId: 'DE340109304',
   },
 
+  // Web3Forms Access-Key für das Kontaktformular (statischer Versand ohne Backend).
+  // Kostenlos unter https://web3forms.com (E-Mail eintragen, Key erhalten).
+  // Leer => Formular nutzt mailto-Fallback. TODO: Key eintragen.
+  formAccessKey: '' as string,
+
   // Smoobu-Account-ID (Booking-Tool-iFrame: .../booking-tool/iframe/{userId}/{apartmentId}).
   smoobuUserId: '40536',
   // Optionale Sammel-/Such-Buchungsmaschine über alle Objekte (falls vorhanden).

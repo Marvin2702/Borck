@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * *' # täglicher Rebuild für aktuelle Smoobu-Preise
 
 permissions:
   contents: read
@@ -35,6 +37,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Fetch Smoobu prices (optional, nur mit Secret)
+        run: node scripts/fetch-prices.mjs
+        env:
+          SMOOBU_API_KEY: ${{ secrets.SMOOBU_API_KEY }}
 
       - name: Build
         run: npm run build

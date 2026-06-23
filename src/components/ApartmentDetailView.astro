@@ -3,6 +3,7 @@ import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BookingWidget from './BookingWidget.astro';
 import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
+import { priceFrom } from '../data/prices';
 import { site } from '../data/site';
 
 interface Props { lang: Lang; apartment: CollectionEntry<'apartments'> }
@@ -13,6 +14,7 @@ const { Content } = await render(apartment);
 
 const origin = Astro.site ?? new URL(site.domain);
 const detailUrl = new URL(localizedPath(`apartments/${apartment.id}`, lang), origin).href;
+const price = priceFrom(d.smoobu_id, d.price_from);
 
 const title = `Ferienwohnung ${d.name} · ${site.name} Büsum`;
 const description = `Ferienwohnung ${d.name} in Büsum: ${d.summary} Für ${d.persons} ${t('apartments.persons')}, ${d.view}.`;
@@ -41,11 +43,11 @@ const apartmentLd: Record<string, unknown> = {
     ? { floorSize: { '@type': 'QuantitativeValue', value: d.size_qm, unitCode: 'MTK' } }
     : {}),
   amenityFeature: d.features.map((f) => ({ '@type': 'LocationFeatureSpecification', name: f })),
-  ...(d.price_from
+  ...(price
     ? {
         offers: {
           '@type': 'Offer',
-          price: d.price_from,
+          price,
           priceCurrency: 'EUR',
           availability: 'https://schema.org/InStock',
           url: detailUrl,
@@ -83,7 +85,7 @@ const breadcrumbLd = {
           <li><strong>{d.persons}</strong> {t('apartments.persons')}</li>
           {d.bedrooms && <li><strong>{d.bedrooms}</strong> {d.bedrooms === 1 ? t('apartments.bedroom') : t('apartments.bedrooms')}</li>}
           {d.size_qm && <li><strong>{d.size_qm}</strong> m²</li>}
-          {d.price_from && <li>{t('apartments.from')} <strong>{d.price_from} €</strong>/{t('apartments.night')}</li>}
+          {price && <li>{t('apartments.from')} <strong>{price} €</strong>/{t('apartments.night')}</li>}
         </ul>
       </div>
     </header>
