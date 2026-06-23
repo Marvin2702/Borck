@@ -3,51 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBanner from './CtaBanner.astro';
 import { useTranslations, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
+import { lageCards, formatDistance, lageLabels } from '../data/lage';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-
-// Lokalisierte Reiseführer-Highlights (Topical-Authority-Baustein für SEO).
-const highlights: Record<Lang, { icon: string; title: string; text: string }[]> = {
-  de: [
-    { icon: '🌊', title: 'Strand & Perlebucht', text: 'Sandstrand, Familienlagune und Promenade, nur wenige Schritte vom Deich.' },
-    { icon: '🥾', title: 'Wattwanderung', text: 'Geführte Touren ins UNESCO-Weltnaturerbe Wattenmeer direkt vor Büsum.' },
-    { icon: '⚓', title: 'Hafen & Krabben', text: 'Fischkutter, frische Nordseekrabben und Hafenflair zum Schlendern.' },
-    { icon: '🐑', title: 'Deich & Radwege', text: 'Endlose Deichwege zum Wandern und Radeln, mit Schafen und Weitblick.' },
-    { icon: '🎫', title: 'Gästekarte & Kurabgabe', text: 'Die Büsumer Gästekarte bringt Ermäßigungen vor Ort; die ortsübliche Kurabgabe wird separat erhoben.' },
-    { icon: '🚗', title: 'Anreise & Parken', text: 'Über die A23 bis Heide und weiter nach Büsum. Zu jedem Apartment gehören ein PKW-Stellplatz und eine abschließbare Fahrradgarage.' },
-    { icon: '🌧️', title: 'Auch bei Schietwetter', text: 'Wellenbad, die Sturmflutenwelt „Blanker Hans" und das Museum am Meer machen Büsum bei jedem Wetter lohnenswert.' },
-  ],
-  en: [
-    { icon: '🌊', title: 'Beach & lagoon', text: 'Sandy beach, family lagoon and promenade, steps from the dyke.' },
-    { icon: '🥾', title: 'Mudflat walks', text: 'Guided tours into the UNESCO World Heritage Wadden Sea off Büsum.' },
-    { icon: '⚓', title: 'Harbour & shrimp', text: 'Fishing cutters, fresh North Sea shrimp and harbour atmosphere.' },
-    { icon: '🐑', title: 'Dyke & cycle paths', text: 'Endless dyke paths for walking and cycling, with sheep and wide views.' },
-    { icon: '🎫', title: 'Guest card & spa tax', text: 'The Büsum guest card brings local discounts; the customary spa tax (Kurabgabe) is charged separately.' },
-    { icon: '🚗', title: 'Arrival & parking', text: 'Via the A23 to Heide and on to Büsum. Each apartment has its own parking space and a lockable bike garage.' },
-    { icon: '🌧️', title: 'Even in rough weather', text: 'The wave pool, the „Blanker Hans" storm-surge world and the seaside museum make Büsum worthwhile in any weather.' },
-  ],
-  nl: [
-    { icon: '🌊', title: 'Strand & lagune', text: 'Zandstrand, familielagune en promenade, op een paar passen van de dijk.' },
-    { icon: '🥾', title: 'Wadlopen', text: 'Geleide tochten in het UNESCO-werelderfgoed Waddenzee bij Büsum.' },
-    { icon: '⚓', title: 'Haven & garnalen', text: 'Viskotters, verse Noordzeegarnalen en echte havensfeer.' },
-    { icon: '🐑', title: 'Dijk & fietspaden', text: 'Eindeloze dijkpaden om te wandelen en fietsen, met schapen en weids uitzicht.' },
-    { icon: '🎫', title: 'Gastenkaart & kuurtaks', text: 'De Büsumer gastenkaart geeft korting ter plaatse; de gebruikelijke kuurtaks (Kurabgabe) wordt apart berekend.' },
-    { icon: '🚗', title: 'Aankomst & parkeren', text: 'Via de A23 naar Heide en verder naar Büsum. Bij elk appartement horen een eigen parkeerplaats en een afsluitbare fietsenstalling.' },
-    { icon: '🌧️', title: 'Ook bij slecht weer', text: 'Het golfbad, de stormvloedwereld „Blanker Hans" en het museum aan zee maken Büsum bij elk weer de moeite waard.' },
-  ],
-  da: [
-    { icon: '🌊', title: 'Strand & lagune', text: 'Sandstrand, familielagune og promenade, få skridt fra diget.' },
-    { icon: '🥾', title: 'Vadehavsvandring', text: 'Guidede ture i UNESCO-verdensarven Vadehavet ud for Büsum.' },
-    { icon: '⚓', title: 'Havn & rejer', text: 'Fiskekuttere, friske Nordsørejer og ægte havnestemning.' },
-    { icon: '🐑', title: 'Dige & cykelstier', text: 'Endeløse digestier til gåture og cykling, med får og vid udsigt.' },
-    { icon: '🎫', title: 'Gæstekort & kurafgift', text: 'Büsum-gæstekortet giver rabatter på stedet; den sædvanlige kurafgift (Kurabgabe) opkræves separat.' },
-    { icon: '🚗', title: 'Ankomst & parkering', text: 'Via A23 til Heide og videre til Büsum. Til hver lejlighed hører en parkeringsplads og en aflåselig cykelgarage.' },
-    { icon: '🌧️', title: 'Også i dårligt vejr', text: 'Bølgebadet, stormflodsverdenen „Blanker Hans" og museet ved havet gør Büsum værd at besøge i al slags vejr.' },
-  ],
-};
-const cards = highlights[lang];
+const labels = lageLabels[lang];
 const title = `${t('location.title')} · ${site.name} Büsum`;
 ---
 <BaseLayout title={title} description={t('location.subtitle')} pageKey="lage">
@@ -58,19 +19,43 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
       <p class="lead mx-auto">{t('location.subtitle')}</p>
     </div>
   </section>
+
   <section class="section" style="padding-top:0">
     <div class="container">
       <div class="hl-grid">
-        {cards.map((c) => (
-          <div class="hl card">
-            <span class="hl-icon" aria-hidden="true">{c.icon}</span>
-            <h3>{c.title}</h3>
-            <p>{c.text}</p>
-          </div>
+        {lageCards.map((c) => (
+          <button type="button" class="hl card" data-dialog={`cat-${c.id}`}>
+            <span class="hl-top">
+              <span class="hl-icon" aria-hidden="true">{c.icon}</span>
+              <span class="hl-dist">📍 {formatDistance(c.distanceKm, lang)}</span>
+            </span>
+            <h2 class="hl-h">{c.title[lang]}</h2>
+            <p>{c.text[lang]}</p>
+            <span class="hl-open">{labels.open} →</span>
+          </button>
         ))}
       </div>
     </div>
   </section>
+
+  {lageCards.map((c) => (
+    <dialog class="lage-dialog" id={`cat-${c.id}`} aria-label={c.title[lang]}>
+      <div class="ld-head">
+        <h2><span aria-hidden="true">{c.icon}</span> {c.title[lang]}</h2>
+        <button type="button" class="ld-close" data-close aria-label={labels.close}>×</button>
+      </div>
+      <p class="ld-dist">📍 {labels.distance}: {formatDistance(c.distanceKm, lang)}</p>
+      <p class="ld-sub">{labels.activities}</p>
+      <div class="ld-grid">
+        {c.activities[lang].map((a) => (
+          a.url
+            ? <a class="ld-act" href={a.url} target="_blank" rel="noopener">{a.name}<span aria-hidden="true">↗</span></a>
+            : <span class="ld-act ld-act--info">{a.name}</span>
+        ))}
+      </div>
+    </dialog>
+  ))}
+
   <section class="section section--alt" style="padding-top:0">
     <div class="container-narrow">
       <h2 class="text-center">{t('nav.location')}</h2>
@@ -91,14 +76,50 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
 
 <style>
   .hl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
-  .hl { padding: 1.5rem 1.4rem; }
+  .hl {
+    appearance: none; font: inherit; text-align: left; cursor: pointer;
+    padding: 1.4rem; display: flex; flex-direction: column; gap: 0.3rem;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .hl:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--c-aqua-300); }
+  .hl-top { display: flex; align-items: center; justify-content: space-between; }
   .hl-icon { font-size: 1.8rem; }
-  .hl h3 { margin: 0.6rem 0 0.3rem; font-size: 1.15rem; }
-  .hl p { color: var(--text-muted); margin: 0; font-size: 0.95rem; }
+  .hl-dist { font-size: 0.78rem; font-weight: 700; color: var(--brand); background: var(--c-aqua-100); border-radius: 999px; padding: 0.2rem 0.6rem; white-space: nowrap; }
+  .hl-h { margin: 0.5rem 0 0.2rem; font-size: 1.15rem; }
+  .hl p { color: var(--text-muted); margin: 0; font-size: 0.95rem; flex: 1; }
+  .hl-open { margin-top: 0.8rem; color: var(--brand); font-weight: 600; font-size: 0.9rem; }
   @media (max-width: 900px) { .hl-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 520px) { .hl-grid { grid-template-columns: 1fr; } }
+
+  /* Aktivitäts-Dialog */
+  .lage-dialog { border: 0; border-radius: var(--radius-lg); padding: 0 0 0.4rem; max-width: 560px; width: calc(100% - 2rem); box-shadow: var(--shadow-lg); color: var(--text); }
+  .lage-dialog::backdrop { background: rgba(13, 59, 68, 0.55); backdrop-filter: blur(2px); }
+  .ld-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.2rem 1.4rem 0; }
+  .ld-head h2 { margin: 0; font-size: 1.4rem; }
+  .ld-close { background: none; border: 0; font-size: 2rem; line-height: 1; cursor: pointer; color: var(--text-muted); }
+  .ld-close:hover { color: var(--text); }
+  .ld-dist { padding: 0.5rem 1.4rem 0; color: var(--brand); font-weight: 600; margin: 0; }
+  .ld-sub { padding: 0.6rem 1.4rem 0; margin: 0; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .ld-grid { display: grid; gap: 0.6rem; padding: 0.8rem 1.4rem 1.2rem; }
+  .ld-act { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.9rem 1.1rem; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: var(--brand-strong); font-weight: 600; background: var(--c-sand-50); }
+  a.ld-act:hover { border-color: var(--c-aqua-300); background: var(--c-aqua-100); }
+  .ld-act--info { color: var(--text-muted); font-weight: 500; }
 
   .map-embed { aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--line); margin-top: 1rem; }
   .map-embed :global(iframe) { width: 100%; height: 100%; border: 0; display: block; }
   .map-addr { color: var(--text-muted); margin-top: 0.8rem; }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-dialog]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-dialog');
+      const dlg = (id && document.getElementById(id)) as HTMLDialogElement | null;
+      dlg?.showModal?.();
+    });
+  });
+  document.querySelectorAll<HTMLDialogElement>('dialog.lage-dialog').forEach((dlg) => {
+    dlg.querySelector('[data-close]')?.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  });
+</script>
