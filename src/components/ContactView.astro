@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Img from './Img.astro';
 import { useTranslations, withBase, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
@@ -68,8 +69,8 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
       </form>
 
       <figure class="contact-image">
-        <img src={withBase('/images/kontakt-maritim.jpg')} alt="Haus Aquamarin in Büsum"
-             width="1200" height="600" loading="lazy" decoding="async" />
+        <Img src="/images/kontakt-maritim.jpg" alt="Haus Aquamarin in Büsum"
+             width={1200} height={600} loading="lazy" sizes="100vw" />
       </figure>
       <p class="addr-line">{site.name} · {site.address.street} · {site.address.postalCode} {site.address.city}</p>
     </div>

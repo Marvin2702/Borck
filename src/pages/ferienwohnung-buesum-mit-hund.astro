@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import ThemeLandingView from '../components/ThemeLandingView.astro';
+
+const apartments = (await getCollection('apartments'))
+  .filter((a) => a.data.dogFriendly)
+  .sort((a, b) => a.data.order - b.data.order);
+---
+<ThemeLandingView
+  lang="de"
+  pageKey="ferienwohnung-buesum-mit-hund"
+  metaTitle="Ferienwohnung Büsum mit Hund · Haus Aquamarin"
+  metaDescription="Hundefreundliche Ferienwohnungen in Büsum, direkt hinter der Familienlagune. Mehrere ebenerdige Apartments mit Terrasse, Hund 46 € pro Buchung. Ohne Buchungsgebühr direkt buchen."
+  eyebrow="Urlaub mit Hund · Büsum"
+  h1="Ferienwohnung in Büsum mit Hund"
+  intro={[
+    "Mit dem Hund an die Nordsee: Im Haus Aquamarin sind mehrere Apartments hundefreundlich. Besonders geeignet sind die ebenerdigen Wohnungen mit eigener Terrasse und separatem Eingang. Der Hund kostet 46 € pro Buchung.",
+    "Strand, Deich und Wattenmeer liegen direkt vor der Tür, die Familienlagune Perlebucht ist nur rund 0,4 km entfernt. Sie buchen direkt beim Gastgeber, ohne Vermittlungsprovision.",
+  ]}
+  apartments={apartments}
+/>

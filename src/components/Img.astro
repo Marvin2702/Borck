@@ -1,0 +1,36 @@
+---
+// Bild mit moderner Format-Aushandlung (AVIF -> WebP -> JPG), base-path-aware.
+// Erwartet einen /images/<name>.jpg-Pfad; die .webp/.avif-Varianten liegen daneben
+// (erzeugt via scripts/gen-image-variants.mjs).
+import { withBase } from '../i18n/utils';
+
+interface Props {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'auto' | 'low';
+  sizes?: string;
+}
+const { src, alt, width, height, class: cls, loading = 'lazy', fetchpriority, sizes } = Astro.props;
+const base = src.replace(/\.(jpe?g|png)$/i, '');
+const jpg = withBase(`${base}.jpg`);
+const webp = withBase(`${base}.webp`);
+const avif = withBase(`${base}.avif`);
+---
+<picture>
+  <source type="image/avif" srcset={avif} sizes={sizes} />
+  <source type="image/webp" srcset={webp} sizes={sizes} />
+  <img
+    src={jpg}
+    alt={alt}
+    width={width}
+    height={height}
+    loading={loading}
+    fetchpriority={fetchpriority}
+    decoding="async"
+    class={cls}
+  />
+</picture>

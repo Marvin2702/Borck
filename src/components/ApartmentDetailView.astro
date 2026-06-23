@@ -2,6 +2,7 @@
 import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BookingWidget from './BookingWidget.astro';
+import Img from './Img.astro';
 import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { priceFrom } from '../data/prices';
 import { site } from '../data/site';
@@ -95,11 +96,12 @@ const breadcrumbLd = {
         <div class="container">
           <div class={`apt-gallery count-${Math.min(d.gallery.length, 3)}`}>
             {d.gallery.map((src, i) => (
-              <figure class={i === 0 ? 'g-main' : ''}>
-                <img src={withBase(src)} alt={`Ferienwohnung ${d.name} in Büsum, Ansicht ${i + 1}`}
-                     width="1200" height="800"
+              <figure class={i === 0 ? 'g-main' : ''} data-lightbox-item>
+                <Img src={src} alt={`Ferienwohnung ${d.name} in Büsum, Ansicht ${i + 1}`}
+                     width={1200} height={800}
                      loading={i === 0 ? 'eager' : 'lazy'}
-                     fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
+                     fetchpriority={i === 0 ? 'high' : undefined}
+                     sizes="(max-width: 820px) 100vw, 66vw" />
               </figure>
             ))}
           </div>
@@ -126,6 +128,18 @@ const breadcrumbLd = {
     </section>
 
     <BookingWidget lang={lang} smoobuId={d.smoobu_id} apartmentName={d.name} />
+
+    <div class="sticky-cta">
+      <span class="sticky-price">
+        {price ? <span>{t('apartments.from')} <strong>{price} €</strong></span> : <strong>{d.name}</strong>}
+      </span>
+      <a href="#buchung" class="btn btn--gold">{t('nav.book')}</a>
+    </div>
+
+    <div class="lightbox" data-lightbox hidden>
+      <button class="lightbox-close" type="button" aria-label="Schließen" data-lightbox-close>×</button>
+      <img class="lightbox-img" alt="" />
+    </div>
   </article>
 </BaseLayout>
 
@@ -158,4 +172,46 @@ const breadcrumbLd = {
     .apt-gallery, .apt-gallery.count-2, .apt-gallery.count-3 { grid-template-columns: 1fr; grid-template-rows: none; }
     .apt-gallery.count-3 .g-main { grid-row: auto; }
   }
+
+  /* Galerie-Lightbox */
+  .lightbox { position: fixed; inset: 0; z-index: 300; background: rgba(13, 59, 68, 0.92); display: grid; place-items: center; padding: 1.5rem; }
+  .lightbox[hidden] { display: none; }
+  .lightbox-img { max-width: 95vw; max-height: 90vh; border-radius: 8px; box-shadow: var(--shadow-lg); }
+  .lightbox-close { position: absolute; top: 0.8rem; right: 1.2rem; background: none; border: 0; color: #fff; font-size: 2.6rem; line-height: 1; cursor: pointer; }
+
+  /* Sticky Buchungs-CTA (mobil) */
+  .sticky-cta {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+    display: none; align-items: center; justify-content: space-between; gap: 1rem;
+    background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line); padding: 0.7rem 1.1rem;
+    box-shadow: 0 -4px 20px rgba(13, 59, 68, 0.1);
+  }
+  .sticky-price strong { color: var(--brand-strong); font-size: 1.15rem; }
+  @media (max-width: 820px) {
+    .sticky-cta { display: flex; }
+    article { padding-bottom: 76px; }
+  }
 </style>
+
+<script>
+  // Galerie-Lightbox
+  const lb = document.querySelector<HTMLElement>('[data-lightbox]');
+  const lbImg = lb?.querySelector('.lightbox-img') as HTMLImageElement | null;
+  const closeLb = () => { if (lb) { lb.hidden = true; document.body.style.overflow = ''; } };
+  document.querySelectorAll<HTMLImageElement>('[data-lightbox-item] img').forEach((img) => {
+    img.style.cursor = 'zoom-in';
+    img.addEventListener('click', () => {
+      if (!lb || !lbImg) return;
+      lbImg.src = img.currentSrc || img.src;
+      lbImg.alt = img.alt || '';
+      lb.hidden = false;
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  lb?.addEventListener('click', (e) => {
+    const target = e.target as Element;
+    if (target === lb || target.hasAttribute('data-lightbox-close')) closeLb();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLb(); });
+</script>

@@ -3,6 +3,7 @@ import '@fontsource-variable/fraunces';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 import { site } from '../data/site';
 import { getLangFromUrl, useTranslations, alternateLinks, hreflangCode, withBase } from '../i18n/utils';
 
@@ -17,9 +18,11 @@ interface Props {
   noindex?: boolean;
   /** Bewertungen für JSON-LD (nur auf der Startseite ausgegeben). */
   reviews?: { author: string; rating: number; body: string }[];
+  /** hreflang-Alternates unterdrücken (für einsprachige Seiten, z. B. DE-Landingpages). */
+  noAlternates?: boolean;
 }
 
-const { title, description, pageKey = '', image, jsonLd = [], noindex = false, reviews = [] } = Astro.props;
+const { title, description, pageKey = '', image, jsonLd = [], noindex = false, reviews = [], noAlternates = false } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -91,8 +94,8 @@ const allJsonLd = [lodging, ...jsonLd];
     <link rel="canonical" href={canonical} />
     {robotsNoindex && <meta name="robots" content="noindex, nofollow" />}
 
-    {/* hreflang-Alternates über alle Sprachen + x-default */}
-    {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+    {/* hreflang-Alternates über alle Sprachen + x-default (außer bei einsprachigen Seiten) */}
+    {!noAlternates && alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
 
     {/* Open Graph / Twitter */}
     <meta property="og:type" content="website" />
@@ -112,6 +115,7 @@ const allJsonLd = [lodging, ...jsonLd];
     <meta name="twitter:image" content={ogImage} />
 
     <meta name="theme-color" content="#155e6e" />
+    {site.googleSiteVerification && <meta name="google-site-verification" content={site.googleSiteVerification} />}
     <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
     <link rel="sitemap" href={withBase('sitemap-index.xml')} />
 
@@ -129,6 +133,7 @@ const allJsonLd = [lodging, ...jsonLd];
       <slot />
     </main>
     <Footer lang={lang} />
+    <ConsentBanner lang={lang} />
 
     <style>
       .skip-link {

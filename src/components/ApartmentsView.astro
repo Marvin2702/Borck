@@ -2,7 +2,8 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ApartmentCard from './ApartmentCard.astro';
-import { useTranslations, type Lang } from '../i18n/utils';
+import Faq from './Faq.astro';
+import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
 interface Props { lang: Lang }
@@ -62,6 +63,21 @@ const description = t('apartments.subtitle');
       <p class="muted-note">{t('apartments.priceNote')}</p>
     </div>
   </section>
+
+  {lang === 'de' && (
+    <section class="section section--alt theme-section">
+      <div class="container-narrow text-center">
+        <p class="eyebrow">Beliebte Themen</p>
+        <div class="theme-links">
+          <a href={localizedPath('ferienwohnung-buesum-mit-hund', 'de')}>Ferienwohnung mit Hund</a>
+          <a href={localizedPath('ferienwohnung-buesum-meerblick', 'de')}>Ferienwohnung mit Meerblick</a>
+          <a href={localizedPath('ferienwohnung-buesum-nebensaison', 'de')}>Nebensaison &amp; Winter</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <Faq lang={lang} />
 </BaseLayout>
 
 <style>
@@ -86,6 +102,13 @@ const description = t('apartments.subtitle');
   .filter-pill:hover { border-color: var(--c-aqua-300); }
   .filter-pill.is-active { background: var(--brand); color: #fff; border-color: var(--brand); }
   .filter-none { text-align: center; color: var(--text-muted); cursor: pointer; text-decoration: underline; margin-top: 1.5rem; }
+  .theme-section { padding-block: clamp(2rem, 1.5rem + 2vw, 3rem); }
+  .theme-links { display: flex; flex-wrap: wrap; gap: 0.7rem; justify-content: center; margin-top: 1rem; }
+  .theme-links a {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 0.5rem 1.1rem; text-decoration: none; font-weight: 600; color: var(--brand);
+  }
+  .theme-links a:hover { border-color: var(--c-aqua-300); color: var(--brand-strong); }
 </style>
 
 <script>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBanner from './CtaBanner.astro';
+import Img from './Img.astro';
 import { useTranslations, withBase, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
@@ -46,8 +47,8 @@ const title = `${t('about.title')} · ${site.name} Büsum`;
 
       <div class="host">
         <figure class="host-photo">
-          <img src={withBase('/images/iris-mia.jpg')} alt="Iris, Gastgeberin im Haus Aquamarin, mit Hund Mia"
-               width="900" height="900" loading="eager" decoding="async" />
+          <Img src="/images/iris-mia.jpg" alt="Iris, Gastgeberin im Haus Aquamarin, mit Hund Mia"
+               width={900} height={900} loading="eager" sizes="(max-width: 720px) 100vw, 40vw" />
         </figure>
         <div class="host-text">
           {paras.map((p) => <p>{p}</p>)}

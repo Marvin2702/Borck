@@ -1,0 +1,87 @@
+---
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const titles: Record<Lang, string> = {
+  de: 'Häufige Fragen',
+  en: 'Frequently asked questions',
+  nl: 'Veelgestelde vragen',
+  da: 'Ofte stillede spørgsmål',
+};
+
+const faqs: Record<Lang, { q: string; a: string }[]> = {
+  de: [
+    { q: 'Sind Hunde erlaubt?', a: 'Ja, mehrere Apartments sind hundefreundlich. Der Hund kostet 46 € pro Buchung.' },
+    { q: 'Wann kann ich anreisen?', a: 'Die Anreise ist selbstständig und rund um die Uhr möglich.' },
+    { q: 'Gibt es Parkplätze?', a: 'Ja, zu jedem Apartment gehören ein PKW-Stellplatz und eine abschließbare Fahrradgarage.' },
+    { q: 'Wie buche ich?', a: 'Direkt online über den Verfügbarkeitskalender des jeweiligen Apartments, ohne Buchungsgebühr.' },
+    { q: 'Was kosten Bettwäsche und Handtücher?', a: 'Bettwäsche 12 € pro Person, Handtücher 9 € pro Satz.' },
+    { q: 'Wie weit ist es zum Strand?', a: 'Nur etwa 0,4 km bis zur Familienlagune Perlebucht.' },
+  ],
+  en: [
+    { q: 'Are dogs allowed?', a: 'Yes, several apartments are dog-friendly. A dog costs €46 per booking.' },
+    { q: 'When can I check in?', a: 'Self check-in is possible around the clock.' },
+    { q: 'Is there parking?', a: 'Yes, each apartment has a car parking space and a lockable bike garage.' },
+    { q: 'How do I book?', a: "Directly online via each apartment's availability calendar, with no booking fee." },
+    { q: 'What do bed linen and towels cost?', a: 'Bed linen €12 per person, towels €9 per set.' },
+    { q: 'How far is the beach?', a: 'Only about 0.4 km to the Perlebucht family lagoon.' },
+  ],
+  nl: [
+    { q: 'Zijn honden toegestaan?', a: 'Ja, meerdere appartementen zijn hondvriendelijk. Een hond kost € 46 per boeking.' },
+    { q: 'Wanneer kan ik inchecken?', a: 'Zelf inchecken kan de klok rond.' },
+    { q: 'Is er parkeergelegenheid?', a: 'Ja, bij elk appartement horen een parkeerplaats en een afsluitbare fietsenstalling.' },
+    { q: 'Hoe boek ik?', a: 'Rechtstreeks online via de beschikbaarheidskalender van elk appartement, zonder boekingskosten.' },
+    { q: 'Wat kosten beddengoed en handdoeken?', a: 'Beddengoed € 12 per persoon, handdoeken € 9 per set.' },
+    { q: 'Hoe ver is het strand?', a: 'Slechts ongeveer 0,4 km tot de familielagune Perlebucht.' },
+  ],
+  da: [
+    { q: 'Er hunde tilladt?', a: 'Ja, flere lejligheder er hundevenlige. En hund koster 46 € pr. booking.' },
+    { q: 'Hvornår kan jeg tjekke ind?', a: 'Selv-check-in er muligt døgnet rundt.' },
+    { q: 'Er der parkering?', a: 'Ja, til hver lejlighed hører en parkeringsplads og en aflåselig cykelgarage.' },
+    { q: 'Hvordan booker jeg?', a: 'Direkte online via den enkelte lejligheds ledighedskalender, uden bookinggebyr.' },
+    { q: 'Hvad koster sengetøj og håndklæder?', a: 'Sengetøj 12 € pr. person, håndklæder 9 € pr. sæt.' },
+    { q: 'Hvor langt er der til stranden?', a: 'Kun cirka 0,4 km til familielagunen Perlebucht.' },
+  ],
+};
+
+const items = faqs[lang];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((i) => ({
+    '@type': 'Question',
+    name: i.q,
+    acceptedAnswer: { '@type': 'Answer', text: i.a },
+  })),
+};
+---
+<section class="section faq">
+  <div class="container-narrow">
+    <h2 class="text-center">{titles[lang]}</h2>
+    <div class="faq-list">
+      {items.map((i) => (
+        <details class="faq-item">
+          <summary>{i.q}</summary>
+          <p>{i.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+  <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+</section>
+
+<style>
+  .faq-list { margin-top: 1.8rem; display: grid; gap: 0.6rem; }
+  .faq-item { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .faq-item summary {
+    cursor: pointer; padding: 1rem 1.2rem; font-weight: 600; color: var(--brand-strong);
+    list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; color: var(--accent); font-size: 1.4rem; line-height: 1; }
+  .faq-item[open] summary::after { content: '–'; }
+  .faq-item p { margin: 0; padding: 0 1.2rem 1.1rem; color: var(--text-muted); }
+</style>

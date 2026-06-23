@@ -98,6 +98,7 @@ a:hover { color: var(--brand-strong); }
 .site-footer :focus-visible,
 .cta-banner :focus-visible { outline-color: var(--c-aqua-100); }
 img { max-width: 100%; height: auto; display: block; }
+picture { display: contents; } /* Wrapper beeinflusst Layout nicht; <img> bleibt maßgeblich */
 
 /* Layout-Helfer */
 .container { width: min(100% - 2.4rem, var(--maxw)); margin-inline: auto; }

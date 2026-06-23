@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ApartmentCard from './ApartmentCard.astro';
+import CtaBanner from './CtaBanner.astro';
+import Faq from './Faq.astro';
+import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  lang: Lang;
+  pageKey: string;
+  metaTitle: string;
+  metaDescription: string;
+  eyebrow: string;
+  h1: string;
+  intro: string[];
+  apartments: CollectionEntry<'apartments'>[];
+}
+const { lang, pageKey, metaTitle, metaDescription, eyebrow, h1, intro, apartments } = Astro.props;
+const t = useTranslations(lang);
+---
+<BaseLayout title={metaTitle} description={metaDescription} pageKey={pageKey} noAlternates={true}>
+  <section class="section">
+    <div class="container-narrow">
+      <p class="eyebrow">{eyebrow}</p>
+      <h1>{h1}</h1>
+      {intro.map((p) => <p class="lead intro-p">{p}</p>)}
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="apt-grid">
+        {apartments.map((a) => <ApartmentCard apartment={a} lang={lang} />)}
+      </div>
+      <p class="text-center" style="margin-top:2rem">
+        <a class="btn btn--ghost" href={localizedPath('apartments', lang)}>{t('apartments.all')}</a>
+      </p>
+    </div>
+  </section>
+
+  <Faq lang={lang} />
+  <CtaBanner lang={lang} />
+</BaseLayout>
+
+<style>
+  .apt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  @media (max-width: 960px) { .apt-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .apt-grid { grid-template-columns: 1fr; } }
+  .intro-p { margin-bottom: 1rem; max-width: 65ch; }
+</style>

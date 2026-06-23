@@ -122,11 +122,8 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
     setTimeout(() => showFallback(el), 8000);
   }
 
+  // Erst auf Klick laden (Nutzeraktion = DSGVO-konform, schützt zudem CWV/INP).
   document.querySelectorAll<HTMLElement>('.booking-embed').forEach((el) => {
     el.querySelector('.booking-activate')?.addEventListener('click', () => initSmoobu(el));
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) { initSmoobu(el); io.disconnect(); } });
-    }, { rootMargin: '300px' });
-    io.observe(el);
   });
 </script>

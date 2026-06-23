@@ -1,0 +1,73 @@
+---
+import { localizedPath, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const txt: Record<Lang, { text: string; more: string; accept: string; decline: string }> = {
+  de: { text: 'Wir nutzen Statistik-Cookies, um die Website zu verbessern. Nur mit Ihrer Einwilligung.', more: 'Datenschutz', accept: 'Akzeptieren', decline: 'Ablehnen' },
+  en: { text: 'We use statistics cookies to improve the website. Only with your consent.', more: 'Privacy', accept: 'Accept', decline: 'Decline' },
+  nl: { text: 'We gebruiken statistiek-cookies om de website te verbeteren. Alleen met uw toestemming.', more: 'Privacy', accept: 'Accepteren', decline: 'Weigeren' },
+  da: { text: 'Vi bruger statistik-cookies for at forbedre websitet. Kun med dit samtykke.', more: 'Privatliv', accept: 'Acceptér', decline: 'Afvis' },
+};
+const c = txt[lang];
+const privacyHref = localizedPath('datenschutz', 'de');
+---
+<div class="consent" data-consent data-ga={site.googleAnalyticsId} hidden role="dialog" aria-label="Cookie-Einwilligung">
+  <p>{c.text} <a href={privacyHref}>{c.more}</a></p>
+  <div class="consent-actions">
+    <button type="button" class="btn btn--ghost" data-consent-decline>{c.decline}</button>
+    <button type="button" class="btn btn--gold" data-consent-accept>{c.accept}</button>
+  </div>
+</div>
+
+<style>
+  .consent {
+    position: fixed; bottom: 1rem; left: 1rem; right: 1rem; z-index: 250;
+    max-width: 560px; margin-inline: auto;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow-lg); padding: 1.1rem 1.3rem;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem 1.2rem;
+  }
+  .consent[hidden] { display: none; }
+  .consent p { margin: 0; flex: 1 1 240px; font-size: 0.92rem; color: var(--text-muted); }
+  .consent-actions { display: flex; gap: 0.6rem; }
+  .consent .btn { padding: 0.55rem 1.1rem; font-size: 0.9rem; }
+</style>
+
+<script>
+  const KEY = 'ha-consent-stats';
+  const el = document.querySelector<HTMLElement>('[data-consent]');
+  const gaId = el?.dataset.ga || '';
+
+  function loadGA() {
+    const w = window as any;
+    if (!gaId || w.__gaLoaded) return;
+    w.__gaLoaded = true;
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+    document.head.appendChild(s);
+    w.dataLayer = w.dataLayer || [];
+    w.gtag = function () { w.dataLayer.push(arguments); };
+    w.gtag('js', new Date());
+    w.gtag('config', gaId, { anonymize_ip: true });
+  }
+
+  if (gaId && el) {
+    const stored = localStorage.getItem(KEY);
+    if (stored === 'granted') loadGA();
+    else if (stored !== 'denied') el.hidden = false;
+
+    el.querySelector('[data-consent-accept]')?.addEventListener('click', () => {
+      localStorage.setItem(KEY, 'granted');
+      el.hidden = true;
+      loadGA();
+    });
+    el.querySelector('[data-consent-decline]')?.addEventListener('click', () => {
+      localStorage.setItem(KEY, 'denied');
+      el.hidden = true;
+    });
+  }
+</script>

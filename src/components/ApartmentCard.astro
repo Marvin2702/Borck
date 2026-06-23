@@ -1,6 +1,7 @@
 ---
 import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { priceFrom } from '../data/prices';
+import Img from './Img.astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props { apartment: CollectionEntry<'apartments'>; lang: Lang }
@@ -18,7 +19,7 @@ const price = priceFrom(d.smoobu_id, d.price_from);
   data-seaview={d.view.toLowerCase().includes('meerblick') ? '1' : '0'}>
   <a href={href} class="apt-media" aria-label={d.name}>
     {d.heroImage ? (
-      <img src={withBase(d.heroImage)} alt={`Ferienwohnung ${d.name} in Büsum – ${d.view}`} width="640" height="400" loading="lazy" decoding="async" />
+      <Img src={d.heroImage} alt={`Ferienwohnung ${d.name} in Büsum, ${d.view}`} width={640} height={400} loading="lazy" sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw" />
     ) : (
       <span class="apt-placeholder" style={`--a:${accent}`}>
         <span class="apt-gem" aria-hidden="true">◈</span>

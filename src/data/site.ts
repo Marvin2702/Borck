@@ -59,6 +59,11 @@ export const site = {
     ustId: 'DE340109304',
   },
 
+  // Google: GA4-Mess-ID (z. B. "G-XXXXXXXXXX") und Search-Console-Verifizierung.
+  // GA lädt NUR nach Einwilligung im Consent-Banner. Leer => kein Analytics, kein Banner.
+  googleAnalyticsId: '' as string,
+  googleSiteVerification: '' as string,
+
   // Web3Forms Access-Key für das Kontaktformular (statischer Versand ohne Backend).
   // Kostenlos unter https://web3forms.com (E-Mail eintragen, Key erhalten).
   // Leer => Formular nutzt mailto-Fallback. TODO: Key eintragen.
