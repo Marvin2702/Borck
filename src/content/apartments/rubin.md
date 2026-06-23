@@ -14,6 +14,7 @@ features:
   - Kostenloses WLAN
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
+smoobu_id: "133683"
 accent: "#a52a3a"
 heroImage: /images/rubin-1.jpg
 gallery:

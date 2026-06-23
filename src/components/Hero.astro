@@ -5,7 +5,7 @@ import { site } from '../data/site';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const bookHref = localizedPath('apartments', lang) + '#buchung';
+const bookHref = localizedPath('apartments', lang);
 const apartmentsHref = localizedPath('apartments', lang);
 ---
 

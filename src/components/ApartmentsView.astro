@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ApartmentCard from './ApartmentCard.astro';
-import BookingWidget from './BookingWidget.astro';
 import { useTranslations, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
@@ -30,8 +29,6 @@ const description = t('apartments.subtitle');
       </div>
     </div>
   </section>
-
-  <BookingWidget lang={lang} />
 
   <section class="section">
     <div class="container-narrow">

@@ -16,6 +16,7 @@ features:
   - Gartenmöbel
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
+smoobu_id: "133658"
 accent: "#3aa6a0"
 heroImage: /images/opal-1.jpg
 gallery:

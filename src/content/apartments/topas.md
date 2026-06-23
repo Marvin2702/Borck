@@ -16,6 +16,7 @@ features:
   - Gartenmöbel & Sonnenschirm
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
+smoobu_id: "133657"
 accent: "#d0a02a"
 heroImage: /images/topas-2.jpg
 gallery:

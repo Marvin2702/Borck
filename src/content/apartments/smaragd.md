@@ -16,6 +16,7 @@ features:
   - Kostenloses WLAN
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
+smoobu_id: "133659"
 accent: "#2e8b57"
 heroImage: /images/smaragd-1.jpg
 gallery:

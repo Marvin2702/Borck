@@ -59,7 +59,9 @@ export const site = {
     ustId: 'DE340109304',
   },
 
-  // Globale Smoobu-Buchungsseite (alle Objekte). TODO: echte ID eintragen.
+  // Smoobu-Account-ID (Booking-Tool-iFrame: .../booking-tool/iframe/{userId}/{apartmentId}).
+  smoobuUserId: '40536',
+  // Optionale Sammel-/Such-Buchungsmaschine über alle Objekte (falls vorhanden).
   smoobuGroupId: '' as string,
 } as const;
 

@@ -3,7 +3,7 @@ import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const bookHref = localizedPath('apartments', lang) + '#buchung';
+const bookHref = localizedPath('apartments', lang);
 ---
 <section class="cta-banner">
   <div class="container cta-inner">

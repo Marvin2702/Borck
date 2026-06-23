@@ -15,6 +15,7 @@ features:
   - Kostenloses WLAN
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
+smoobu_id: "133655"
 accent: "#2f5fa6"
 heroImage: /images/saphir-1.jpg
 gallery:

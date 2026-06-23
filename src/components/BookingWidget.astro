@@ -4,14 +4,17 @@ import { site } from '../data/site';
 
 interface Props {
   lang: Lang;
-  /** Smoobu-Objekt-ID (Apartment). Leer => globale Gruppen-ID, sonst Platzhalter. */
+  /** Smoobu-Objekt-ID (Apartment). Leer => Gruppen-ID, sonst Kontakt-Fallback. */
   smoobuId?: string;
   apartmentName?: string;
 }
 const { lang, smoobuId, apartmentName } = Astro.props;
 const t = useTranslations(lang);
+
 const effectiveId = smoobuId || site.smoobuGroupId || '';
 const hasId = effectiveId.length > 0;
+// Smoobu-Sprachsegment der Booking-Tool-URL (Fallback DE bei unbekannt).
+const smoobuLang = ({ de: 'de', en: 'en', nl: 'nl', da: 'da' } as Record<string, string>)[lang] ?? 'de';
 const waText = encodeURIComponent(t('contact.whatsapp.msg'));
 ---
 
@@ -26,25 +29,15 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
     {hasId ? (
       <div
         class="booking-embed"
-        data-smoobu-id={effectiveId}
-        data-base="https://login.smoobu.com"
+        data-id={effectiveId}
+        data-user={site.smoobuUserId}
+        data-lang={smoobuLang}
       >
-        <button type="button" class="btn btn--gold booking-activate">
-          {t('booking.fallback')}
-        </button>
+        <button type="button" class="btn btn--gold booking-activate">{t('booking.fallback')}</button>
         <p class="booking-hint">{t('booking.placeholder')}</p>
       </div>
     ) : (
       <div class="booking-placeholder">
-        {/* TODO: Smoobu-Objekt-ID in src/data/site.ts (smoobuGroupId) bzw. im
-            Frontmatter des Apartments (smoobu_id) hinterlegen, dann erscheint
-            hier der echte Buchungskalender. Bis dahin: Kontakt-Fallback. */}
-        <div class="ph-cal" aria-hidden="true">
-          <div class="ph-cal-head"></div>
-          <div class="ph-cal-grid">
-            {Array.from({ length: 35 }).map(() => <span></span>)}
-          </div>
-        </div>
         <div class="ph-cta">
           <p class="ph-note">{t('booking.subtitle')}</p>
           <div class="ph-buttons">
@@ -65,59 +58,54 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
     background: var(--surface);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
-    padding: clamp(1.2rem, 0.8rem + 2vw, 2.4rem);
+    padding: clamp(1rem, 0.6rem + 1.6vw, 1.8rem);
     min-height: 360px;
     display: grid;
   }
   .booking-embed { display: grid; place-items: center; gap: 1rem; align-content: center; min-height: 320px; text-align: center; }
+  .booking-embed[data-loaded] { display: block; place-items: stretch; }
   .booking-hint { color: var(--text-muted); font-size: 0.9rem; }
-
-  .booking-placeholder { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
-  .ph-cal { border: 1px solid var(--line); border-radius: 14px; padding: 1rem; background: var(--c-sand-50); }
-  .ph-cal-head { height: 14px; width: 60%; background: var(--c-aqua-300); border-radius: 6px; margin-bottom: 0.9rem; }
-  .ph-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .ph-cal-grid span { aspect-ratio: 1; border-radius: 5px; background: var(--c-aqua-100); border: 1px solid var(--c-aqua-100); }
-  .ph-cal-grid span:nth-child(3n) { background: #fff; }
+  .booking-placeholder { display: grid; place-items: center; min-height: 280px; text-align: center; }
   .ph-note { color: var(--text-muted); }
-  .ph-buttons { display: flex; gap: 0.7rem; flex-wrap: wrap; }
-  @media (max-width: 640px) {
-    .booking-placeholder { grid-template-columns: 1fr; }
-  }
+  .ph-buttons { display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: center; }
+  /* Smoobu-iFrame responsiv */
+  .booking-shell :global(iframe) { width: 100% !important; border: 0; }
 </style>
 
 <script>
-  // Lazy-Load des Smoobu-Buchungstools: erst auf Klick laden (schützt CWV/INP).
-  // Pattern gem. Smoobu „Booking Engine iframe" — exakten Snippet vom Konto
-  // hier eintragen, sobald die Objekt-ID vorliegt.
+  // Lazy-Load des Smoobu Booking-Tools (schützt CWV/INP). Exaktes Format aus
+  // der Originalseite: BookingToolIframe.js + /<lang>/booking-tool/iframe/<user>/<id>.
   function initSmoobu(el: HTMLElement) {
-    const id = el.dataset.smoobuId;
-    const base = el.dataset.base || 'https://login.smoobu.com';
-    if (!id || el.dataset.loaded) return;
+    if (el.dataset.loaded) return;
     el.dataset.loaded = '1';
-    el.innerHTML = `<div id="smoobu-${id}"></div>`;
+    const id = el.dataset.id;
+    const user = el.dataset.user;
+    const lang = el.dataset.lang || 'de';
+    const base = 'https://login.smoobu.com';
+    const targetId = `smoobuApartment${id}${lang}`;
+    el.innerHTML = `<div id="${targetId}"></div>`;
     const s = document.createElement('script');
-    s.src = `${base}/js/Apartment/CalendarWidget.js`;
+    s.src = `${base}/js/Settings/BookingToolIframe.js`;
     s.async = true;
     s.onload = () => {
       // @ts-ignore – global von Smoobu bereitgestellt
       if (window.BookingToolIframe) {
         // @ts-ignore
         window.BookingToolIframe.initialize({
-          url: `${base}/de/booking/createReservation/${id}`,
+          url: `${base}/${lang}/booking-tool/iframe/${user}/${id}`,
           baseUrl: base,
-          target: `#smoobu-${id}`,
+          target: `#${targetId}`,
         });
       }
     };
     document.body.appendChild(s);
   }
+
   document.querySelectorAll<HTMLElement>('.booking-embed').forEach((el) => {
-    const btn = el.querySelector('.booking-activate');
-    btn?.addEventListener('click', () => initSmoobu(el));
-    // Optional: bei Sichtbarkeit vorladen
+    el.querySelector('.booking-activate')?.addEventListener('click', () => initSmoobu(el));
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting) { initSmoobu(el); io.disconnect(); } });
-    }, { rootMargin: '200px' });
+    }, { rootMargin: '300px' });
     io.observe(el);
   });
 </script>

@@ -16,6 +16,7 @@ features:
   - Kostenloses WLAN
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
+smoobu_id: "133656"
 accent: "#2a8ca0"
 heroImage: /images/tuerkis-1.jpg
 gallery:
