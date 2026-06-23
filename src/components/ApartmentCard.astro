@@ -13,7 +13,7 @@ const accent = d.accent;
 <article class="card apt">
   <a href={href} class="apt-media" aria-label={d.name}>
     {d.heroImage ? (
-      <img src={withBase(d.heroImage)} alt={d.name} width="640" height="420" loading="lazy" decoding="async" />
+      <img src={withBase(d.heroImage)} alt={`Ferienwohnung ${d.name} in Büsum – ${d.view}`} width="640" height="400" loading="lazy" decoding="async" />
     ) : (
       <span class="apt-placeholder" style={`--a:${accent}`}>
         <span class="apt-gem" aria-hidden="true">◈</span>
@@ -29,7 +29,7 @@ const accent = d.accent;
     <ul class="apt-meta">
       <li><strong>{d.persons}</strong> {t('apartments.persons')}</li>
       {d.size_qm && <li><strong>{d.size_qm}</strong> m²</li>}
-      {d.bedrooms && <li><strong>{d.bedrooms}</strong> {d.bedrooms === 1 ? 'Schlafzimmer' : 'Schlafzimmer'}</li>}
+      {d.bedrooms && <li><strong>{d.bedrooms}</strong> {d.bedrooms === 1 ? t('apartments.bedroom') : t('apartments.bedrooms')}</li>}
     </ul>
     <div class="apt-foot">
       {d.price_from

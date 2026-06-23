@@ -32,6 +32,9 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
         data-id={effectiveId}
         data-user={site.smoobuUserId}
         data-lang={smoobuLang}
+        data-phone={site.phone.replace(/\s/g, '')}
+        data-phonelabel={site.phoneDisplay}
+        data-wa={`https://wa.me/${site.whatsapp}?text=${waText}`}
       >
         <button type="button" class="btn btn--gold booking-activate">{t('booking.fallback')}</button>
         <p class="booking-hint">{t('booking.placeholder')}</p>
@@ -75,6 +78,19 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
 <script>
   // Lazy-Load des Smoobu Booking-Tools (schützt CWV/INP). Exaktes Format aus
   // der Originalseite: BookingToolIframe.js + /<lang>/booking-tool/iframe/<user>/<id>.
+  function showFallback(el: HTMLElement) {
+    if (el.dataset.fallback || el.querySelector('iframe')) return;
+    el.dataset.fallback = '1';
+    const phone = el.dataset.phone || '';
+    const phoneLabel = el.dataset.phonelabel || phone;
+    const wa = el.dataset.wa || '#';
+    el.innerHTML =
+      '<div style="text-align:center;display:grid;gap:0.8rem;justify-items:center">' +
+      `<a class="btn btn--gold" href="tel:${phone}">☎ ${phoneLabel}</a>` +
+      `<a class="btn btn--ghost" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>` +
+      '</div>';
+  }
+
   function initSmoobu(el: HTMLElement) {
     if (el.dataset.loaded) return;
     el.dataset.loaded = '1';
@@ -96,9 +112,14 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
           baseUrl: base,
           target: `#${targetId}`,
         });
+      } else {
+        showFallback(el);
       }
     };
+    s.onerror = () => showFallback(el);
     document.body.appendChild(s);
+    // Sicherheitsnetz: erscheint nach 8 s kein iFrame (Adblock/CSP/Netz), Kontakt anbieten.
+    setTimeout(() => showFallback(el), 8000);
   }
 
   document.querySelectorAll<HTMLElement>('.booking-embed').forEach((el) => {

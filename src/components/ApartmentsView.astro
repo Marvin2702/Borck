@@ -10,7 +10,7 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
 
-const title = `${t('apartments.title')} · ${site.name} Büsum`;
+const title = `Ferienwohnungen in Büsum · ${site.name}`;
 const description = t('apartments.subtitle');
 ---
 <BaseLayout title={title} description={description} pageKey="apartments">

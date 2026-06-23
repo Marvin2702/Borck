@@ -6,7 +6,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const bookHref = localizedPath('apartments', lang);
-const apartmentsHref = localizedPath('apartments', lang);
+const apartmentsHref = '#apartments-preview';
 ---
 
 <section class="hero">
@@ -27,10 +27,10 @@ const apartmentsHref = localizedPath('apartments', lang);
       <a href={bookHref} class="btn btn--gold btn--lg">{t('hero.cta.book')}</a>
       <a href={apartmentsHref} class="btn btn--ghost btn--lg">{t('hero.cta.apartments')}</a>
     </div>
-    <div class="hero-trust">
+    <a class="hero-trust" href="#bewertungen">
       <span class="stars" aria-hidden="true">★★★★★</span>
-      <span>{site.rating.value.toFixed(1)} · {site.rating.count} {t('reviews.source')}s</span>
-    </div>
+      <span>{site.rating.value.toFixed(1)} · {site.rating.count} {t('reviews.count')}</span>
+    </a>
   </div>
 </section>
 
@@ -55,6 +55,8 @@ const apartmentsHref = localizedPath('apartments', lang);
   .hero-trust {
     margin-top: 2rem; display: inline-flex; align-items: center; gap: 0.6rem;
     color: var(--c-ink-700); font-weight: 600; font-size: 0.95rem;
+    text-decoration: none;
   }
+  .hero-trust:hover { color: var(--brand); }
   .stars { color: var(--c-gold); letter-spacing: 2px; }
 </style>

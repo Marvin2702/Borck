@@ -14,11 +14,16 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
+const reviews = (await getCollection('reviews')).map((r) => ({
+  author: r.data.author,
+  rating: r.data.rating,
+  body: (r.body ?? '').trim(),
+}));
 
-const title = `${site.name} Büsum · ${t('hero.title')}`;
+const title = `Ferienwohnungen in Büsum · ${site.name}`;
 const description = t('hero.subtitle');
 ---
-<BaseLayout title={title} description={description} pageKey="" >
+<BaseLayout title={title} description={description} pageKey="" reviews={reviews}>
   <Hero lang={lang} />
   <UspGrid lang={lang} />
 

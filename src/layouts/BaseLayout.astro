@@ -1,4 +1,5 @@
 ---
+import '@fontsource-variable/fraunces';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -14,31 +15,36 @@ interface Props {
   /** Zusätzliche JSON-LD-Objekte (z. B. Apartment/Offer je Detailseite). */
   jsonLd?: Record<string, unknown>[];
   noindex?: boolean;
+  /** Bewertungen für JSON-LD (nur auf der Startseite ausgegeben). */
+  reviews?: { author: string; rating: number; body: string }[];
 }
 
-const { title, description, pageKey = '', image, jsonLd = [], noindex = false } = Astro.props;
+const { title, description, pageKey = '', image, jsonLd = [], noindex = false, reviews = [] } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 // Origin aus Astro-Config (passt sich Prod-Domain bzw. Staging automatisch an).
 const origin = Astro.site ?? new URL(site.domain);
 const canonical = new URL(Astro.url.pathname, origin).href;
-// TODO: og-default.svg durch echtes 1200x630-JPG mit Profifoto ersetzen.
-const ogImage = new URL(image ? withBase(image) : withBase('images/og-default.svg'), origin).href;
+const ogImage = new URL(image ? withBase(image) : withBase('images/og-default.jpg'), origin).href;
 const alternates = alternateLinks(pageKey, origin);
 // Staging-Deploys (z. B. GitHub Pages) NICHT indexieren – schützt Prod-SEO.
 const staging = import.meta.env.PUBLIC_STAGING === 'true';
 const robotsNoindex = noindex || staging;
 
-// JSON-LD: LodgingBusiness als globale Org-Auszeichnung (reguläres Schema —
-// bewusst KEIN Google-VacationRental, da invite-only; s. Plan §5).
-const lodging = {
+const isHome = pageKey === '';
+const ogLocaleMap: Record<string, string> = { de: 'de_DE', en: 'en_US', nl: 'nl_NL', da: 'da_DK' };
+const ogLocale = ogLocaleMap[lang] ?? 'de_DE';
+const localeAlternates = (['de', 'en', 'nl', 'da'] as const).filter((l) => l !== lang).map((l) => ogLocaleMap[l]);
+
+// JSON-LD: LodgingBusiness (reguläres Schema, bewusst KEIN Google-VacationRental).
+const lodging: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'LodgingBusiness',
-  '@id': `${site.domain}/#lodging`,
+  '@id': new URL('/#lodging', origin).href,
   name: site.name,
   description,
-  url: site.domain,
+  url: origin.href,
   telephone: site.phone,
   email: site.email,
   priceRange: site.priceRange,
@@ -52,14 +58,26 @@ const lodging = {
     addressCountry: site.address.country,
   },
   geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
-  aggregateRating: {
+  petsAllowed: true,
+};
+// AggregateRating + einzelne Reviews NUR auf der Startseite ausgeben (dort sind
+// die Bewertungen sichtbar) — entspricht Googles Rich-Result-Policy.
+if (isHome) {
+  lodging.aggregateRating = {
     '@type': 'AggregateRating',
     ratingValue: site.rating.value,
     reviewCount: site.rating.count,
     bestRating: 5,
-  },
-  petsAllowed: true,
-};
+  };
+  if (reviews.length) {
+    lodging.review = reviews.map((r) => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.author },
+      reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
+      reviewBody: r.body,
+    }));
+  }
+}
 const allJsonLd = [lodging, ...jsonLd];
 ---
 
@@ -83,20 +101,21 @@ const allJsonLd = [lodging, ...jsonLd];
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:locale" content={hreflangCode(lang).replace('-', '_')} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:locale" content={ogLocale} />
+    {localeAlternates.map((l) => <meta property="og:locale:alternate" content={l} />)}
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
 
     <meta name="theme-color" content="#155e6e" />
     <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
     <link rel="sitemap" href={withBase('sitemap-index.xml')} />
 
-    {/* Schriften: Fraunces (Headlines) — preconnect für schnelleren LCP */}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap"
-    />
+    {/* Schriften: Fraunces self-hosted via @fontsource-variable (DSGVO + LCP). */}
 
     {/* Strukturierte Daten */}
     {allJsonLd.map((obj) => (

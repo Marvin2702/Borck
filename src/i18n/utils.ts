@@ -72,7 +72,7 @@ export function alternateLinks(pageKey: string, origin: string | URL) {
 }
 
 export function hreflangCode(lang: Lang): string {
-  return { de: 'de-DE', en: 'en', nl: 'nl', da: 'da' }[lang];
+  return { de: 'de', en: 'en', nl: 'nl', da: 'da' }[lang];
 }
 
 export { defaultLang, languages, type Lang };

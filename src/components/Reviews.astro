@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import { useTranslations, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -13,11 +14,15 @@ const reviews = await Promise.all(
   entries.map(async (r) => ({ data: r.data, Content: (await render(r)).Content }))
 );
 ---
-<section class="section section--alt reviews">
+<section class="section section--alt reviews" id="bewertungen">
   <div class="container">
     <div class="reviews-head">
       <p class="eyebrow">{t('reviews.title')}</p>
       <h2>{t('reviews.subtitle')}</h2>
+      <p class="reviews-aggregate">
+        <span class="stars" aria-hidden="true">★★★★★</span>
+        <strong>{site.rating.value.toFixed(1)}</strong> · {site.rating.count} {t('reviews.count')}
+      </p>
     </div>
     <div class="reviews-grid">
       {reviews.map(({ data, Content }) => (
@@ -38,6 +43,9 @@ const reviews = await Promise.all(
 
 <style>
   .reviews-head { text-align: center; margin-bottom: 2.4rem; }
+  .reviews-aggregate { margin-top: 0.6rem; color: var(--text-muted); }
+  .reviews-aggregate .stars { color: var(--c-gold); letter-spacing: 2px; }
+  .reviews-aggregate strong { color: var(--brand-strong); }
   .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
   .review { padding: 1.5rem 1.5rem 1.3rem; display: flex; flex-direction: column; gap: 0.8rem; }
   .review-stars { color: var(--c-gold); letter-spacing: 2px; font-size: 1.05rem; }
@@ -46,5 +54,6 @@ const reviews = await Promise.all(
   .review-text :global(p) { margin: 0; }
   .review-cap { display: flex; flex-direction: column; gap: 0.1rem; font-size: 0.9rem; }
   .review-cap span { color: var(--text-muted); }
-  @media (max-width: 900px) { .reviews-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .reviews-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .reviews-grid { grid-template-columns: 1fr; } }
 </style>
