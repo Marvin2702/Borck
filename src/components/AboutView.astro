@@ -12,31 +12,31 @@ const t = useTranslations(lang);
 const story: Record<Lang, string[]> = {
   de: [
     'Moin Moin liebe Freunde der Nordsee! ❤️ Ich bin Iris, eure Gastgeberin hier im Haus Aquamarin in Büsum. Direkt hinter der Familienlagune biete ich euch 7 Apartments für unvergessliche Nordsee-Erlebnisse.',
-    'Vom gemütlichen Studio bis zu geräumigen Familienunterkünften – bei mir findet jeder sein Zuhause fernab von Zuhause. Mir ist wichtig, dass ihr euch unkompliziert wohlfühlt und die coolen Vibes der Nordsee erlebt.',
-    'Ich setze mich für eine inklusive Atmosphäre ein, in der jeder Gast sich geschätzt fühlt – unabhängig von Herkunft, Alter oder Fähigkeiten. Vielfalt wird bei mir zelebriert! Ich stehe euch jederzeit für Buchungsanfragen oder Tipps zur Verfügung. 💙',
+    'Vom gemütlichen Studio bis zu geräumigen Familienunterkünften, bei mir findet jeder sein Zuhause fernab von Zuhause. Mir ist wichtig, dass ihr euch unkompliziert wohlfühlt und die coolen Vibes der Nordsee erlebt.',
+    'Ich setze mich für eine inklusive Atmosphäre ein, in der jeder Gast sich geschätzt fühlt, unabhängig von Herkunft, Alter oder Fähigkeiten. Vielfalt wird bei mir zelebriert! Ich stehe euch jederzeit für Buchungsanfragen oder Tipps zur Verfügung. 💙',
     'High five ✋ mit maritimen Grüßen, Iris',
   ],
   en: [
     'Moin moin, dear friends of the North Sea! ❤️ I am Iris, your host here at Haus Aquamarin in Büsum. Right behind the family lagoon I offer you 7 apartments for unforgettable North Sea moments.',
-    'From a cosy studio to spacious family flats – everyone finds a home away from home with me. What matters to me: that you feel at ease, effortlessly, and soak up the cool vibes of the North Sea.',
-    'I stand for an inclusive atmosphere in which every guest feels valued – regardless of origin, age or ability. Diversity is celebrated here! I am always available for booking enquiries or tips. 💙',
+    'From a cosy studio to spacious family flats, everyone finds a home away from home with me. What matters to me: that you feel at ease, effortlessly, and soak up the cool vibes of the North Sea.',
+    'I stand for an inclusive atmosphere in which every guest feels valued, regardless of origin, age or ability. Diversity is celebrated here! I am always available for booking enquiries or tips. 💙',
     'High five ✋ with maritime greetings, Iris',
   ],
   nl: [
     'Moin moin, lieve vrienden van de Noordzee! ❤️ Ik ben Iris, jullie gastvrouw hier in Haus Aquamarin in Büsum. Direct achter de familielagune bied ik jullie 7 appartementen voor onvergetelijke Noordzee-momenten.',
-    'Van een gezellige studio tot ruime familieappartementen – bij mij vindt iedereen een thuis ver van huis. Belangrijk voor mij: dat jullie je ongecompliceerd op je gemak voelen en de coole vibes van de Noordzee beleven.',
-    'Ik sta voor een inclusieve sfeer waarin elke gast zich gewaardeerd voelt – ongeacht afkomst, leeftijd of mogelijkheden. Diversiteit wordt hier gevierd! Ik sta altijd klaar voor boekingsvragen of tips. 💙',
+    'Van een gezellige studio tot ruime familieappartementen, bij mij vindt iedereen een thuis ver van huis. Belangrijk voor mij: dat jullie je ongecompliceerd op je gemak voelen en de coole vibes van de Noordzee beleven.',
+    'Ik sta voor een inclusieve sfeer waarin elke gast zich gewaardeerd voelt, ongeacht afkomst, leeftijd of mogelijkheden. Diversiteit wordt hier gevierd! Ik sta altijd klaar voor boekingsvragen of tips. 💙',
     'High five ✋ met maritieme groeten, Iris',
   ],
   da: [
     'Moin moin, kære venner af Nordsøen! ❤️ Jeg er Iris, jeres vært her i Haus Aquamarin i Büsum. Lige bag familielagunen tilbyder jeg jer 7 lejligheder til uforglemmelige Nordsø-oplevelser.',
-    'Fra et hyggeligt studie til rummelige familielejligheder – hos mig finder alle et hjem væk hjemmefra. Det vigtige for mig: at I føler jer godt tilpas, helt ukompliceret, og oplever Nordsøens gode vibes.',
-    'Jeg står for en inkluderende atmosfære, hvor hver gæst føler sig værdsat – uanset oprindelse, alder eller evner. Mangfoldighed fejres her! Jeg står altid til rådighed for bookingforespørgsler eller tips. 💙',
+    'Fra et hyggeligt studie til rummelige familielejligheder, hos mig finder alle et hjem væk hjemmefra. Det vigtige for mig: at I føler jer godt tilpas, helt ukompliceret, og oplever Nordsøens gode vibes.',
+    'Jeg står for en inkluderende atmosfære, hvor hver gæst føler sig værdsat, uanset oprindelse, alder eller evner. Mangfoldighed fejres her! Jeg står altid til rådighed for bookingforespørgsler eller tips. 💙',
     'High five ✋ med maritime hilsner, Iris',
   ],
 };
 const paras = story[lang];
-const title = `${t('about.title')} – ${site.name} Büsum`;
+const title = `${t('about.title')} · ${site.name} Büsum`;
 ---
 <BaseLayout title={title} description={paras[0]} pageKey="ueber-uns" image="/images/iris-mia.jpg">
   <section class="section">

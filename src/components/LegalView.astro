@@ -11,7 +11,7 @@ const titles = {
   datenschutz: 'Datenschutzerklärung',
   agb: 'AGB & Buchungsbedingungen',
 };
-const title = `${titles[kind]} – ${site.name}`;
+const title = `${titles[kind]} · ${site.name}`;
 const imp = site.impressum;
 ---
 <BaseLayout title={title} description={titles[kind]} pageKey={kind} noindex={kind !== 'impressum'}>
@@ -51,7 +51,7 @@ const imp = site.impressum;
               frei umformuliert werden). */}
           <p><strong>Hier folgt der Originaltext.</strong> Der bestehende, rechtlich
             geprüfte {titles[kind]}-Text von nordsee-buesum-fewo.de wird hier
-            1:1 eingesetzt – bitte den Originaltext übernehmen, nicht neu formulieren.</p>
+            1:1 eingesetzt, bitte den Originaltext übernehmen, nicht neu formulieren.</p>
         </div>
       )}
     </div>

@@ -21,9 +21,9 @@ heroImage: /images/opal-1.jpg
 gallery:
   - /images/opal-1.jpg
   - /images/opal-2.jpg
-summary: Deich-Kino für 4 Personen – Doppeltes Balkon-Glück mit Weitblick.
+summary: Deich-Kino für 4 Personen. Doppeltes Balkon-Glück mit Weitblick.
 ---
 
-Helle Ferienwohnung in der 1. Etage mit zwei Balkonen – darunter ein Balkon mit
+Helle Ferienwohnung in der 1. Etage mit zwei Balkonen, darunter ein Balkon mit
 weitem Deichblick. Mit 2 Schlafzimmern ideal für bis zu 4 Personen. Warum nur
 einen Balkon, wenn man zwei haben kann? Rund 55 m², nur 0,4 km zur Perlebucht.

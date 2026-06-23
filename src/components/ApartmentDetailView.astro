@@ -11,14 +11,14 @@ const t = useTranslations(lang);
 const d = apartment.data;
 const { Content } = await render(apartment);
 
-const title = `${d.name} – ${t('apartments.title')} ${site.name} Büsum`;
+const title = `${d.name} · ${t('apartments.title')} ${site.name} Büsum`;
 const description = `${d.summary} ${d.persons} ${t('apartments.persons')}, ${d.view}.`;
 
 // JSON-LD: Apartment + (sofern Preis vorhanden) Offer. Reguläres Schema.org.
 const apartmentLd: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'Apartment',
-  name: `${site.name} – ${d.name}`,
+  name: `${site.name} · ${d.name}`,
   description: d.summary,
   occupancy: { '@type': 'QuantitativeValue', maxValue: d.persons },
   numberOfBedrooms: d.bedrooms,
@@ -68,7 +68,7 @@ const apartmentLd: Record<string, unknown> = {
           <div class={`apt-gallery count-${Math.min(d.gallery.length, 3)}`}>
             {d.gallery.map((src, i) => (
               <figure class={i === 0 ? 'g-main' : ''}>
-                <img src={withBase(src)} alt={`${d.name} – Ansicht ${i + 1}`}
+                <img src={withBase(src)} alt={`${d.name} · Ansicht ${i + 1}`}
                      width="1200" height="800"
                      loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
               </figure>

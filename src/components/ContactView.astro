@@ -7,7 +7,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const waText = encodeURIComponent(t('contact.whatsapp.msg'));
-const title = `${t('contact.title')} – ${site.name} Büsum`;
+const title = `${t('contact.title')} · ${site.name} Büsum`;
 ---
 <BaseLayout title={title} description={t('contact.subtitle')} pageKey="kontakt">
   <section class="section">

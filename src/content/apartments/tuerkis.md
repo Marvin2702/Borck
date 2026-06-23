@@ -21,11 +21,11 @@ heroImage: /images/tuerkis-1.jpg
 gallery:
   - /images/tuerkis-1.jpg
   - /images/tuerkis-2.jpg
-summary: Küstengold für 4 Personen – Urlaub mit Deichblick.
+summary: Küstengold für 4 Personen. Urlaub mit Deichblick.
 ---
 
 Stilvolle Ferienwohnung in der 1. Etage mit kleinem Balkon & Deichblick. Mit
-offener Küche (inkl. großem Geschirrspüler) und familienfreundlichem Grundriss –
+offener Küche (inkl. großem Geschirrspüler) und familienfreundlichem Grundriss,
 ideal für bis zu 4 Personen.
 
 Zwei Schlafzimmer (Elternschlafzimmer + Kinderzimmer), rund 57 m² und nur 0,4 km

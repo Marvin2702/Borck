@@ -21,9 +21,9 @@ heroImage: /images/bernstein-1.jpg
 gallery:
   - /images/bernstein-1.jpg
   - /images/bernstein-2.jpg
-summary: Ankerplatz für Barfuß-Freunde – Auszeit im Erdgeschoss mit eigener Terrasse.
+summary: Ankerplatz für Barfuß-Freunde. Auszeit im Erdgeschoss mit eigener Terrasse.
 ---
 
 Kompakte, gemütliche Ferienwohnung im Erdgeschoss mit Terrasse und separatem
-Eingang. Ideal für bis zu 2 Personen – ruhig gelegen und trotzdem nah an der
+Eingang. Ideal für bis zu 2 Personen, ruhig gelegen und trotzdem nah an der
 Familienlagune Perlebucht (ca. 0,4 km).

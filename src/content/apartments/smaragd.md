@@ -22,9 +22,9 @@ gallery:
   - /images/smaragd-1.jpg
   - /images/smaragd-2.jpg
   - /images/smaragd-3.jpg
-summary: Dein Loft unter dem Küstenhimmel – Kompaktes Urlaubsglück für 2 mit seitlichem Deichblick.
+summary: Dein Loft unter dem Küstenhimmel. Kompaktes Urlaubsglück für 2 mit seitlichem Deichblick.
 ---
 
 Charmantes 1-Raum-Apartment in der 1. Etage mit autarkem Eingang und Balkon mit
-seitlichem Deichblick. Ideal für bis zu 2 Personen – ruhig gelegen und trotzdem
+seitlichem Deichblick. Ideal für bis zu 2 Personen, ruhig gelegen und trotzdem
 nah an der Familienlagune Perlebucht (ca. 0,4 km).

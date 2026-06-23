@@ -34,7 +34,7 @@ const accent = d.accent;
     <div class="apt-foot">
       {d.price_from
         ? <span class="apt-price">{t('apartments.from')} <strong>{d.price_from} €</strong> / {t('apartments.night')}</span>
-        : <span class="apt-price apt-price--tbd">{t('apartments.from')} <strong>—</strong></span>}
+        : <span class="apt-price apt-price--tbd">{t('apartments.priceDynamic')}</span>}
       <a href={href} class="btn btn--ghost apt-link">{t('apartments.details')} →</a>
     </div>
   </div>

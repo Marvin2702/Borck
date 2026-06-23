@@ -18,9 +18,9 @@ accent: "#a52a3a"
 heroImage: /images/rubin-1.jpg
 gallery:
   - /images/rubin-1.jpg
-summary: Familien-Glück am Deich – Dein gemütlicher Ankerplatz für 4 Personen.
+summary: Familien-Glück am Deich. Dein gemütlicher Ankerplatz für 4 Personen.
 ---
 
 Familienfreundliche Ferienwohnung im Erdgeschoss mit Terrasse, offener Küche und
-2 Schlafzimmern – ideal für bis zu 4 Personen. Ruhig gelegen und trotzdem nah an
+2 Schlafzimmern, ideal für bis zu 4 Personen. Ruhig gelegen und trotzdem nah an
 der Familienlagune Perlebucht (ca. 0,4 km).

@@ -21,10 +21,10 @@ heroImage: /images/topas-2.jpg
 gallery:
   - /images/topas-2.jpg
   - /images/topas-1.jpg
-summary: Dein Logenplatz über der Brandung – Nordsee-Feeling für 5 Personen mit Meerblick.
+summary: Dein Logenplatz über der Brandung. Nordsee-Feeling für 5 Personen mit Meerblick.
 ---
 
 Großzügige Ferienwohnung in der 2. Etage (ganz oben) mit kleinem Balkon &
-Meerblick. Mit 2 Schlafzimmern (1× Doppelbett, 1× drei Einzelbetten) – ideal für
+Meerblick. Mit 2 Schlafzimmern (1× Doppelbett, 1× drei Einzelbetten), ideal für
 bis zu 5 Personen. Wer ganz oben wohnt, sieht das Meer zuerst. Rund 76 m², nur
 0,4 km bis zur Familienlagune Perlebucht.

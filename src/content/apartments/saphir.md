@@ -20,9 +20,9 @@ heroImage: /images/saphir-1.jpg
 gallery:
   - /images/saphir-1.jpg
   - /images/saphir-2.jpg
-summary: Sonniger Wohlfühlort für 4 Personen – Deine Auszeit mit eigener Terrasse.
+summary: Sonniger Wohlfühlort für 4 Personen. Deine Auszeit mit eigener Terrasse.
 ---
 
 Helle, gemütliche Ferienwohnung im Erdgeschoss mit Terrasse, offener Küche und
-2 Schlafzimmern – ideal für bis zu 4 Personen. Ruhig gelegen und trotzdem nah an
+2 Schlafzimmern, ideal für bis zu 4 Personen. Ruhig gelegen und trotzdem nah an
 der Familienlagune Perlebucht (ca. 0,4 km).

@@ -15,7 +15,7 @@ const t = useTranslations(lang);
 
 const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
 
-const title = `${site.name} Büsum – ${t('hero.title')}`;
+const title = `${site.name} Büsum · ${t('hero.title')}`;
 const description = t('hero.subtitle');
 ---
 <BaseLayout title={title} description={description} pageKey="" >
