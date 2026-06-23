@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localizedPath } from '../i18n/utils';
+---
+<BaseLayout
+  title="Seite nicht gefunden · Haus Aquamarin"
+  description="Die aufgerufene Seite wurde nicht gefunden."
+  noindex={true}
+  noAlternates={true}
+>
+  <section class="section">
+    <div class="container-narrow text-center" style="padding-block: 3rem">
+      <p class="eyebrow">Fehler 404</p>
+      <h1>Seite nicht gefunden</h1>
+      <p class="lead mx-auto">Diese Seite gibt es leider nicht (mehr). Vielleicht hilft einer dieser Wege weiter:</p>
+      <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem">
+        <a class="btn btn--gold" href={localizedPath('', 'de')}>Zur Startseite</a>
+        <a class="btn btn--ghost" href={localizedPath('apartments', 'de')}>Apartments ansehen</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

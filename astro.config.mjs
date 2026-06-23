@@ -32,6 +32,12 @@ export default defineConfig({
           da: 'da-DK',
         },
       },
+      // DE-only Landingpages haben keine Sprachversionen -> keine hreflang-Alternates
+      // in der Sitemap (sonst Verweise auf nicht existente /en|nl|da-Seiten).
+      serialize(item) {
+        if (item.url.includes('/ferienwohnung-buesum-')) delete item.links;
+        return item;
+      },
     }),
   ],
 });

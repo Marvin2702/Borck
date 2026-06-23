@@ -16,15 +16,17 @@ interface Props {
 }
 const { src, alt, width, height, class: cls, loading = 'lazy', fetchpriority, sizes } = Astro.props;
 const base = src.replace(/\.(jpe?g|png)$/i, '');
-const jpg = withBase(`${base}.jpg`);
-const webp = withBase(`${base}.webp`);
-const avif = withBase(`${base}.avif`);
+const widths = [640, 1024, 1600];
+const srcset = (ext: string) => widths.map((w) => `${withBase(`${base}-${w}.${ext}`)} ${w}w`).join(', ');
+const fallbackSizes = sizes ?? '100vw';
 ---
 <picture>
-  <source type="image/avif" srcset={avif} sizes={sizes} />
-  <source type="image/webp" srcset={webp} sizes={sizes} />
+  <source type="image/avif" srcset={srcset('avif')} sizes={fallbackSizes} />
+  <source type="image/webp" srcset={srcset('webp')} sizes={fallbackSizes} />
   <img
-    src={jpg}
+    src={withBase(`${base}.jpg`)}
+    srcset={srcset('jpg')}
+    sizes={fallbackSizes}
     alt={alt}
     width={width}
     height={height}

@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { type Lang } from '../i18n/utils';
 import { site } from '../data/site';
+import { legal } from '../data/legal';
 
 interface Props { lang: Lang; kind: 'impressum' | 'datenschutz' | 'agb' }
 const { lang, kind } = Astro.props;
@@ -13,14 +14,15 @@ const titles = {
 };
 const title = `${titles[kind]} · ${site.name}`;
 const imp = site.impressum;
+const doc = kind !== 'impressum' ? legal[kind] : null;
 ---
-<BaseLayout title={title} description={titles[kind]} pageKey={kind} noindex={kind !== 'impressum'}>
+<BaseLayout title={title} description={titles[kind]} pageKey={kind} noAlternates={true}>
   <section class="section">
-    <div class="container-narrow">
+    <div class="container-narrow legal">
       <h1>{titles[kind]}</h1>
 
       {kind === 'impressum' ? (
-        <div class="impressum">
+        <div class="legal-body">
           <p>Angaben gemäß § 5 DDG / § 5 TMG</p>
           <p>
             <strong>{imp.operator}</strong><br />
@@ -45,27 +47,19 @@ const imp = site.impressum;
           <p class="note">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV: {imp.operator}, {imp.street}, {imp.postalCode} {imp.city}.</p>
         </div>
       ) : (
-        <div class="legal-note">
-          {/* TODO: Bestehenden, rechtlich geprüften Text von nordsee-buesum-fewo.de
-              1:1 übernehmen ({titles[kind]} ist rechtlich verbindlich und darf nicht
-              frei umformuliert werden). */}
-          <p><strong>Hier folgt der Originaltext.</strong> Der bestehende, rechtlich
-            geprüfte {titles[kind]}-Text von nordsee-buesum-fewo.de wird hier
-            1:1 eingesetzt, bitte den Originaltext übernehmen, nicht neu formulieren.</p>
-        </div>
+        <div class="legal-body" set:html={doc!.html} />
       )}
+
+      {doc && <p class="legal-stand">Stand: {doc.stand}</p>}
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .impressum p { margin-bottom: 1.1rem; }
-  .impressum .note { color: var(--text-muted); font-size: 0.9rem; }
-  .legal-note {
-    border: 1px dashed var(--c-aqua-300);
-    background: var(--c-aqua-100);
-    border-radius: var(--radius);
-    padding: 1.2rem 1.4rem;
-    color: var(--text-muted);
-  }
+  .legal-body :global(h3) { font-size: 1.2rem; margin: 1.8rem 0 0.6rem; }
+  .legal-body :global(p) { margin: 0 0 0.9rem; }
+  .legal-body :global(ul) { margin: 0 0 1rem; padding-left: 1.3rem; }
+  .legal-body :global(li) { margin-bottom: 0.3rem; }
+  .legal-body :global(.note) { color: var(--text-muted); font-size: 0.9rem; }
+  .legal-stand { color: var(--text-muted); font-size: 0.85rem; margin-top: 2rem; }
 </style>
