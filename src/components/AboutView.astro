@@ -9,37 +9,51 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
-// Echter "Über mich"-Text von Iris (Original DE), Übersetzungen für EN/NL/DA.
-const story: Record<Lang, string[]> = {
-  de: [
-    'Moin Moin liebe Freunde der Nordsee! ❤️ Ich bin Iris, eure Gastgeberin hier im Haus Aquamarin in Büsum. Direkt hinter der Familienlagune biete ich euch 7 Apartments für unvergessliche Nordsee-Erlebnisse.',
-    'Vom gemütlichen Studio bis zu geräumigen Familienunterkünften, bei mir findet jeder sein Zuhause fernab von Zuhause. Mir ist wichtig, dass ihr euch unkompliziert wohlfühlt und die Nordsee in vollen Zügen genießt.',
-    'Ich setze mich für eine inklusive Atmosphäre ein, in der jeder Gast sich geschätzt fühlt, unabhängig von Herkunft, Alter oder Fähigkeiten. Vielfalt wird bei mir zelebriert! Ich stehe euch jederzeit für Buchungsanfragen oder Tipps zur Verfügung. 💙',
-    'Mit maritimen Grüßen, Iris',
-  ],
-  en: [
-    'Moin moin, dear friends of the North Sea! ❤️ I am Iris, your host here at Haus Aquamarin in Büsum. Right behind the family lagoon I offer you 7 apartments for unforgettable North Sea moments.',
-    'From a cosy studio to spacious family flats, everyone finds a home away from home with me. What matters to me: that you feel at ease, effortlessly, and enjoy the North Sea to the fullest.',
-    'I stand for an inclusive atmosphere in which every guest feels valued, regardless of origin, age or ability. Diversity is celebrated here! I am always available for booking enquiries or tips. 💙',
-    'With maritime greetings, Iris',
-  ],
-  nl: [
-    'Moin moin, lieve vrienden van de Noordzee! ❤️ Ik ben Iris, jullie gastvrouw hier in Haus Aquamarin in Büsum. Direct achter de familielagune bied ik jullie 7 appartementen voor onvergetelijke Noordzee-momenten.',
-    'Van een gezellige studio tot ruime familieappartementen, bij mij vindt iedereen een thuis ver van huis. Belangrijk voor mij: dat jullie je ongecompliceerd op je gemak voelen en volop van de Noordzee genieten.',
-    'Ik sta voor een inclusieve sfeer waarin elke gast zich gewaardeerd voelt, ongeacht afkomst, leeftijd of mogelijkheden. Diversiteit wordt hier gevierd! Ik sta altijd klaar voor boekingsvragen of tips. 💙',
-    'Met maritieme groeten, Iris',
-  ],
-  da: [
-    'Moin moin, kære venner af Nordsøen! ❤️ Jeg er Iris, jeres vært her i Haus Aquamarin i Büsum. Lige bag familielagunen tilbyder jeg jer 7 lejligheder til uforglemmelige Nordsø-oplevelser.',
-    'Fra et hyggeligt studie til rummelige familielejligheder, hos mig finder alle et hjem væk hjemmefra. Det vigtige for mig: at I føler jer godt tilpas, helt ukompliceret, og nyder Nordsøen fuldt ud.',
-    'Jeg står for en inkluderende atmosfære, hvor hver gæst føler sig værdsat, uanset oprindelse, alder eller evner. Mangfoldighed fejres her! Jeg står altid til rådighed for bookingforespørgsler eller tips. 💙',
-    'Med maritime hilsner, Iris',
-  ],
+// Echter "Über mich"-Text von Iris (Original DE inkl. Original-Zwischenüberschriften),
+// Übersetzungen für EN/NL/DA. Struktur 1:1 wie nordsee-buesum-fewo.de/ueber-mich.
+interface AboutContent { intro: string; sections: { h: string; p: string }[]; signoff: string }
+const story: Record<Lang, AboutContent> = {
+  de: {
+    intro: 'Moin Moin liebe Freunde der Nordsee! ❤️ Ich bin Iris, eure Gastgeberin hier im Haus Aquamarin in Büsum. Direkt hinter der Familienlagune biete ich euch 7 Apartments für unvergessliche Nordsee-Erlebnisse.',
+    sections: [
+      { h: 'Für jeden das Passende dabei', p: 'Vom gemütlichen Studio bis zu geräumigen Familienunterkünften, bei mir findet jeder sein Zuhause fernab von Zuhause. Mir ist wichtig, dass ihr euch unkompliziert wohlfühlt und die Nordsee in vollen Zügen genießt.' },
+      { h: 'Herzlichkeit & Vielfalt', p: 'Ich setze mich für eine inklusive Atmosphäre ein, in der jeder Gast sich geschätzt fühlt, unabhängig von Herkunft, Alter oder Fähigkeiten. Vielfalt wird bei mir zelebriert!' },
+      { h: 'Habt ihr Fragen?', p: 'Ich stehe euch jederzeit für Buchungsanfragen oder Tipps zur Verfügung. Ich freue mich darauf, eure Gastgeberin zu sein!' },
+    ],
+    signoff: 'Mit maritimen Grüßen, Iris',
+  },
+  en: {
+    intro: 'Moin moin, dear friends of the North Sea! ❤️ I am Iris, your host here at Haus Aquamarin in Büsum. Right behind the family lagoon I offer you 7 apartments for unforgettable North Sea moments.',
+    sections: [
+      { h: 'Something for everyone', p: 'From a cosy studio to spacious family flats, everyone finds a home away from home with me. What matters to me: that you feel at ease, effortlessly, and enjoy the North Sea to the fullest.' },
+      { h: 'Warmth & diversity', p: 'I stand for an inclusive atmosphere in which every guest feels valued, regardless of origin, age or ability. Diversity is celebrated here!' },
+      { h: 'Any questions?', p: 'I am always here for booking enquiries or tips. I look forward to being your host!' },
+    ],
+    signoff: 'With maritime greetings, Iris',
+  },
+  nl: {
+    intro: 'Moin moin, lieve vrienden van de Noordzee! ❤️ Ik ben Iris, jullie gastvrouw hier in Haus Aquamarin in Büsum. Direct achter de familielagune bied ik jullie 7 appartementen voor onvergetelijke Noordzee-momenten.',
+    sections: [
+      { h: 'Voor ieder wat wils', p: 'Van een gezellige studio tot ruime familieappartementen, bij mij vindt iedereen een thuis ver van huis. Belangrijk voor mij: dat jullie je ongecompliceerd op je gemak voelen en volop van de Noordzee genieten.' },
+      { h: 'Hartelijkheid & diversiteit', p: 'Ik sta voor een inclusieve sfeer waarin elke gast zich gewaardeerd voelt, ongeacht afkomst, leeftijd of mogelijkheden. Diversiteit wordt hier gevierd!' },
+      { h: 'Hebben jullie vragen?', p: 'Ik sta altijd klaar voor boekingsvragen of tips. Ik verheug me erop jullie gastvrouw te zijn!' },
+    ],
+    signoff: 'Met maritieme groeten, Iris',
+  },
+  da: {
+    intro: 'Moin moin, kære venner af Nordsøen! ❤️ Jeg er Iris, jeres vært her i Haus Aquamarin i Büsum. Lige bag familielagunen tilbyder jeg jer 7 lejligheder til uforglemmelige Nordsø-oplevelser.',
+    sections: [
+      { h: 'Noget for enhver', p: 'Fra et hyggeligt studie til rummelige familielejligheder, hos mig finder alle et hjem væk hjemmefra. Det vigtige for mig: at I føler jer godt tilpas, helt ukompliceret, og nyder Nordsøen fuldt ud.' },
+      { h: 'Hjertelighed & mangfoldighed', p: 'Jeg står for en inkluderende atmosfære, hvor hver gæst føler sig værdsat, uanset oprindelse, alder eller evner. Mangfoldighed fejres her!' },
+      { h: 'Har I spørgsmål?', p: 'Jeg står altid til rådighed for bookingforespørgsler eller tips. Jeg glæder mig til at være jeres vært!' },
+    ],
+    signoff: 'Med maritime hilsner, Iris',
+  },
 };
-const paras = story[lang];
+const content = story[lang];
 const title = `${t('about.title')} · ${site.name} Büsum`;
 ---
-<BaseLayout title={title} description={paras[0]} pageKey="ueber-uns" image="/images/iris-mia.jpg">
+<BaseLayout title={title} description={content.intro} pageKey="ueber-uns" image="/images/iris-mia.jpg">
   <section class="section">
     <div class="container-narrow">
       <p class="eyebrow">{site.tagline}</p>
@@ -51,7 +65,14 @@ const title = `${t('about.title')} · ${site.name} Büsum`;
                width={900} height={900} loading="eager" sizes="(max-width: 720px) 100vw, 40vw" />
         </figure>
         <div class="host-text">
-          {paras.map((p) => <p>{p}</p>)}
+          <p class="lead-intro">{content.intro}</p>
+          {content.sections.map((s) => (
+            <div class="host-section">
+              <h2>{s.h}</h2>
+              <p>{s.p}</p>
+            </div>
+          ))}
+          <p class="signoff">{content.signoff}</p>
         </div>
       </div>
     </div>
@@ -66,9 +87,13 @@ const title = `${t('about.title')} · ${site.name} Büsum`;
     width: 100%; height: auto; border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md); object-fit: cover; aspect-ratio: 1 / 1;
   }
-  .host-text p:last-child {
+  .lead-intro { font-size: 1.1rem; }
+  .host-section { margin-top: 1.5rem; }
+  .host-section h2 { font-size: 1.3rem; margin: 0 0 0.4rem; color: var(--brand-strong); }
+  .host-section p { margin: 0; }
+  .signoff {
     font-family: var(--font-head); font-size: 1.2rem; color: var(--brand);
-    margin-top: 1rem;
+    margin-top: 1.6rem;
   }
   @media (max-width: 720px) { .host { grid-template-columns: 1fr; } }
 </style>
