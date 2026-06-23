@@ -12,7 +12,7 @@ const labels = lageLabels[lang];
 const title = `${t('location.title')} · ${site.name} Büsum`;
 ---
 <BaseLayout title={title} description={t('location.subtitle')} pageKey="lage">
-  <section class="section">
+  <section class="section lage-hero">
     <div class="container-narrow text-center">
       <p class="eyebrow">{site.tagline}</p>
       <h1>{t('location.title')}</h1>
@@ -75,19 +75,25 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
 </BaseLayout>
 
 <style>
-  .hl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
+  /* Kompakter Hero, damit alle 7 Kacheln ohne Scrollen sichtbar sind */
+  .lage-hero { padding-block: clamp(1.4rem, 0.8rem + 2vw, 2.6rem); }
+  .lage-hero h1 { font-size: clamp(1.9rem, 1.4rem + 2vw, 2.8rem); margin: 0.1rem 0 0.3rem; }
+  .lage-hero .eyebrow { margin-bottom: 0.3rem; }
+  .lage-hero .lead { font-size: 1.05rem; margin-top: 0.2rem; }
+
+  .hl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
   .hl {
     appearance: none; font: inherit; text-align: left; cursor: pointer;
-    padding: 1.4rem; display: flex; flex-direction: column; gap: 0.3rem;
+    padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.2rem;
     transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
   .hl:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--c-aqua-300); }
   .hl-top { display: flex; align-items: center; justify-content: space-between; }
-  .hl-icon { font-size: 1.8rem; }
+  .hl-icon { font-size: 1.55rem; }
   .hl-dist { font-size: 0.78rem; font-weight: 700; color: var(--brand); background: var(--c-aqua-100); border-radius: 999px; padding: 0.2rem 0.6rem; white-space: nowrap; }
-  .hl-h { margin: 0.5rem 0 0.2rem; font-size: 1.15rem; }
-  .hl p { color: var(--text-muted); margin: 0; font-size: 0.95rem; flex: 1; }
-  .hl-open { margin-top: 0.8rem; color: var(--brand); font-weight: 600; font-size: 0.9rem; }
+  .hl-h { margin: 0.35rem 0 0.15rem; font-size: 1.1rem; }
+  .hl p { color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.45; flex: 1; }
+  .hl-open { margin-top: 0.55rem; color: var(--brand); font-weight: 600; font-size: 0.88rem; }
   @media (max-width: 900px) { .hl-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 520px) { .hl-grid { grid-template-columns: 1fr; } }
 
