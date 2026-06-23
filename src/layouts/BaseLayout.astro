@@ -63,6 +63,8 @@ const lodging: Record<string, unknown> = {
   },
   geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
   petsAllowed: true,
+  checkinTime: site.checkinTime,
+  checkoutTime: site.checkoutTime,
 };
 // AggregateRating + einzelne Reviews NUR auf der Startseite ausgeben (dort sind
 // die Bewertungen sichtbar) — entspricht Googles Rich-Result-Policy.

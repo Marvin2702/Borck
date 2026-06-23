@@ -20,8 +20,8 @@ const reviews = (await getCollection('reviews')).map((r) => ({
   body: (r.body ?? '').trim(),
 }));
 
-const title = `Ferienwohnungen in Büsum · ${site.name}`;
-const description = t('hero.subtitle');
+const title = `${t('meta.fewoBuesum')} · ${site.name}`;
+const description = t('meta.homeDesc');
 ---
 <BaseLayout title={title} description={description} pageKey="" reviews={reviews}>
   <Hero lang={lang} />

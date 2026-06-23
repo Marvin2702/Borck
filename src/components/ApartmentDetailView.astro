@@ -2,6 +2,7 @@
 import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BookingWidget from './BookingWidget.astro';
+import GoodToKnow from './GoodToKnow.astro';
 import Img from './Img.astro';
 import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { priceFrom } from '../data/prices';
@@ -38,6 +39,8 @@ const apartmentLd: Record<string, unknown> = {
   numberOfBedrooms: d.bedrooms,
   numberOfRooms: d.bedrooms,
   petsAllowed: d.dogFriendly,
+  checkinTime: site.checkinTime,
+  checkoutTime: site.checkoutTime,
   address: {
     '@type': 'PostalAddress',
     streetAddress: site.address.street,
@@ -132,6 +135,8 @@ const breadcrumbLd = {
         </aside>
       </div>
     </section>
+
+    <GoodToKnow lang={lang} />
 
     <BookingWidget lang={lang} smoobuId={d.smoobu_id} apartmentName={d.name} />
 

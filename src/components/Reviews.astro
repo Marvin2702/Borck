@@ -23,6 +23,7 @@ const reviews = await Promise.all(
         <span class="stars" aria-hidden="true">★★★★★</span>
         <strong>{site.rating.value.toFixed(1)}</strong> · {site.rating.count} {t('reviews.count')}
       </p>
+      {lang !== 'de' && <p class="reviews-orig">{t('reviews.origGerman')}</p>}
     </div>
     <div class="reviews-grid">
       {reviews.map(({ data, Content }) => (
@@ -46,6 +47,7 @@ const reviews = await Promise.all(
   .reviews-aggregate { margin-top: 0.6rem; color: var(--text-muted); }
   .reviews-aggregate .stars { color: var(--c-gold); letter-spacing: 2px; }
   .reviews-aggregate strong { color: var(--brand-strong); }
+  .reviews-orig { color: var(--text-muted); font-size: 0.82rem; font-style: italic; margin-top: 0.4rem; }
   .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
   .review { padding: 1.5rem 1.5rem 1.3rem; display: flex; flex-direction: column; gap: 0.8rem; }
   .review-stars { color: var(--c-gold); letter-spacing: 2px; font-size: 1.05rem; }

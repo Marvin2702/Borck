@@ -1,0 +1,84 @@
+---
+import { type Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const data: Record<Lang, { title: string; items: { l: string; v: string }[] }> = {
+  de: {
+    title: 'Gut zu wissen',
+    items: [
+      { l: 'Check-in', v: 'ab 15:00 Uhr (Anreise rund um die Uhr möglich)' },
+      { l: 'Check-out', v: 'bis 10:00 Uhr' },
+      { l: 'Anzahlung', v: '50 € innerhalb von 7 Tagen' },
+      { l: 'Restzahlung', v: '30 Tage vor Anreise' },
+      { l: 'Stornierung', v: 'bis 30 Tage vorher kostenfrei' },
+      { l: 'Hund', v: '46 € pro Buchung (2. Hund 23 €)' },
+      { l: 'Bettwäsche / Handtücher', v: '12 € pro Person / 9 € pro Satz' },
+      { l: 'Parkplatz & WLAN', v: 'inklusive' },
+    ],
+  },
+  en: {
+    title: 'Good to know',
+    items: [
+      { l: 'Check-in', v: 'from 3:00 pm (self check-in around the clock)' },
+      { l: 'Check-out', v: 'until 10:00 am' },
+      { l: 'Deposit', v: '€50 within 7 days' },
+      { l: 'Balance', v: '30 days before arrival' },
+      { l: 'Cancellation', v: 'free up to 30 days before' },
+      { l: 'Dog', v: '€46 per booking (2nd dog €23)' },
+      { l: 'Bed linen / towels', v: '€12 per person / €9 per set' },
+      { l: 'Parking & Wi-Fi', v: 'included' },
+    ],
+  },
+  nl: {
+    title: 'Goed om te weten',
+    items: [
+      { l: 'Check-in', v: 'vanaf 15:00 uur (zelf inchecken de klok rond)' },
+      { l: 'Check-out', v: 'tot 10:00 uur' },
+      { l: 'Aanbetaling', v: '€ 50 binnen 7 dagen' },
+      { l: 'Restbetaling', v: '30 dagen voor aankomst' },
+      { l: 'Annulering', v: 'gratis tot 30 dagen vooraf' },
+      { l: 'Hond', v: '€ 46 per boeking (2e hond € 23)' },
+      { l: 'Beddengoed / handdoeken', v: '€ 12 p.p. / € 9 per set' },
+      { l: 'Parkeerplaats & wifi', v: 'inbegrepen' },
+    ],
+  },
+  da: {
+    title: 'Godt at vide',
+    items: [
+      { l: 'Check-in', v: 'fra kl. 15:00 (selv-check-in døgnet rundt)' },
+      { l: 'Check-out', v: 'indtil kl. 10:00' },
+      { l: 'Depositum', v: '50 € inden 7 dage' },
+      { l: 'Restbetaling', v: '30 dage før ankomst' },
+      { l: 'Afbestilling', v: 'gratis indtil 30 dage før' },
+      { l: 'Hund', v: '46 € pr. booking (2. hund 23 €)' },
+      { l: 'Sengetøj / håndklæder', v: '12 € pr. pers. / 9 € pr. sæt' },
+      { l: 'Parkering & wi-fi', v: 'inkluderet' },
+    ],
+  },
+};
+const d = data[lang];
+---
+<section class="section gtw">
+  <div class="container-narrow">
+    <h2>{d.title}</h2>
+    <div class="gtw-grid">
+      {d.items.map((i) => (
+        <div class="gtw-row">
+          <span class="gtw-l">{i.l}</span>
+          <span class="gtw-v">{i.v}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .gtw-grid { margin-top: 1.4rem; display: grid; gap: 0; border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+  .gtw-row { display: grid; grid-template-columns: minmax(140px, 0.6fr) 1fr; gap: 1rem; padding: 0.85rem 1.2rem; }
+  .gtw-row:nth-child(odd) { background: var(--c-sand-50); }
+  .gtw-l { font-weight: 600; color: var(--brand-strong); }
+  .gtw-v { color: var(--text); }
+  @media (max-width: 520px) { .gtw-row { grid-template-columns: 1fr; gap: 0.2rem; } }
+</style>

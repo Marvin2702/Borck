@@ -25,7 +25,7 @@ const t = useTranslations(lang);
     <div class="container-narrow">
       <p class="eyebrow">{eyebrow}</p>
       <h1>{h1}</h1>
-      {intro.map((p) => <p class="lead intro-p">{p}</p>)}
+      {intro.map((p, i) => (i === 0 ? <p class="lead intro-p">{p}</p> : <p class="intro-p body-p">{p}</p>))}
     </div>
   </section>
 
