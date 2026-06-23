@@ -1,5 +1,5 @@
 ---
-import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props { apartment: CollectionEntry<'apartments'>; lang: Lang }
@@ -13,7 +13,7 @@ const accent = d.accent;
 <article class="card apt">
   <a href={href} class="apt-media" aria-label={d.name}>
     {d.heroImage ? (
-      <img src={d.heroImage} alt={d.name} width="640" height="420" loading="lazy" decoding="async" />
+      <img src={withBase(d.heroImage)} alt={d.name} width="640" height="420" loading="lazy" decoding="async" />
     ) : (
       <span class="apt-placeholder" style={`--a:${accent}`}>
         <span class="apt-gem" aria-hidden="true">◈</span>

@@ -3,23 +3,26 @@ name: Saphir
 order: 2
 persons: 4
 bedrooms: 2
-view: Mit Terrasse
+view: Terrasse · Gartenblick
+floor: Erdgeschoss
 features:
-  - Eigene Terrasse
-  - Voll ausgestattete Küche
-  - WLAN kostenfrei
-  - Smart-TV
-  - Gartenmöbel
-dogFriendly: false
+  - Eigene Terrasse (ca. 60 m²) mit Gartenblick
+  - Offene Einbauküche mit Geschirrspüler
+  - Induktionskochfeld & Backofen mit Mikrowelle
+  - Doppelbett 180 cm + Etagenbett
+  - Duschbad mit Haartrockner
+  - Flachbild-TV mit SAT, DAB+ Radio
+  - Kostenloses WLAN
+  - PKW-Stellplatz & abschließbare Fahrradgarage
+dogFriendly: true
 accent: "#2f5fa6"
-summary: Tiefblaue Ruhe mit eigener Terrasse für lange Sommerabende.
-# TODO Auftraggeber: size_qm, price_from, smoobu_id, gallery ergänzen
+heroImage: /images/saphir-1.jpg
+gallery:
+  - /images/saphir-1.jpg
+  - /images/saphir-2.jpg
+summary: Sonniger Wohlfühlort für 4 Personen – Deine Auszeit mit eigener Terrasse.
 ---
 
-**Saphir** trägt das tiefe Blau der Nordsee in sich. Highlight ist die eigene
-Terrasse – Ihr privater Freisitz für das Frühstück in der Morgensonne oder ein
-Glas Wein nach dem Strandtag.
-
-Vier Gäste finden hier Platz, dazu eine komplett ausgestattete Küche und alles,
-was einen entspannten Urlaub ausmacht. Ein ruhiger Rückzugsort, nur einen
-Spaziergang vom Meer entfernt.
+Helle, gemütliche Ferienwohnung im Erdgeschoss mit Terrasse, offener Küche und
+2 Schlafzimmern – ideal für bis zu 4 Personen. Ruhig gelegen und trotzdem nah an
+der Familienlagune Perlebucht (ca. 0,4 km).

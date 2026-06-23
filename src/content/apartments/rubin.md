@@ -3,22 +3,24 @@ name: Rubin
 order: 5
 persons: 4
 bedrooms: 2
-view: Am Deich
+view: Terrasse · am Deich
+floor: Erdgeschoss
 features:
-  - Direkt am Deich
-  - Voll ausgestattete Küche
-  - WLAN kostenfrei
-  - Balkon oder Terrasse
-  - Smart-TV
+  - Eigene Terrasse (ca. 60 m²)
+  - Offene Küche, 4-Zonen-Ceranfeld & Backofen
+  - Doppelbett 180 cm + Etagenbett
+  - Duschbad mit Haartrockner
+  - Flachbild-TV mit SAT
+  - Kostenloses WLAN
+  - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 accent: "#a52a3a"
-summary: Kräftige Farben, beste Lage – nur einen Deichschritt vom Meer.
-# TODO Auftraggeber: size_qm, price_from, smoobu_id, gallery ergänzen
+heroImage: /images/rubin-1.jpg
+gallery:
+  - /images/rubin-1.jpg
+summary: Familien-Glück am Deich – Dein gemütlicher Ankerplatz für 4 Personen.
 ---
 
-**Rubin** setzt einen warmen, kräftigen Akzent – und punktet vor allem mit der
-Lage **direkt am Deich**. Über die Deichkrone sind Sie in Minuten am Wasser,
-beim Wattspaziergang oder auf der Promenade.
-
-Vier Gäste wohnen hier komfortabel, mit voll ausgestatteter Küche und WLAN.
-Wer das Meer liebt und kurze Wege schätzt, ist in Rubin genau richtig.
+Familienfreundliche Ferienwohnung im Erdgeschoss mit Terrasse, offener Küche und
+2 Schlafzimmern – ideal für bis zu 4 Personen. Ruhig gelegen und trotzdem nah an
+der Familienlagune Perlebucht (ca. 0,4 km).

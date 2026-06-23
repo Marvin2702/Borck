@@ -3,22 +3,28 @@ name: Topas
 order: 4
 persons: 5
 bedrooms: 2
+size_qm: 76
 view: Meerblick
+floor: 2. Etage (ganz oben)
 features:
-  - Meerblick
-  - Voll ausgestattete Küche
-  - WLAN kostenfrei
-  - Balkon
-  - Smart-TV
-dogFriendly: false
+  - Balkon mit Meerblick
+  - Offene Einbauküche, Mini-Geschirrspüler & Mikrowelle mit Grill
+  - Doppelbett 180 cm + 3 Einzelbetten (je 90 cm)
+  - Duschbad mit Haartrockner
+  - Flachbild-TV mit SAT
+  - Kostenloses WLAN
+  - Gartenmöbel & Sonnenschirm
+  - PKW-Stellplatz & abschließbare Fahrradgarage
+dogFriendly: true
 accent: "#d0a02a"
-summary: Das großzügige Apartment mit Meerblick – Platz für bis zu fünf Gäste.
-# TODO Auftraggeber: size_qm, price_from, smoobu_id, gallery ergänzen
+heroImage: /images/topas-2.jpg
+gallery:
+  - /images/topas-2.jpg
+  - /images/topas-1.jpg
+summary: Dein Logenplatz über der Brandung – Nordsee-Feeling für 5 Personen mit Meerblick.
 ---
 
-**Topas** ist unser großzügigstes Apartment und das einzige für bis zu fünf
-Gäste. Der eigentliche Star ist der **Meerblick**: Hier sehen Sie die Nordsee,
-hören die Möwen und spüren das Licht der Küste den ganzen Tag.
-
-Eine voll ausgestattete Küche, ein Balkon zum Durchatmen und reichlich Raum für
-die ganze Familie machen Topas zum Lieblingsplatz für längere Aufenthalte.
+Großzügige Ferienwohnung in der 2. Etage (ganz oben) mit kleinem Balkon &
+Meerblick. Mit 2 Schlafzimmern (1× Doppelbett, 1× drei Einzelbetten) – ideal für
+bis zu 5 Personen. Wer ganz oben wohnt, sieht das Meer zuerst. Rund 76 m², nur
+0,4 km bis zur Familienlagune Perlebucht.

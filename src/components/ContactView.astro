@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { useTranslations, type Lang } from '../i18n/utils';
+import { useTranslations, withBase, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
 interface Props { lang: Lang }
@@ -39,10 +39,12 @@ const title = `${t('contact.title')} – ${site.name} Büsum`;
         </div>
       </div>
 
-      {/* TODO: Google-Maps-Embed der exakten Lage einsetzen (Lazy-iFrame). */}
-      <div class="map-placeholder" aria-hidden="true">
-        <span>Karte / Anfahrt — Google-Maps-Embed folgt</span>
-      </div>
+      {/* TODO: optional Google-Maps-Embed der exakten Lage (Lazy-iFrame) ergänzen. */}
+      <figure class="contact-image">
+        <img src={withBase('/images/kontakt-maritim.jpg')} alt="Haus Aquamarin in Büsum"
+             width="1200" height="600" loading="lazy" decoding="async" />
+      </figure>
+      <p class="addr-line">{site.name} · {site.address.street} · {site.address.postalCode} {site.address.city}</p>
     </div>
   </section>
 </BaseLayout>
@@ -59,11 +61,8 @@ const title = `${t('contact.title')} – ${site.name} Büsum`;
   .ci { font-size: 1.4rem; }
   .cl { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; }
   .contact-card strong { color: var(--brand-strong); font-size: 1.1rem; }
-  .map-placeholder {
-    margin-top: 1.5rem; height: 280px; border-radius: var(--radius-lg);
-    display: grid; place-items: center; color: var(--text-muted);
-    background: repeating-linear-gradient(45deg, var(--c-aqua-100), var(--c-aqua-100) 18px, var(--c-sand-100) 18px, var(--c-sand-100) 36px);
-    border: 1px dashed var(--c-aqua-300);
-  }
+  .contact-image { margin: 1.5rem 0 0.6rem; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+  .contact-image img { width: 100%; height: auto; display: block; object-fit: cover; aspect-ratio: 2 / 1; }
+  .addr-line { color: var(--text-muted); text-align: center; }
   @media (max-width: 600px) { .contact-grid { grid-template-columns: 1fr; } }
 </style>

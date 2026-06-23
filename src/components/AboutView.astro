@@ -1,38 +1,56 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBanner from './CtaBanner.astro';
-import { useTranslations, type Lang } from '../i18n/utils';
+import { useTranslations, withBase, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
-// Lokalisierter Marken-/Konzepttext. Gastgeber-Story TODO (echte Angaben).
-const intro: Record<Lang, string> = {
-  de: 'Haus Aquamarin ist ein familiengeführtes Haus mit sieben individuell gestalteten Ferienapartments – jedes nach einem Edelstein benannt. Wir vermieten direkt, ohne Zwischenhändler, und sind persönlich für unsere Gäste da.',
-  en: 'Haus Aquamarin is a family-run house with seven individually designed holiday apartments – each named after a gemstone. We rent directly, without middlemen, and are personally there for our guests.',
-  nl: 'Haus Aquamarin is een familiebedrijf met zeven individueel ingerichte vakantieappartementen – elk vernoemd naar een edelsteen. Wij verhuren rechtstreeks, zonder tussenpersonen, en staan persoonlijk voor onze gasten klaar.',
-  da: 'Haus Aquamarin er et familiedrevet hus med syv individuelt indrettede ferielejligheder – hver opkaldt efter en ædelsten. Vi udlejer direkte, uden mellemled, og er personligt til stede for vores gæster.',
+// Echter "Über mich"-Text von Iris (Original DE), Übersetzungen für EN/NL/DA.
+const story: Record<Lang, string[]> = {
+  de: [
+    'Moin Moin liebe Freunde der Nordsee! ❤️ Ich bin Iris, eure Gastgeberin hier im Haus Aquamarin in Büsum. Direkt hinter der Familienlagune biete ich euch 7 Apartments für unvergessliche Nordsee-Erlebnisse.',
+    'Vom gemütlichen Studio bis zu geräumigen Familienunterkünften – bei mir findet jeder sein Zuhause fernab von Zuhause. Mir ist wichtig, dass ihr euch unkompliziert wohlfühlt und die coolen Vibes der Nordsee erlebt.',
+    'Ich setze mich für eine inklusive Atmosphäre ein, in der jeder Gast sich geschätzt fühlt – unabhängig von Herkunft, Alter oder Fähigkeiten. Vielfalt wird bei mir zelebriert! Ich stehe euch jederzeit für Buchungsanfragen oder Tipps zur Verfügung. 💙',
+    'High five ✋ mit maritimen Grüßen, Iris',
+  ],
+  en: [
+    'Moin moin, dear friends of the North Sea! ❤️ I am Iris, your host here at Haus Aquamarin in Büsum. Right behind the family lagoon I offer you 7 apartments for unforgettable North Sea moments.',
+    'From a cosy studio to spacious family flats – everyone finds a home away from home with me. What matters to me: that you feel at ease, effortlessly, and soak up the cool vibes of the North Sea.',
+    'I stand for an inclusive atmosphere in which every guest feels valued – regardless of origin, age or ability. Diversity is celebrated here! I am always available for booking enquiries or tips. 💙',
+    'High five ✋ with maritime greetings, Iris',
+  ],
+  nl: [
+    'Moin moin, lieve vrienden van de Noordzee! ❤️ Ik ben Iris, jullie gastvrouw hier in Haus Aquamarin in Büsum. Direct achter de familielagune bied ik jullie 7 appartementen voor onvergetelijke Noordzee-momenten.',
+    'Van een gezellige studio tot ruime familieappartementen – bij mij vindt iedereen een thuis ver van huis. Belangrijk voor mij: dat jullie je ongecompliceerd op je gemak voelen en de coole vibes van de Noordzee beleven.',
+    'Ik sta voor een inclusieve sfeer waarin elke gast zich gewaardeerd voelt – ongeacht afkomst, leeftijd of mogelijkheden. Diversiteit wordt hier gevierd! Ik sta altijd klaar voor boekingsvragen of tips. 💙',
+    'High five ✋ met maritieme groeten, Iris',
+  ],
+  da: [
+    'Moin moin, kære venner af Nordsøen! ❤️ Jeg er Iris, jeres vært her i Haus Aquamarin i Büsum. Lige bag familielagunen tilbyder jeg jer 7 lejligheder til uforglemmelige Nordsø-oplevelser.',
+    'Fra et hyggeligt studie til rummelige familielejligheder – hos mig finder alle et hjem væk hjemmefra. Det vigtige for mig: at I føler jer godt tilpas, helt ukompliceret, og oplever Nordsøens gode vibes.',
+    'Jeg står for en inkluderende atmosfære, hvor hver gæst føler sig værdsat – uanset oprindelse, alder eller evner. Mangfoldighed fejres her! Jeg står altid til rådighed for bookingforespørgsler eller tips. 💙',
+    'High five ✋ med maritime hilsner, Iris',
+  ],
 };
+const paras = story[lang];
 const title = `${t('about.title')} – ${site.name} Büsum`;
 ---
-<BaseLayout title={title} description={intro[lang]} pageKey="ueber-uns">
+<BaseLayout title={title} description={paras[0]} pageKey="ueber-uns" image="/images/iris-mia.jpg">
   <section class="section">
     <div class="container-narrow">
       <p class="eyebrow">{site.tagline}</p>
       <h1>{t('about.title')}</h1>
-      <p class="lead">{intro[lang]}</p>
 
-      <div class="host card">
-        <div class="host-avatar" aria-hidden="true">◈</div>
-        <div>
-          {/* TODO: echte Gastgeber-Story, Namen, Foto und persönlicher Text.
-              Eine signierte Story ist laut Wettbewerbsanalyse ein starker
-              Marken- und Vertrauenshebel (SPO-Best-Practice). */}
-          <p><em>Hier folgt Ihre persönliche Gastgeber-Geschichte: Wer Sie sind,
-            warum Büsum, was Gäste bei Ihnen erwartet. (Platzhalter – bitte
-            ergänzen, idealerweise mit Foto und Unterschrift.)</em></p>
+      <div class="host">
+        <figure class="host-photo">
+          <img src={withBase('/images/iris-mia.jpg')} alt="Iris, Gastgeberin im Haus Aquamarin, mit Hund Mia"
+               width="900" height="900" loading="eager" decoding="async" />
+        </figure>
+        <div class="host-text">
+          {paras.map((p) => <p>{p}</p>)}
         </div>
       </div>
     </div>
@@ -41,12 +59,15 @@ const title = `${t('about.title')} – ${site.name} Büsum`;
 </BaseLayout>
 
 <style>
-  .host { display: grid; grid-template-columns: auto 1fr; gap: 1.4rem; align-items: center; padding: 1.6rem; margin-top: 2rem; }
-  .host-avatar {
-    width: 88px; height: 88px; border-radius: 50%;
-    display: grid; place-items: center; font-size: 2rem; color: #fff;
-    background: linear-gradient(140deg, var(--c-aqua-500), var(--c-aqua-900));
+  .host { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 2.2rem; align-items: start; margin-top: 1.5rem; }
+  .host-photo { margin: 0; }
+  .host-photo img {
+    width: 100%; height: auto; border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md); object-fit: cover; aspect-ratio: 1 / 1;
   }
-  .host em { color: var(--text-muted); }
-  @media (max-width: 520px) { .host { grid-template-columns: 1fr; text-align: center; } .host-avatar { margin-inline: auto; } }
+  .host-text p:last-child {
+    font-family: var(--font-head); font-size: 1.2rem; color: var(--brand);
+    margin-top: 1rem;
+  }
+  @media (max-width: 720px) { .host { grid-template-columns: 1fr; } }
 </style>

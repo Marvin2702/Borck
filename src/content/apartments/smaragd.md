@@ -3,23 +3,28 @@ name: Smaragd
 order: 7
 persons: 2
 bedrooms: 1
-view: Loft-Stil
+size_qm: 28
+view: Seitlicher Deichblick
+floor: 1. Etage (Dachgeschoss)
 features:
-  - Loft-Charakter
-  - Voll ausgestattete Küche
-  - WLAN kostenfrei
-  - Balkon oder Terrasse
-  - Smart-TV
-dogFriendly: false
+  - Balkon mit seitlichem Deichblick & Sonnenschirm
+  - Autarker, separater Eingang
+  - Küchenzeile mit Ceran-Kochfeld & Mikrowelle mit Backofenfunktion
+  - 2 Einzelbetten (90 × 200 cm)
+  - Duschbad mit Haartrockner
+  - Flachbild-TV mit SAT
+  - Kostenloses WLAN
+  - PKW-Stellplatz & abschließbare Fahrradgarage
+dogFriendly: true
 accent: "#2e8b57"
-summary: Stilvolles Loft-Apartment für zwei – das Refugium für Paare.
-# TODO Auftraggeber: size_qm, price_from, smoobu_id, gallery ergänzen
+heroImage: /images/smaragd-1.jpg
+gallery:
+  - /images/smaragd-1.jpg
+  - /images/smaragd-2.jpg
+  - /images/smaragd-3.jpg
+summary: Dein Loft unter dem Küstenhimmel – Kompaktes Urlaubsglück für 2 mit seitlichem Deichblick.
 ---
 
-**Smaragd** ist unser intimstes Apartment: ein **Loft im Grünen Stein**, gemacht
-für zwei. Offener Grundriss, klare Linien und ein Hauch von Großstadt-Loft,
-übersetzt in die Ruhe der Nordsee.
-
-Ideal für Paare und Kurzentschlossene, die ein stilvolles Refugium suchen –
-mit voll ausgestatteter Küche, WLAN und allem, was ein romantisches
-Wochenende braucht.
+Charmantes 1-Raum-Apartment in der 1. Etage mit autarkem Eingang und Balkon mit
+seitlichem Deichblick. Ideal für bis zu 2 Personen – ruhig gelegen und trotzdem
+nah an der Familienlagune Perlebucht (ca. 0,4 km).

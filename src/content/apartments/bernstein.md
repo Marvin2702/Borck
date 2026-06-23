@@ -1,25 +1,29 @@
 ---
 name: Bernstein
 order: 3
-persons: 4
-bedrooms: 2
-view: Erdgeschoss
+persons: 2
+bedrooms: 1
+size_qm: 35
+view: Terrasse · separater Eingang
 floor: Erdgeschoss
 features:
-  - Ebenerdiger Zugang
-  - Voll ausgestattete Küche
-  - WLAN kostenfrei
-  - Terrasse
-  - Smart-TV
+  - Eigene Terrasse (ca. 35 m²)
+  - Separater privater Eingang, Anreise rund um die Uhr
+  - Offene Küche, 4-Zonen-Kochfeld & Mikrowelle
+  - Doppelbett 180 cm
+  - Duschbad mit Haartrockner
+  - Flachbild-TV mit SAT
+  - Kostenloses WLAN
+  - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 accent: "#c9821f"
-summary: Warmes Erdgeschoss-Apartment mit ebenerdigem Zugang – barrierearm und hundefreundlich.
-# TODO Auftraggeber: size_qm, price_from, smoobu_id, gallery ergänzen
+heroImage: /images/bernstein-1.jpg
+gallery:
+  - /images/bernstein-1.jpg
+  - /images/bernstein-2.jpg
+summary: Ankerplatz für Barfuß-Freunde – Auszeit im Erdgeschoss mit eigener Terrasse.
 ---
 
-**Bernstein** leuchtet in warmen, goldenen Tönen. Als Erdgeschoss-Apartment
-bietet es ebenerdigen, bequemen Zugang – ideal, wenn Treppen lästig sind, der
-Hund mit dabei ist oder Sie einfach unkompliziert ankommen möchten.
-
-Für vier Personen ausgelegt, mit voll ausgestatteter Küche, WLAN und direktem
-Zugang nach draußen. Gemütlichkeit auf einer Ebene, nah am Deich.
+Kompakte, gemütliche Ferienwohnung im Erdgeschoss mit Terrasse und separatem
+Eingang. Ideal für bis zu 2 Personen – ruhig gelegen und trotzdem nah an der
+Familienlagune Perlebucht (ca. 0,4 km).

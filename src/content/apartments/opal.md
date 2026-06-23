@@ -3,22 +3,27 @@ name: Opal
 order: 6
 persons: 4
 bedrooms: 2
-view: Doppelter Balkon
+size_qm: 55
+view: Zwei Balkone · Deichblick
+floor: 1. Etage
 features:
-  - Zwei Balkone
-  - Voll ausgestattete Küche
-  - WLAN kostenfrei
-  - Smart-TV
-  - Sonne morgens & abends
-dogFriendly: false
+  - Zwei Balkone (einer mit weitem Deichblick)
+  - Offene Einbauküche & Mini-Geschirrspüler
+  - Doppelbett 180 cm + Etagenbett
+  - Duschbad mit Haartrockner
+  - Flachbild-TV mit SAT
+  - Kostenloses WLAN
+  - Gartenmöbel
+  - PKW-Stellplatz & abschließbare Fahrradgarage
+dogFriendly: true
 accent: "#3aa6a0"
-summary: Schimmernde Leichtigkeit mit gleich zwei Balkonen – Sonne den ganzen Tag.
-# TODO Auftraggeber: size_qm, price_from, smoobu_id, gallery ergänzen
+heroImage: /images/opal-1.jpg
+gallery:
+  - /images/opal-1.jpg
+  - /images/opal-2.jpg
+summary: Deich-Kino für 4 Personen – Doppeltes Balkon-Glück mit Weitblick.
 ---
 
-**Opal** schimmert in sanften, changierenden Tönen und bietet eine Besonderheit:
-gleich **zwei Balkone**. So genießen Sie die Morgensonne auf der einen und das
-Abendlicht auf der anderen Seite – dem Lauf der Sonne folgend.
-
-Für vier Personen, mit voll ausgestatteter Küche und WLAN. Licht, Luft und
-Weite – Opal ist das Apartment für alle, die das Draußen lieben.
+Helle Ferienwohnung in der 1. Etage mit zwei Balkonen – darunter ein Balkon mit
+weitem Deichblick. Mit 2 Schlafzimmern ideal für bis zu 4 Personen. Warum nur
+einen Balkon, wenn man zwei haben kann? Rund 55 m², nur 0,4 km zur Perlebucht.

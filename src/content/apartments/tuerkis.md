@@ -3,23 +3,30 @@ name: Türkis
 order: 1
 persons: 4
 bedrooms: 2
+size_qm: 57
 view: Deichblick
+floor: 1. Etage
 features:
-  - Voll ausgestattete Küche
-  - WLAN kostenfrei
-  - Balkon oder Terrasse
-  - Smart-TV
-  - Eigener Stellplatz
+  - Balkon mit Deichblick
+  - Offene Einbauküche mit großem Geschirrspüler
+  - 4-Zonen-Induktionskochfeld
+  - Doppelbett 180 cm + Etagenbett
+  - Duschbad mit Haartrockner
+  - Flachbild-TV mit SAT
+  - Kostenloses WLAN
+  - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 accent: "#2a8ca0"
-summary: Heller Klassiker mit Blick über den Deich – ideal für Familien und Paare.
-# TODO Auftraggeber: size_qm, price_from, smoobu_id, gallery ergänzen
+heroImage: /images/tuerkis-1.jpg
+gallery:
+  - /images/tuerkis-1.jpg
+  - /images/tuerkis-2.jpg
+summary: Küstengold für 4 Personen – Urlaub mit Deichblick.
 ---
 
-Das Apartment **Türkis** empfängt Sie mit klarem, hellem Design in den Farben des
-Wattenmeers. Vom Wohnbereich schweift der Blick über den grünen Deich – morgens
-Kaffee mit Weitblick, abends das Farbenspiel der untergehenden Sonne.
+Stilvolle Ferienwohnung in der 1. Etage mit kleinem Balkon & Deichblick. Mit
+offener Küche (inkl. großem Geschirrspüler) und familienfreundlichem Grundriss –
+ideal für bis zu 4 Personen.
 
-Auf rund vier Personen ausgelegt, verbindet Türkis offene Wohnlichkeit mit einer
-voll ausgestatteten Küche und schnellem WLAN. Strand, Promenade und Ortskern
-erreichen Sie in wenigen Minuten zu Fuß.
+Zwei Schlafzimmer (Elternschlafzimmer + Kinderzimmer), rund 57 m² und nur 0,4 km
+bis zur Familienlagune Perlebucht.

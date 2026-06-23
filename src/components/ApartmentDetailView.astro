@@ -2,7 +2,7 @@
 import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BookingWidget from './BookingWidget.astro';
-import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
 interface Props { lang: Lang; apartment: CollectionEntry<'apartments'> }
@@ -62,6 +62,22 @@ const apartmentLd: Record<string, unknown> = {
       </div>
     </header>
 
+    {d.gallery.length > 0 && (
+      <section class="apt-gallery-sec">
+        <div class="container">
+          <div class={`apt-gallery count-${Math.min(d.gallery.length, 3)}`}>
+            {d.gallery.map((src, i) => (
+              <figure class={i === 0 ? 'g-main' : ''}>
+                <img src={withBase(src)} alt={`${d.name} – Ansicht ${i + 1}`}
+                     width="1200" height="800"
+                     loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
     <section class="section">
       <div class="container detail-grid">
         <div class="detail-body">
@@ -100,4 +116,17 @@ const apartmentLd: Record<string, unknown> = {
   .feature-list li { color: var(--text); }
   .dog-badge { margin-top: 1rem; color: var(--brand); font-weight: 600; }
   @media (max-width: 820px) { .detail-grid { grid-template-columns: 1fr; } .detail-aside { position: static; } }
+
+  .apt-gallery-sec { padding-top: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+  .apt-gallery { display: grid; gap: 0.8rem; }
+  .apt-gallery figure { margin: 0; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
+  .apt-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; aspect-ratio: 3 / 2; }
+  .apt-gallery.count-2 { grid-template-columns: 1fr 1fr; }
+  .apt-gallery.count-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
+  .apt-gallery.count-3 .g-main { grid-row: 1 / 3; }
+  .apt-gallery.count-3 .g-main img { aspect-ratio: auto; min-height: 100%; }
+  @media (max-width: 640px) {
+    .apt-gallery, .apt-gallery.count-2, .apt-gallery.count-3 { grid-template-columns: 1fr; grid-template-rows: none; }
+    .apt-gallery.count-3 .g-main { grid-row: auto; }
+  }
 </style>

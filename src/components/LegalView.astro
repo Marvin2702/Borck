@@ -12,24 +12,55 @@ const titles = {
   agb: 'AGB & Buchungsbedingungen',
 };
 const title = `${titles[kind]} – ${site.name}`;
+const imp = site.impressum;
 ---
 <BaseLayout title={title} description={titles[kind]} pageKey={kind} noindex={kind !== 'impressum'}>
   <section class="section">
     <div class="container-narrow">
       <h1>{titles[kind]}</h1>
-      <div class="legal-note">
-        {/* TODO: Bestehenden, rechtlich geprüften Text von nordsee-buesum-fewo.de
-            1:1 übernehmen (Impressum/Datenschutz/AGB sind rechtlich verbindlich
-            und dürfen nicht frei umformuliert werden). */}
-        <p><strong>Platzhalter.</strong> Hier wird der bestehende, rechtlich
-          geprüfte {titles[kind]}-Text der aktuellen Website eingesetzt. Bitte
-          den Originaltext übernehmen – nicht neu formulieren.</p>
-      </div>
+
+      {kind === 'impressum' ? (
+        <div class="impressum">
+          <p>Angaben gemäß § 5 DDG / § 5 TMG</p>
+          <p>
+            <strong>{imp.operator}</strong><br />
+            Ferienapartmentvermietung „{site.name}"<br />
+            {imp.street}<br />
+            {imp.postalCode} {imp.city}<br />
+            {imp.country}
+          </p>
+          <p>
+            <strong>Kontakt</strong><br />
+            Telefon: {imp.phone} (alternativ {imp.phoneAlt})<br />
+            E-Mail: <a href={`mailto:${imp.email}`}>{imp.email}</a>
+          </p>
+          <p>
+            <strong>Umsatzsteuer-Identifikationsnummer</strong> (§ 27a UStG)<br />
+            {imp.ustId}
+          </p>
+          <p>
+            <strong>Objekt-Anschrift</strong><br />
+            {site.name}, {site.address.street}, {site.address.postalCode} {site.address.city}
+          </p>
+          <p class="note">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV: {imp.operator}, {imp.street}, {imp.postalCode} {imp.city}.</p>
+        </div>
+      ) : (
+        <div class="legal-note">
+          {/* TODO: Bestehenden, rechtlich geprüften Text von nordsee-buesum-fewo.de
+              1:1 übernehmen ({titles[kind]} ist rechtlich verbindlich und darf nicht
+              frei umformuliert werden). */}
+          <p><strong>Hier folgt der Originaltext.</strong> Der bestehende, rechtlich
+            geprüfte {titles[kind]}-Text von nordsee-buesum-fewo.de wird hier
+            1:1 eingesetzt – bitte den Originaltext übernehmen, nicht neu formulieren.</p>
+        </div>
+      )}
     </div>
   </section>
 </BaseLayout>
 
 <style>
+  .impressum p { margin-bottom: 1.1rem; }
+  .impressum .note { color: var(--text-muted); font-size: 0.9rem; }
   .legal-note {
     border: 1px dashed var(--c-aqua-300);
     background: var(--c-aqua-100);
