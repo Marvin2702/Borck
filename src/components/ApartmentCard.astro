@@ -21,7 +21,7 @@ const summary = tr?.summary ?? d.summary;
   data-persons={d.persons}
   data-dog={d.dogFriendly ? '1' : '0'}
   data-seaview={d.view.toLowerCase().includes('meerblick') ? '1' : '0'}>
-  <a href={href} class="apt-media" aria-label={d.name}>
+  <a href={href} class="apt-media">
     {d.heroImage ? (
       <Img src={d.heroImage} alt={`${t('apartments.holidayApt')} ${d.name}, ${view}`} width={640} height={400} loading="lazy" sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw" />
     ) : (
