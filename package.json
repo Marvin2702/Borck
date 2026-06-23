@@ -14,6 +14,10 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",
     "@fontsource-variable/fraunces": "^5.2.9",
-    "astro": "^5.6.1"
+    "astro": "^5.6.1",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.21"
   }
 }

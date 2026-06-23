@@ -5,13 +5,15 @@
 // Entfernungen sind Näherungswerte ab dem Objekt – bei Bedarf exakt nachmessen.
 // =========================================================================
 import type { Lang } from '../i18n/utils';
+import { site } from './site';
 
 export type Activity = { name: string; url: string };
 
 export type LageCard = {
   id: string;
   icon: string;
-  distanceKm: number | null; // null => "am Apartment"
+  coords: [number, number]; // [lat, lng] – Marker-Position auf der Karte
+  atHome?: boolean;         // true => "am Apartment" statt Entfernung (= Standort des Hauses)
   title: Record<Lang, string>;
   text: Record<Lang, string>;
   activities: Record<Lang, Activity[]>;
@@ -23,7 +25,7 @@ export const lageCards: LageCard[] = [
   {
     id: 'strand',
     icon: '🌊',
-    distanceKm: 0.4,
+    coords: [54.1384261, 8.8383051], // Familienlagune Perlebucht
     title: { de: 'Strand & Perlebucht', en: 'Beach & lagoon', nl: 'Strand & lagune', da: 'Strand & lagune' },
     text: {
       de: 'Sandstrand, Familienlagune und Promenade, nur wenige Schritte vom Deich.',
@@ -57,7 +59,7 @@ export const lageCards: LageCard[] = [
   {
     id: 'watt',
     icon: '🥾',
-    distanceKm: 0.4,
+    coords: [54.1362, 8.8352], // Watt seewärts vor der Perlebucht
     title: { de: 'Wattwanderung', en: 'Mudflat walk', nl: 'Wadlopen', da: 'Vadehavstur' },
     text: {
       de: 'Geführte Touren ins UNESCO-Weltnaturerbe Wattenmeer direkt vor Büsum.',
@@ -91,7 +93,7 @@ export const lageCards: LageCard[] = [
   {
     id: 'hafen',
     icon: '⚓',
-    distanceKm: 1.2,
+    coords: [54.1220931, 8.8588978], // Büsumer Hafen
     title: { de: 'Hafen & Krabben', en: 'Harbour & shrimp', nl: 'Haven & garnalen', da: 'Havn & rejer' },
     text: {
       de: 'Fischkutter, frische Nordseekrabben und Hafenflair zum Schlendern.',
@@ -121,7 +123,7 @@ export const lageCards: LageCard[] = [
   {
     id: 'deich',
     icon: '🐑',
-    distanceKm: 0.1,
+    coords: [54.1392, 8.8430], // Deich, kurzes Stück nördlich am Haus
     title: { de: 'Deich & Radwege', en: 'Dyke & cycle paths', nl: 'Dijk & fietspaden', da: 'Dige & cykelstier' },
     text: {
       de: 'Endlose Deichwege zum Wandern und Radeln, mit Schafen und Weitblick.',
@@ -151,7 +153,7 @@ export const lageCards: LageCard[] = [
   {
     id: 'gaestekarte',
     icon: '🎫',
-    distanceKm: 0.8,
+    coords: [54.1294850, 8.8560528], // Tourist-Info Watt'n Hus
     title: { de: 'Gästekarte & Kurabgabe', en: 'Guest card & spa tax', nl: 'Gastenkaart & kuurtaks', da: 'Gæstekort & kurafgift' },
     text: {
       de: 'Die Büsumer Gästekarte bringt Ermäßigungen vor Ort; die ortsübliche Kurabgabe wird separat erhoben.',
@@ -185,7 +187,8 @@ export const lageCards: LageCard[] = [
   {
     id: 'anreise',
     icon: '🚗',
-    distanceKm: null,
+    coords: [54.1376163, 8.8448759], // Haus Aquamarin (Große Tiefe 31)
+    atHome: true,
     title: { de: 'Anreise & Parken', en: 'Arrival & parking', nl: 'Aankomst & parkeren', da: 'Ankomst & parkering' },
     text: {
       de: 'Über die A23 bis Heide und weiter nach Büsum. Zu jedem Apartment gehören ein PKW-Stellplatz und eine abschließbare Fahrradgarage.',
@@ -215,7 +218,7 @@ export const lageCards: LageCard[] = [
   {
     id: 'schietwetter',
     icon: '🌧️',
-    distanceKm: 0.6,
+    coords: [54.1281385, 8.8569203], // Wellenbad/Spa Meerzeit
     title: { de: 'Auch bei Schietwetter', en: 'Even in rough weather', nl: 'Ook bij slecht weer', da: 'Også i dårligt vejr' },
     text: {
       de: 'Das Wellenbad „Meerzeit", der Spa und das Museum am Meer machen Büsum bei jedem Wetter lohnenswert.',
@@ -252,7 +255,27 @@ const distAtHome: Record<Lang, string> = {
   de: 'am Apartment', en: 'at the apartment', nl: 'bij het appartement', da: 'ved lejligheden',
 };
 
-/** Formatiert die Entfernung lokalisiert ("ca. 0,4 km" / "approx. 0.4 km"). */
+const HOME: [number, number] = [site.geo.lat, site.geo.lng];
+
+/** Luftlinie (Haversine) in km zwischen zwei [lat, lng]-Punkten. */
+function haversineKm(a: [number, number], b: [number, number]): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b[0] - a[0]);
+  const dLng = toRad(b[1] - a[1]);
+  const lat1 = toRad(a[0]);
+  const lat2 = toRad(b[0]);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/** Entfernung einer Kachel ab dem Haus (km), oder null wenn die Kachel das Haus selbst ist. */
+export function cardDistanceKm(card: LageCard): number | null {
+  if (card.atHome) return null;
+  return haversineKm(HOME, card.coords);
+}
+
+/** Formatiert die Entfernung lokalisiert ("ca. 0,4 km" / "approx. 0.4 km" / "am Apartment"). */
 export function formatDistance(km: number | null, lang: Lang): string {
   if (km === null) return distAtHome[lang];
   const num = km.toLocaleString(lang === 'en' ? 'en-US' : 'de-DE', {
@@ -261,6 +284,9 @@ export function formatDistance(km: number | null, lang: Lang): string {
   });
   return `${lang === 'en' ? 'approx.' : 'ca.'} ${num} km`;
 }
+
+/** Koordinaten des Hauses (für Marker/Karte). */
+export const homeCoords = HOME;
 
 export const lageLabels: Record<Lang, { activities: string; open: string; close: string; distance: string }> = {
   de: { activities: 'Aktivitäten & Buchen', open: 'Aktivitäten ansehen', close: 'Schließen', distance: 'Entfernung' },

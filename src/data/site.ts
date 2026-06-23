@@ -28,8 +28,8 @@ export const site = {
     country: 'DE',
   },
 
-  // Geo (Büsum, nahe Familienlagune Perlebucht – TODO: exakte Objekt-Koordinaten)
-  geo: { lat: 54.1336, lng: 8.8575 },
+  // Geo (Große Tiefe 31, geocodiert via OSM/Nominatim – nahe Familienlagune Perlebucht)
+  geo: { lat: 54.1376163, lng: 8.8448759 },
 
   // Aggregat-Bewertung (Google – TODO: Live-Werte pflegen)
   rating: { value: 5.0, count: 8 },

@@ -3,13 +3,43 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBanner from './CtaBanner.astro';
 import { useTranslations, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
-import { lageCards, formatDistance, lageLabels } from '../data/lage';
+import { lageCards, formatDistance, cardDistanceKm, lageLabels, homeCoords } from '../data/lage';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const labels = lageLabels[lang];
 const title = `${t('location.title')} · ${site.name} Büsum`;
+
+// Daten für die interaktive Karte (sprachaufgelöst, als JSON-Insel an das Client-Skript).
+const homeCard = lageCards.find((c) => c.atHome)!;
+const mapLabels: Record<Lang, { here: string; directions: string; hint: string }> = {
+  de: { here: 'Euer Apartment', directions: 'Aktivitäten & Infos', hint: 'Tippe auf einen Marker für Infos, Entfernung und Buchung.' },
+  en: { here: 'Your apartment', directions: 'Activities & info', hint: 'Tap a marker for info, distance and booking.' },
+  nl: { here: 'Jullie appartement', directions: 'Activiteiten & info', hint: 'Tik op een marker voor info, afstand en boeking.' },
+  da: { here: 'Jeres lejlighed', directions: 'Aktiviteter & info', hint: 'Tryk på en markør for info, afstand og booking.' },
+};
+const mapPayload = {
+  home: {
+    name: site.name,
+    coords: homeCoords,
+    address: `${site.address.street} · ${site.address.postalCode} ${site.address.city}`,
+    here: mapLabels[lang].here,
+    text: homeCard.text[lang],
+    activities: homeCard.activities[lang],
+  },
+  points: lageCards
+    .filter((c) => !c.atHome)
+    .map((c) => ({
+      icon: c.icon,
+      coords: c.coords,
+      title: c.title[lang],
+      dist: formatDistance(cardDistanceKm(c), lang),
+      text: c.text[lang],
+      activities: c.activities[lang],
+    })),
+  labels: { activities: mapLabels[lang].directions },
+};
 ---
 <BaseLayout title={title} description={t('location.subtitle')} pageKey="lage">
   <section class="section lage-hero">
@@ -27,7 +57,7 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
           <button type="button" class="hl card" data-dialog={`cat-${c.id}`}>
             <span class="hl-top">
               <span class="hl-icon" aria-hidden="true">{c.icon}</span>
-              <span class="hl-dist">📍 {formatDistance(c.distanceKm, lang)}</span>
+              <span class="hl-dist">📍 {formatDistance(cardDistanceKm(c), lang)}</span>
             </span>
             <h2 class="hl-h">{c.title[lang]}</h2>
             <p>{c.text[lang]}</p>
@@ -44,7 +74,7 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
         <h2><span aria-hidden="true">{c.icon}</span> {c.title[lang]}</h2>
         <button type="button" class="ld-close" data-close aria-label={labels.close}>×</button>
       </div>
-      <p class="ld-dist">📍 {labels.distance}: {formatDistance(c.distanceKm, lang)}</p>
+      <p class="ld-dist">📍 {labels.distance}: {formatDistance(cardDistanceKm(c), lang)}</p>
       <p class="ld-sub">{labels.activities}</p>
       <div class="ld-grid">
         {c.activities[lang].map((a) => (
@@ -59,14 +89,9 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
   <section class="section section--alt" style="padding-top:0">
     <div class="container-narrow">
       <h2 class="text-center">{t('nav.location')}</h2>
-      <div class="map-embed">
-        <iframe
-          title={`Karte ${site.name} Büsum`}
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          src="https://www.google.com/maps?q=Gro%C3%9Fe%20Tiefe%2031%2C%2025761%20B%C3%BCsum&output=embed"
-        ></iframe>
-      </div>
+      <p class="text-center map-intro">{mapLabels[lang].hint}</p>
+      <div id="lage-map" class="lage-map" role="application" aria-label={`Karte mit Ausflugszielen rund um ${site.name} Büsum`}></div>
+      <script type="application/json" id="lage-map-data" set:html={JSON.stringify(mapPayload)} />
       <p class="text-center map-addr">{site.name} · {site.address.street} · {site.address.postalCode} {site.address.city}</p>
     </div>
   </section>
@@ -111,9 +136,31 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
   a.ld-act:hover { border-color: var(--c-aqua-300); background: var(--c-aqua-100); }
   .ld-act--info { color: var(--text-muted); font-weight: 500; }
 
-  .map-embed { aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--line); margin-top: 1rem; }
-  .map-embed :global(iframe) { width: 100%; height: 100%; border: 0; display: block; }
+  .map-intro { color: var(--text-muted); margin-top: 0.3rem; font-size: 0.95rem; }
+  .lage-map {
+    height: 460px; margin-top: 1rem; border-radius: var(--radius-lg);
+    overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--line);
+    background: var(--c-aqua-100); z-index: 0;
+  }
+  @media (max-width: 600px) { .lage-map { height: 380px; } }
   .map-addr { color: var(--text-muted); margin-top: 0.8rem; }
+
+  /* Leaflet-generierte Elemente liegen außerhalb des Astro-Scopes -> :global */
+  .lage-map :global(.mp-pin) {
+    display: grid; place-items: center; width: 34px; height: 34px;
+    background: #fff; border: 2px solid var(--c-aqua-300); border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(13,59,68,0.25); font-size: 1.1rem; line-height: 1;
+  }
+  .lage-map :global(.mp-pin--home) { border-color: var(--c-gold); background: #fff7e0; width: 38px; height: 38px; font-size: 1.25rem; }
+  .lage-map :global(.leaflet-popup-content) { margin: 0.8rem 1rem; font-family: var(--font-body); }
+  .lage-map :global(.mp-title) { display: block; font-family: var(--font-head); font-size: 1.1rem; color: var(--brand-strong); }
+  .lage-map :global(.mp-dist) { display: inline-block; margin-top: 0.25rem; font-size: 0.8rem; font-weight: 700; color: var(--brand); background: var(--c-aqua-100); border-radius: 999px; padding: 0.15rem 0.55rem; }
+  .lage-map :global(.mp-text) { margin: 0.5rem 0 0.6rem; color: var(--text-muted); font-size: 0.9rem; line-height: 1.45; }
+  .lage-map :global(.mp-acts) { display: grid; gap: 0.4rem; }
+  .lage-map :global(.mp-act) { display: block; padding: 0.5rem 0.7rem; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--brand-strong); font-weight: 600; font-size: 0.88rem; background: var(--c-sand-50); }
+  .lage-map :global(a.mp-act:hover) { border-color: var(--c-aqua-300); background: var(--c-aqua-100); }
+  .lage-map :global(.mp-act--info) { color: var(--text-muted); font-weight: 500; background: none; border-style: dashed; }
+  .lage-map :global(.leaflet-popup-content-wrapper) { border-radius: 12px; }
 </style>
 
 <script>
@@ -128,4 +175,78 @@ const title = `${t('location.title')} · ${site.name} Büsum`;
     dlg.querySelector('[data-close]')?.addEventListener('click', () => dlg.close());
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
   });
+</script>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+
+  const mapEl = document.getElementById('lage-map');
+  const dataEl = document.getElementById('lage-map-data');
+
+  if (mapEl && dataEl) {
+    const data = JSON.parse(dataEl.textContent || '{}');
+    const esc = (s: unknown) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    const actsHtml = (acts: any[]) => acts.map((a) =>
+      a.url
+        ? `<a class="mp-act" href="${a.url}" target="_blank" rel="noopener">${esc(a.name)} ↗</a>`
+        : `<span class="mp-act mp-act--info">${esc(a.name)}</span>`
+    ).join('');
+
+    const catPopup = (p: any) =>
+      `<div class="mp"><strong class="mp-title">${esc(p.icon)} ${esc(p.title)}</strong>` +
+      `<span class="mp-dist">📍 ${esc(p.dist)}</span>` +
+      `<p class="mp-text">${esc(p.text)}</p>` +
+      `<div class="mp-acts">${actsHtml(p.activities)}</div></div>`;
+
+    const homePopup = (h: any) =>
+      `<div class="mp"><strong class="mp-title">🏡 ${esc(h.name)}</strong>` +
+      `<span class="mp-dist">${esc(h.here)}</span>` +
+      `<p class="mp-text">${esc(h.address)}<br>${esc(h.text)}</p>` +
+      `<div class="mp-acts">${actsHtml(h.activities)}</div></div>`;
+
+    const pin = (emoji: string, extra?: string, size = 34) =>
+      L.divIcon({
+        className: ('mp-pin ' + (extra || '')).trim(),
+        html: `<span>${emoji}</span>`,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+        popupAnchor: [0, -(size / 2) - 2],
+      });
+
+    let inited = false;
+    const init = () => {
+      if (inited) return;
+      inited = true;
+      const map = L.map(mapEl as HTMLElement, { scrollWheelZoom: false }).setView(data.home.coords, 14);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
+      }).addTo(map);
+
+      const bounds: [number, number][] = [data.home.coords];
+      L.marker(data.home.coords, { icon: pin('🏡', 'mp-pin--home', 40), title: data.home.name, riseOnHover: true })
+        .addTo(map)
+        .bindPopup(homePopup(data.home), { maxWidth: 280 });
+
+      data.points.forEach((p: any) => {
+        bounds.push(p.coords);
+        L.marker(p.coords, { icon: pin(p.icon), title: p.title, riseOnHover: true })
+          .addTo(map)
+          .bindPopup(catPopup(p), { maxWidth: 280 });
+      });
+
+      map.fitBounds(bounds, { padding: [40, 40] });
+    };
+
+    // Robustes Lazy-Init: nach 'load' im Idle starten (nach LCP, unter der Falz -> CWV-schonend).
+    const start = () => {
+      const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, o?: any) => void);
+      if (ric) ric(() => init(), { timeout: 1500 });
+      else setTimeout(init, 200);
+    };
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
+  }
 </script>
