@@ -10,6 +10,7 @@ const year = new Date().getFullYear();
 const nav = [
   { key: 'apartments', label: t('nav.apartments') },
   { key: 'lage', label: t('nav.location') },
+  ...(lang === 'de' ? [{ key: 'reisefuehrer', label: 'Reiseführer' }] : []),
   { key: 'ueber-uns', label: t('nav.about') },
   { key: 'kontakt', label: t('nav.contact') },
 ];

@@ -38,4 +38,19 @@ const reviews = defineCollection({
   }),
 });
 
-export const collections = { apartments, reviews };
+// Reiseführer / Content-Cluster (DE) – Long-Tail-SEO rund um Büsum.
+const guides = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/guides' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    order: z.number().default(99),
+    teaser: z.string(),
+    icon: z.string().default('📘'),
+    updated: z.string().optional(),
+    // Verlinkte Themen-Landingpages (pageKeys aus src/data/landing.ts).
+    relatedLanding: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = { apartments, reviews, guides };

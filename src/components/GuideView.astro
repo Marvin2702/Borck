@@ -1,0 +1,114 @@
+---
+import { render, getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBanner from './CtaBanner.astro';
+import { localizedPath, useTranslations } from '../i18n/utils';
+import { site } from '../data/site';
+import { landingPages } from '../data/landing';
+
+interface Props { guide: CollectionEntry<'guides'> }
+const { guide } = Astro.props;
+const lang = 'de' as const;
+const t = useTranslations(lang);
+const g = guide.data;
+const { Content } = await render(guide);
+
+const origin = Astro.site ?? new URL(site.domain);
+const url = new URL(localizedPath(`reisefuehrer/${guide.id}`, lang), origin).href;
+
+const others = (await getCollection('guides'))
+  .filter((x) => x.id !== guide.id)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+
+const articleLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: g.title,
+  description: g.description,
+  ...(g.updated ? { datePublished: g.updated, dateModified: g.updated } : {}),
+  author: { '@type': 'Person', name: site.legalName },
+  publisher: { '@type': 'Organization', name: site.name },
+  mainEntityOfPage: url,
+};
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Start', item: new URL(localizedPath('', lang), origin).href },
+    { '@type': 'ListItem', position: 2, name: 'Reiseführer', item: new URL(localizedPath('reisefuehrer', lang), origin).href },
+    { '@type': 'ListItem', position: 3, name: g.title, item: url },
+  ],
+};
+---
+<BaseLayout
+  title={`${g.title} · ${site.name}`}
+  description={g.description}
+  pageKey={`reisefuehrer/${guide.id}`}
+  noAlternates={true}
+  jsonLd={[articleLd, breadcrumbLd]}
+>
+  <article>
+    <header class="section guide-hero">
+      <div class="container-narrow">
+        <a class="back" href={localizedPath('reisefuehrer', lang)}>← Reiseführer</a>
+        <p class="eyebrow"><span aria-hidden="true">{g.icon}</span> Büsum</p>
+        <h1>{g.title}</h1>
+        {g.updated && <p class="guide-updated">Aktualisiert: {g.updated}</p>}
+      </div>
+    </header>
+
+    <section class="section" style="padding-top:0">
+      <div class="container-narrow prose">
+        <Content />
+      </div>
+    </section>
+
+    <section class="section section--alt">
+      <div class="container-narrow">
+        <p class="related-lead">{t('apartments.exploreArea')} <a href={localizedPath('lage', lang)}>Lage &amp; Umgebung →</a></p>
+        <div class="guide-links">
+          <a class="btn btn--gold" href={localizedPath('apartments', lang)}>Apartments ansehen</a>
+          {g.relatedLanding.map((key) => (
+            landingPages[key] && <a class="btn btn--ghost" href={localizedPath(key, lang)}>{landingPages[key].content.de.h1}</a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {others.length > 0 && (
+      <section class="section" style="padding-top:0">
+        <div class="container-narrow">
+          <h2>Weitere Reisetipps</h2>
+          <ul class="more-guides">
+            {others.map((o) => (
+              <li><a href={localizedPath(`reisefuehrer/${o.id}`, lang)}><span aria-hidden="true">{o.data.icon}</span> {o.data.title}</a></li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+  </article>
+
+  <CtaBanner lang="de" />
+</BaseLayout>
+
+<style>
+  .guide-hero { padding-bottom: 0.5rem; }
+  .back { display: inline-block; margin-bottom: 0.8rem; text-decoration: none; font-weight: 600; color: var(--brand); }
+  .guide-updated { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.4rem; }
+
+  .prose { font-size: 1.05rem; }
+  .prose :global(h2) { font-family: var(--font-head); font-size: 1.5rem; margin: 1.8rem 0 0.6rem; color: var(--brand-strong); }
+  .prose :global(p) { margin: 0 0 1rem; line-height: 1.7; }
+  .prose :global(ul) { margin: 0 0 1rem 1.2rem; display: grid; gap: 0.4rem; }
+  .prose :global(li) { line-height: 1.6; }
+  .prose :global(a) { color: var(--brand); }
+
+  .related-lead { margin: 0 0 1rem; color: var(--text-muted); }
+  .related-lead a { color: var(--brand); font-weight: 600; text-decoration: none; }
+  .guide-links { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+  .more-guides { list-style: none; padding: 0; margin: 0.6rem 0 0; display: grid; gap: 0.5rem; }
+  .more-guides a { color: var(--brand-strong); font-weight: 600; text-decoration: none; }
+  .more-guides a:hover { color: var(--brand); }
+</style>

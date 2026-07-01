@@ -10,6 +10,8 @@ const t = useTranslations(lang);
 const nav = [
   { key: 'apartments', label: t('nav.apartments') },
   { key: 'lage', label: t('nav.location') },
+  // Reiseführer-Cluster nur auf Deutsch (Content DE-only).
+  ...(lang === 'de' ? [{ key: 'reisefuehrer', label: 'Reiseführer' }] : []),
   { key: 'ueber-uns', label: t('nav.about') },
   { key: 'kontakt', label: t('nav.contact') },
 ];
