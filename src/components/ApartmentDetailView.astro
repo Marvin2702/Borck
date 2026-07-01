@@ -1,5 +1,5 @@
 ---
-import { render, type CollectionEntry } from 'astro:content';
+import { render, getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BookingWidget from './BookingWidget.astro';
 import GoodToKnow from './GoodToKnow.astro';
@@ -80,6 +80,12 @@ const breadcrumbLd = {
     { '@type': 'ListItem', position: 3, name: d.name, item: detailUrl },
   ],
 };
+
+// Interne Verlinkung: bis zu 3 weitere Apartments (nach Reihenfolge).
+const others = (await getCollection('apartments'))
+  .filter((a) => a.id !== apartment.id)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
 ---
 <BaseLayout
   title={title}
@@ -144,6 +150,21 @@ const breadcrumbLd = {
 
     <GoodToKnow lang={lang} />
 
+    <section class="section section--alt more-sec">
+      <div class="container">
+        <h2>{t('apartments.more')}</h2>
+        <div class="more-grid">
+          {others.map((o) => (
+            <a class="more-card" href={localizedPath(`apartments/${o.id}`, lang)}>
+              <strong>{o.data.name}</strong>
+              <span>{trApt(o.id, lang)?.view ?? o.data.view}</span>
+            </a>
+          ))}
+        </div>
+        <p class="more-lage">{t('apartments.exploreArea')} <a href={localizedPath('lage', lang)}>{t('nav.location')} →</a></p>
+      </div>
+    </section>
+
     <div class="sticky-cta">
       <span class="sticky-price">
         {price ? <span>{t('apartments.from')} <strong>{price} €</strong></span> : <strong>{d.name}</strong>}
@@ -194,6 +215,15 @@ const breadcrumbLd = {
   .lightbox[hidden] { display: none; }
   .lightbox-img { max-width: 95vw; max-height: 90vh; border-radius: 8px; box-shadow: var(--shadow-lg); }
   .lightbox-close { position: absolute; top: 0.8rem; right: 1.2rem; background: none; border: 0; color: #fff; font-size: 2.6rem; line-height: 1; cursor: pointer; }
+
+  .more-sec h2 { margin-top: 0; }
+  .more-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0 1.2rem; }
+  .more-card { display: flex; flex-direction: column; gap: 0.2rem; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none; box-shadow: var(--shadow-sm); transition: transform 0.15s ease, border-color 0.2s ease; }
+  .more-card:hover { transform: translateY(-3px); border-color: var(--c-aqua-300); }
+  .more-card strong { color: var(--brand-strong); font-family: var(--font-head); font-size: 1.15rem; }
+  .more-card span { color: var(--text-muted); font-size: 0.9rem; }
+  .more-lage a { color: var(--brand); font-weight: 600; text-decoration: none; }
+  @media (max-width: 700px) { .more-grid { grid-template-columns: 1fr; } }
 
   /* Sticky Buchungs-CTA (mobil) */
   .sticky-cta {

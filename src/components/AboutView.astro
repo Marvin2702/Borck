@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBanner from './CtaBanner.astro';
 import Img from './Img.astro';
-import { useTranslations, withBase, type Lang } from '../i18n/utils';
+import { useTranslations, withBase, localizedPath, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
 interface Props { lang: Lang }
@@ -75,6 +75,11 @@ const title = `${t('about.title')} · ${site.name} Büsum`;
           <p class="signoff">{content.signoff}</p>
         </div>
       </div>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="container-narrow text-center">
+      <a class="btn btn--ghost" href={localizedPath('apartments', lang)}>{t('apartments.all')}</a>
     </div>
   </section>
   <CtaBanner lang={lang} />
