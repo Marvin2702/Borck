@@ -31,6 +31,7 @@ const t = useTranslations(lang);
 
   <section class="section" style="padding-top:0">
     <div class="container">
+      <h2 class="visually-hidden">{t('apartments.title')}</h2>
       <div class="apt-grid">
         {apartments.map((a) => <ApartmentCard apartment={a} lang={lang} />)}
       </div>

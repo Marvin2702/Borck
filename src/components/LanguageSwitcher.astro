@@ -1,11 +1,14 @@
 ---
 import { languages, locales, localizedPath, pageKeyFromUrl, type Lang } from '../i18n/utils';
 
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props { lang: Lang; noAlternates?: boolean }
+const { lang, noAlternates = false } = Astro.props;
 
 // Aktuellen sprachneutralen Pfad ermitteln (Base + Locale-Präfix entfernt).
 const pageKey = pageKeyFromUrl(Astro.url);
+// Auf einsprachigen Seiten (noAlternates) existieren keine Übersetzungen dieser
+// URL -> Sprachlinks auf die jeweilige Sprach-Startseite zeigen (statt 404).
+const targetFor = (l: Lang) => (noAlternates && l !== lang ? '' : pageKey);
 ---
 
 <div class="lang" data-lang>
@@ -15,7 +18,7 @@ const pageKey = pageKeyFromUrl(Astro.url);
   <ul class="lang-menu" role="menu">
     {locales.map((l) => (
       <li role="none">
-        <a role="menuitem" href={localizedPath(pageKey, l)} hreflang={l}
+        <a role="menuitem" href={localizedPath(targetFor(l), l)} hreflang={l}
            class={l === lang ? 'is-active' : ''} lang={l}>
           {languages[l]}
         </a>

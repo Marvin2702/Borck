@@ -41,6 +41,14 @@ const ogLocaleMap: Record<string, string> = { de: 'de_DE', en: 'en_US', nl: 'nl_
 const ogLocale = ogLocaleMap[lang] ?? 'de_DE';
 const localeAlternates = (['de', 'en', 'nl', 'da'] as const).filter((l) => l !== lang).map((l) => ogLocaleMap[l]);
 
+// Objekt-Ausstattung (lokalisiert) für das LodgingBusiness-Schema.
+const amenityNames: Record<string, string[]> = {
+  de: ['WLAN', 'Parkplatz', 'Fahrradgarage', 'Haustiere willkommen'],
+  en: ['Wi-Fi', 'Parking', 'Bike storage', 'Pets welcome'],
+  nl: ['Wifi', 'Parkeerplaats', 'Fietsenstalling', 'Huisdieren welkom'],
+  da: ['Wi-Fi', 'Parkering', 'Cykelparkering', 'Kæledyr velkomne'],
+};
+
 // JSON-LD: LodgingBusiness (reguläres Schema, bewusst KEIN Google-VacationRental).
 const lodging: Record<string, unknown> = {
   '@context': 'https://schema.org',
@@ -65,6 +73,12 @@ const lodging: Record<string, unknown> = {
   petsAllowed: true,
   checkinTime: site.checkinTime,
   checkoutTime: site.checkoutTime,
+  amenityFeature: (amenityNames[lang] ?? amenityNames.de).map((name) => ({
+    '@type': 'LocationFeatureSpecification', name, value: true,
+  })),
+  ...(site.facebook || site.instagram
+    ? { sameAs: [site.facebook, site.instagram].filter(Boolean) }
+    : {}),
 };
 // AggregateRating + einzelne Reviews NUR auf der Startseite ausgeben (dort sind
 // die Bewertungen sichtbar) — entspricht Googles Rich-Result-Policy.
@@ -133,7 +147,7 @@ const allJsonLd = [lodging, ...jsonLd];
   </head>
   <body>
     <a href="#main" class="skip-link">{t('nav.home')}</a>
-    <Header lang={lang} />
+    <Header lang={lang} noAlternates={noAlternates} />
     <main id="main">
       <slot />
     </main>

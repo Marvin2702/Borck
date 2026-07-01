@@ -3,8 +3,8 @@ import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/uti
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { site } from '../data/site';
 
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props { lang: Lang; noAlternates?: boolean }
+const { lang, noAlternates = false } = Astro.props;
 const t = useTranslations(lang);
 
 const nav = [
@@ -32,7 +32,7 @@ const bookHref = localizedPath('apartments', lang);
       {nav.map((item) => (
         <a href={localizedPath(item.key, lang)} class="nav-link">{item.label}</a>
       ))}
-      <LanguageSwitcher lang={lang} />
+      <LanguageSwitcher lang={lang} noAlternates={noAlternates} />
       <a href={bookHref} class="btn btn--gold nav-cta">{t('nav.book')}</a>
     </nav>
   </div>

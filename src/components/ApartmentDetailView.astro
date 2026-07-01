@@ -25,9 +25,11 @@ const tr = trApt(apartment.id, lang);
 const view = tr?.view ?? d.view;
 const summary = tr?.summary ?? d.summary;
 const apt = t('apartments.holidayApt');
+// Ortspräposition lokalisiert (DA: "i Büsum", sonst "in Büsum").
+const inTown = lang === 'da' ? 'i Büsum' : 'in Büsum';
 
 const title = `${apt} ${d.name} · ${site.name} Büsum`;
-const description = `${apt} ${d.name} in Büsum: ${summary} ${d.persons} ${t('apartments.persons')}, ${view}.`;
+const description = `${apt} ${d.name} ${inTown}: ${summary} ${d.persons} ${t('apartments.persons')}, ${view}.`;
 
 // JSON-LD: Apartment (+ Offer, falls Preis). Reguläres Schema.org.
 const apartmentLd: Record<string, unknown> = {
@@ -36,10 +38,10 @@ const apartmentLd: Record<string, unknown> = {
   name: `${site.name} · ${d.name}`,
   description: summary,
   url: detailUrl,
+  containedInPlace: { '@id': new URL('/#lodging', origin).href },
   image: d.gallery.map((g) => new URL(withBase(g), origin).href),
   occupancy: { '@type': 'QuantitativeValue', maxValue: d.persons },
   numberOfBedrooms: d.bedrooms,
-  numberOfRooms: d.bedrooms,
   petsAllowed: d.dogFriendly,
   checkinTime: site.checkinTime,
   checkoutTime: site.checkoutTime,
@@ -108,7 +110,7 @@ const breadcrumbLd = {
           <div class={`apt-gallery count-${Math.min(d.gallery.length, 3)}`}>
             {d.gallery.map((src, i) => (
               <figure class={i === 0 ? 'g-main' : ''} data-lightbox-item>
-                <Img src={src} alt={`${apt} ${d.name}, ${view} (${i + 1})`}
+                <Img src={src} alt={`${apt} ${d.name}, ${view} · Büsum (${i + 1})`}
                      width={1200} height={800}
                      loading={i === 0 ? 'eager' : 'lazy'}
                      fetchpriority={i === 0 ? 'high' : undefined}
