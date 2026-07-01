@@ -2,29 +2,43 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBanner from './CtaBanner.astro';
+import ExperienceMap from './ExperienceMap.astro';
 import { localizedPath } from '../i18n/utils';
 import { site } from '../data/site';
+import { experiences } from '../data/experiences';
 
 const guides = (await getCollection('guides')).sort((a, b) => a.data.order - b.data.order);
-const title = `Reiseführer Büsum · ${site.name}`;
-const description = 'Reiseführer für Büsum: Wattwandern, Strand & Perlebucht, Anreise, Radtouren, Familienurlaub und Tipps für Schietwetter – alles rund ums Haus Aquamarin.';
+const title = `Reiseführer Büsum: Erlebnisse & Ausflugsziele · ${site.name}`;
+const description = 'Reiseführer für Büsum: die Top-Erlebnisse und Ausflugsziele im Umkreis von 20 km auf einer interaktiven Karte – Wattwandern, Seehundstation, Helgoland, Wellenbad, Kartbahn und mehr, mit Entfernung ab dem Haus.';
+const house = { name: site.name, coords: [site.geo.lat, site.geo.lng] as [number, number], address: `${site.address.street} · ${site.address.postalCode} ${site.address.city}` };
 ---
 <BaseLayout title={title} description={description} pageKey="reisefuehrer" noAlternates={true}>
   <section class="section">
     <div class="container-narrow text-center">
       <p class="eyebrow">Reiseführer · Büsum</p>
-      <h1>Büsum entdecken</h1>
-      <p class="lead mx-auto">Praktische Tipps rund um Büsum – von der Wattwanderung bis zum Schlechtwetter-Programm, alles in Laufnähe zum Haus Aquamarin.</p>
+      <h1>Büsum erleben</h1>
+      <p class="lead mx-auto">Die schönsten Erlebnisse und Ausflugsziele rund um Büsum – im Umkreis von 20 km, mit Entfernung ab dem Haus und Direktlink zum Anbieter.</p>
     </div>
   </section>
 
   <section class="section" style="padding-top:0">
     <div class="container">
+      <h2 class="text-center sec-h2">Erlebnisse & Ausflugsziele auf der Karte</h2>
+      <ExperienceMap lang="de" home={house} points={experiences} showCards={true} mapId="reisefuehrer-map" />
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="sec-head text-center">
+        <p class="eyebrow">Reiseführer</p>
+        <h2>Tipps & Guides</h2>
+      </div>
       <div class="guide-grid">
         {guides.map((g) => (
           <a class="guide-card card" href={localizedPath(`reisefuehrer/${g.id}`, 'de')}>
             <span class="guide-icon" aria-hidden="true">{g.data.icon}</span>
-            <h2>{g.data.title}</h2>
+            <h3>{g.data.title}</h3>
             <p>{g.data.teaser}</p>
             <span class="guide-more">Weiterlesen →</span>
           </a>
@@ -37,11 +51,13 @@ const description = 'Reiseführer für Büsum: Wattwandern, Strand & Perlebucht,
 </BaseLayout>
 
 <style>
+  .sec-h2 { margin-bottom: 1rem; }
+  .sec-head { margin-bottom: 2rem; }
   .guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
   .guide-card { display: flex; flex-direction: column; gap: 0.3rem; padding: 1.4rem; text-decoration: none; color: inherit; transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
   .guide-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--c-aqua-300); }
   .guide-icon { font-size: 2rem; }
-  .guide-card h2 { font-size: 1.25rem; margin: 0.2rem 0; color: var(--brand-strong); }
+  .guide-card h3 { font-size: 1.25rem; margin: 0.2rem 0; color: var(--brand-strong); }
   .guide-card p { color: var(--text-muted); font-size: 0.95rem; flex: 1; margin: 0; }
   .guide-more { color: var(--brand); font-weight: 600; font-size: 0.9rem; margin-top: 0.6rem; }
   @media (max-width: 900px) { .guide-grid { grid-template-columns: 1fr 1fr; } }

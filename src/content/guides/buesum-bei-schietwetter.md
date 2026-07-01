@@ -1,6 +1,6 @@
 ---
 title: "Büsum bei Schietwetter: Programm für graue Tage"
-description: "Schlechtwetter-Tipps für Büsum: Wellenbad Meerzeit, Spa und das Museum am Meer machen graue Nordsee-Tage lohnenswert. Ideen für Familien und Paare."
+description: "Schietwetter-Tipps für Büsum: Wellenbad Meerzeit, Spa und das Museum am Meer machen graue Nordsee-Tage lohnenswert. Ideen für Familien und Paare."
 order: 3
 icon: "🌧️"
 updated: "2026-07-01"

@@ -1,0 +1,163 @@
+---
+// Wiederverwendbare interaktive Leaflet/OpenStreetMap-Karte (kein API-Key).
+// Reiseführer: Erlebnis-Ziele mit Buchungslinks. Lage: Orientierungspunkte.
+import { haversineKm, formatKm } from '../data/experiences';
+import type { Lang } from '../i18n/utils';
+
+type MapPoint = {
+  name: string;
+  icon: string;
+  coords: [number, number];
+  area?: string;
+  description?: string;
+  url?: string;
+  indoor?: boolean;
+};
+
+interface Props {
+  lang: Lang;
+  home: { name: string; coords: [number, number]; address?: string; label?: string };
+  points: MapPoint[];
+  showCards?: boolean;
+  mapId?: string;
+}
+const { lang, home, points, showCards = false, mapId = 'exp-map' } = Astro.props;
+
+const moreLabel: Record<Lang, string> = { de: 'Zur Website', en: 'Visit website', nl: 'Naar de website', da: 'Til websiden' };
+const hint: Record<Lang, string> = {
+  de: 'Tippe auf einen Marker für Infos, Entfernung und Buchung.',
+  en: 'Tap a marker for info, distance and booking.',
+  nl: 'Tik op een marker voor info, afstand en boeking.',
+  da: 'Tryk på en markør for info, afstand og booking.',
+};
+
+const enriched = points.map((p) => ({
+  ...p,
+  dist: formatKm(haversineKm(home.coords, p.coords), lang),
+}));
+
+const payload = {
+  home: { name: home.name, coords: home.coords, address: home.address ?? '' },
+  moreLabel: moreLabel[lang],
+  points: enriched.map((p) => ({ icon: p.icon, name: p.name, coords: p.coords, dist: p.dist, description: p.description ?? '', url: p.url ?? '' })),
+};
+---
+
+<p class="exp-hint text-center">{hint[lang]}</p>
+<div id={mapId} class="exp-map" role="application" aria-label={`Karte mit Zielen rund um ${home.name}`}></div>
+<script type="application/json" data-map-data={mapId} set:html={JSON.stringify(payload)} />
+
+{showCards && (
+  <div class="exp-grid">
+    {enriched.map((p) => (
+      <article class="exp-card card">
+        <span class="exp-top">
+          <span class="exp-icon" aria-hidden="true">{p.icon}</span>
+          <span class="exp-dist">📍 {p.dist}</span>
+        </span>
+        <h3 class="exp-name">{p.name}</h3>
+        {p.area && <span class="exp-area">{p.area}</span>}
+        {p.description && <p class="exp-desc">{p.description}</p>}
+        {p.url && <a class="exp-link" href={p.url} target="_blank" rel="noopener">{moreLabel[lang]} <span aria-hidden="true">↗</span></a>}
+      </article>
+    ))}
+  </div>
+)}
+
+<style>
+  .exp-hint { color: var(--text-muted); font-size: 0.95rem; margin: 0.3rem 0 1rem; }
+  .exp-map {
+    height: 480px; border-radius: var(--radius-lg); overflow: hidden;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--line);
+    background: var(--c-aqua-100); z-index: 0;
+  }
+  @media (max-width: 600px) { .exp-map { height: 380px; } }
+
+  .exp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.4rem; }
+  @media (max-width: 1000px) { .exp-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .exp-grid { grid-template-columns: 1fr; } }
+  .exp-card { padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.25rem; }
+  .exp-top { display: flex; align-items: center; justify-content: space-between; }
+  .exp-icon { font-size: 1.55rem; }
+  .exp-dist { font-size: 0.76rem; font-weight: 700; color: var(--brand); background: var(--c-aqua-100); border-radius: 999px; padding: 0.2rem 0.55rem; white-space: nowrap; }
+  .exp-name { margin: 0.35rem 0 0; font-size: 1.08rem; color: var(--brand-strong); }
+  .exp-area { color: var(--text-muted); font-size: 0.8rem; }
+  .exp-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.45; flex: 1; margin: 0.3rem 0 0; }
+  .exp-link { margin-top: 0.6rem; color: var(--brand); font-weight: 600; font-size: 0.9rem; text-decoration: none; }
+  .exp-link:hover { text-decoration: underline; }
+
+  /* Leaflet-generierte Elemente liegen außerhalb des Astro-Scopes -> :global */
+  .exp-map :global(.mp-pin) {
+    display: grid; place-items: center; width: 34px; height: 34px;
+    background: #fff; border: 2px solid var(--c-aqua-300); border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(13,59,68,0.25); font-size: 1.05rem; line-height: 1;
+  }
+  .exp-map :global(.mp-pin--home) { border-color: var(--c-gold); background: #fff7e0; width: 38px; height: 38px; font-size: 1.2rem; }
+  .exp-map :global(.leaflet-popup-content) { margin: 0.8rem 1rem; font-family: var(--font-body); }
+  .exp-map :global(.mp-title) { display: block; font-family: var(--font-head); font-size: 1.08rem; color: var(--brand-strong); }
+  .exp-map :global(.mp-dist) { display: inline-block; margin-top: 0.25rem; font-size: 0.78rem; font-weight: 700; color: var(--brand); background: var(--c-aqua-100); border-radius: 999px; padding: 0.15rem 0.55rem; }
+  .exp-map :global(.mp-text) { margin: 0.5rem 0 0.6rem; color: var(--text-muted); font-size: 0.88rem; line-height: 1.45; }
+  .exp-map :global(.mp-act) { display: inline-block; padding: 0.45rem 0.7rem; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--brand-strong); font-weight: 600; font-size: 0.86rem; background: var(--c-sand-50); }
+  .exp-map :global(a.mp-act:hover) { border-color: var(--c-aqua-300); background: var(--c-aqua-100); }
+  .exp-map :global(.leaflet-popup-content-wrapper) { border-radius: 12px; }
+</style>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+
+  document.querySelectorAll<HTMLScriptElement>('[data-map-data]').forEach((dataEl) => {
+    const id = dataEl.getAttribute('data-map-data');
+    const mapEl = id ? document.getElementById(id) : null;
+    if (!mapEl || !dataEl.textContent) return;
+    const data = JSON.parse(dataEl.textContent);
+
+    const esc = (s: unknown) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const pin = (emoji: string, extra?: string, size = 34) =>
+      L.divIcon({
+        className: ('mp-pin ' + (extra || '')).trim(),
+        html: `<span>${emoji}</span>`,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+        popupAnchor: [0, -(size / 2) - 2],
+      });
+    const pointPopup = (p: any) =>
+      `<div class="mp"><strong class="mp-title">${esc(p.icon)} ${esc(p.name)}</strong>` +
+      `<span class="mp-dist">📍 ${esc(p.dist)}</span>` +
+      (p.description ? `<p class="mp-text">${esc(p.description)}</p>` : '<div style="height:.4rem"></div>') +
+      (p.url ? `<a class="mp-act" href="${p.url}" target="_blank" rel="noopener">${esc(data.moreLabel || 'Website')} ↗</a>` : '') +
+      `</div>`;
+    const homePopup = (h: any) =>
+      `<div class="mp"><strong class="mp-title">🏡 ${esc(h.name)}</strong>` +
+      (h.address ? `<p class="mp-text">${esc(h.address)}</p>` : '') + `</div>`;
+
+    let inited = false;
+    const init = () => {
+      if (inited) return;
+      inited = true;
+      const map = L.map(mapEl as HTMLElement, { scrollWheelZoom: false }).setView(data.home.coords, 12);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        detectRetina: true,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
+      }).addTo(map);
+      const bounds: [number, number][] = [data.home.coords];
+      L.marker(data.home.coords, { icon: pin('🏡', 'mp-pin--home', 40), title: data.home.name, riseOnHover: true })
+        .addTo(map).bindPopup(homePopup(data.home), { maxWidth: 280 });
+      data.points.forEach((p: any) => {
+        bounds.push(p.coords);
+        L.marker(p.coords, { icon: pin(p.icon), title: p.name, riseOnHover: true })
+          .addTo(map).bindPopup(pointPopup(p), { maxWidth: 280 });
+      });
+      map.fitBounds(bounds, { padding: [40, 40] });
+    };
+
+    const start = () => {
+      const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, o?: any) => void);
+      if (ric) ric(() => init(), { timeout: 1500 });
+      else setTimeout(init, 200);
+    };
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
+  });
+</script>

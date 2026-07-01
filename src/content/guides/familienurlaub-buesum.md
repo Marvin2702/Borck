@@ -1,6 +1,6 @@
 ---
 title: "Familienurlaub in Büsum: Perlebucht, Strand und mehr"
-description: "Familienurlaub in Büsum: die geschützte Familienlagune Perlebucht, flaches Wasser, Wattwandern für Kinder und Schlechtwetter-Programm. Tipps für den Nordseeurlaub mit Kindern."
+description: "Familienurlaub in Büsum: die geschützte Familienlagune Perlebucht, flaches Wasser, Wattwandern für Kinder und Schietwetter-Programm. Tipps für den Nordseeurlaub mit Kindern."
 order: 6
 icon: "👨‍👩‍👧"
 updated: "2026-07-01"

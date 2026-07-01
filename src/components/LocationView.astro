@@ -1,45 +1,39 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBanner from './CtaBanner.astro';
+import ExperienceMap from './ExperienceMap.astro';
 import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
-import { lageCards, formatDistance, cardDistanceKm, lageLabels, homeCoords } from '../data/lage';
+import { lageCards } from '../data/lage';
+import { haversineKm, formatKm } from '../data/experiences';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const labels = lageLabels[lang];
 const title = `${t('location.title')} · ${site.name} Büsum`;
 
-// Daten für die interaktive Karte (sprachaufgelöst, als JSON-Insel an das Client-Skript).
-const homeCard = lageCards.find((c) => c.atHome)!;
-const mapLabels: Record<Lang, { here: string; directions: string; hint: string }> = {
-  de: { here: 'Euer Apartment', directions: 'Aktivitäten & Infos', hint: 'Tippe auf einen Marker für Infos, Entfernung und Buchung.' },
-  en: { here: 'Your apartment', directions: 'Activities & info', hint: 'Tap a marker for info, distance and booking.' },
-  nl: { here: 'Jullie appartement', directions: 'Activiteiten & info', hint: 'Tik op een marker voor info, afstand en boeking.' },
-  da: { here: 'Jeres lejlighed', directions: 'Aktiviteter & info', hint: 'Tryk på en markør for info, afstand og booking.' },
+const house = { name: site.name, coords: [site.geo.lat, site.geo.lng] as [number, number], address: `${site.address.street} · ${site.address.postalCode} ${site.address.city}` };
+
+// Anreise-Inhalt aus lage.ts (die "atHome"-Karte).
+const anreise = lageCards.find((c) => c.atHome)!;
+const routeLink = anreise.activities[lang].find((a) => a.url)?.url;
+const parkNote = anreise.activities[lang].find((a) => !a.url)?.name;
+
+const L: Record<string, Record<Lang, string>> = {
+  anreise: { de: 'Anreise & Parken', en: 'Getting here & parking', nl: 'Aankomst & parkeren', da: 'Ankomst & parkering' },
+  route: { de: 'Route planen', en: 'Plan route', nl: 'Route plannen', da: 'Planlæg rute' },
+  dist: { de: 'Entfernungen & Karte', en: 'Distances & map', nl: 'Afstanden & kaart', da: 'Afstande & kort' },
 };
-const mapPayload = {
-  home: {
-    name: site.name,
-    coords: homeCoords,
-    address: `${site.address.street} · ${site.address.postalCode} ${site.address.city}`,
-    here: mapLabels[lang].here,
-    text: homeCard.text[lang],
-    activities: homeCard.activities[lang],
-  },
-  points: lageCards
-    .filter((c) => !c.atHome)
-    .map((c) => ({
-      icon: c.icon,
-      coords: c.coords,
-      title: c.title[lang],
-      dist: formatDistance(cardDistanceKm(c), lang),
-      text: c.text[lang],
-      activities: c.activities[lang],
-    })),
-  labels: { activities: mapLabels[lang].directions },
-};
+
+// Orientierungspunkte (Karte + Entfernungsliste).
+const orient: { name: Record<Lang, string>; icon: string; coords: [number, number] }[] = [
+  { name: { de: 'Strand & Perlebucht', en: 'Beach & lagoon', nl: 'Strand & lagune', da: 'Strand & lagune' }, icon: '🏖️', coords: [54.1354887, 8.8394263] },
+  { name: { de: 'Deich', en: 'Dyke', nl: 'Dijk', da: 'Dige' }, icon: '🐑', coords: [54.1392, 8.8430] },
+  { name: { de: 'Wellenbad Meerzeit', en: 'Meerzeit wave pool', nl: 'Golfbad Meerzeit', da: 'Bølgebad Meerzeit' }, icon: '🌊', coords: [54.1281385, 8.8569203] },
+  { name: { de: 'Ortszentrum', en: 'Town centre', nl: 'Centrum', da: 'Bymidte' }, icon: '🏘️', coords: [54.1294850, 8.8560528] },
+  { name: { de: 'Hafen & Leuchtturm', en: 'Harbour & lighthouse', nl: 'Haven & vuurtoren', da: 'Havn & fyrtårn' }, icon: '⚓', coords: [54.1220931, 8.8588978] },
+];
+const orientPoints = orient.map((o) => ({ name: o.name[lang], icon: o.icon, coords: o.coords }));
 ---
 <BaseLayout title={title} description={t('location.subtitle')} pageKey="lage">
   <section class="section lage-hero">
@@ -47,52 +41,33 @@ const mapPayload = {
       <p class="eyebrow">{site.tagline}</p>
       <h1>{t('location.title')}</h1>
       <p class="lead mx-auto">{t('location.subtitle')}</p>
-      <p class="lage-apts-link"><a class="btn btn--ghost" href={localizedPath('apartments', lang)}>{t('apartments.all')}</a></p>
     </div>
   </section>
 
   <section class="section" style="padding-top:0">
-    <div class="container">
-      <div class="hl-grid">
-        {lageCards.map((c) => (
-          <button type="button" class="hl card" data-dialog={`cat-${c.id}`}>
-            <span class="hl-top">
-              <span class="hl-icon" aria-hidden="true">{c.icon}</span>
-              <span class="hl-dist">📍 {formatDistance(cardDistanceKm(c), lang)}</span>
-            </span>
-            <h2 class="hl-h">{c.title[lang]}</h2>
-            <p>{c.text[lang]}</p>
-            <span class="hl-open">{labels.open} →</span>
-          </button>
-        ))}
+    <div class="container-narrow">
+      <h2>{L.anreise[lang]}</h2>
+      <p class="anreise-text">{anreise.text[lang]}</p>
+      {parkNote && <p class="park-note">✓ {parkNote}</p>}
+      <div class="lage-actions">
+        {routeLink && <a class="btn btn--gold" href={routeLink} target="_blank" rel="noopener">{L.route[lang]}</a>}
+        <a class="btn btn--ghost" href={localizedPath('apartments', lang)}>{t('apartments.all')}</a>
       </div>
     </div>
   </section>
 
-  {lageCards.map((c) => (
-    <dialog class="lage-dialog" id={`cat-${c.id}`} aria-label={c.title[lang]}>
-      <div class="ld-head">
-        <h2><span aria-hidden="true">{c.icon}</span> {c.title[lang]}</h2>
-        <button type="button" class="ld-close" data-close aria-label={labels.close}>×</button>
-      </div>
-      <p class="ld-dist">📍 {labels.distance}: {formatDistance(cardDistanceKm(c), lang)}</p>
-      <p class="ld-sub">{labels.activities}</p>
-      <div class="ld-grid">
-        {c.activities[lang].map((a) => (
-          a.url
-            ? <a class="ld-act" href={a.url} target="_blank" rel="noopener">{a.name}<span aria-hidden="true">↗</span></a>
-            : <span class="ld-act ld-act--info">{a.name}</span>
-        ))}
-      </div>
-    </dialog>
-  ))}
-
-  <section class="section section--alt" style="padding-top:0">
+  <section class="section section--alt">
     <div class="container-narrow">
-      <h2 class="text-center">{t('nav.location')}</h2>
-      <p class="text-center map-intro">{mapLabels[lang].hint}</p>
-      <div id="lage-map" class="lage-map" role="application" aria-label={`Karte mit Ausflugszielen rund um ${site.name} Büsum`}></div>
-      <script type="application/json" id="lage-map-data" set:html={JSON.stringify(mapPayload)} />
+      <h2>{L.dist[lang]}</h2>
+      <ul class="dist-list">
+        {orient.map((o) => (
+          <li>
+            <span><span aria-hidden="true">{o.icon}</span> {o.name[lang]}</span>
+            <strong>{formatKm(haversineKm(house.coords, o.coords), lang)}</strong>
+          </li>
+        ))}
+      </ul>
+      <ExperienceMap lang={lang} home={house} points={orientPoints} showCards={false} mapId="lage-map" />
       <p class="text-center map-addr">{site.name} · {site.address.street} · {site.address.postalCode} {site.address.city}</p>
     </div>
   </section>
@@ -101,154 +76,13 @@ const mapPayload = {
 </BaseLayout>
 
 <style>
-  /* Kompakter Hero, damit alle 7 Kacheln ohne Scrollen sichtbar sind */
-  .lage-hero { padding-block: clamp(1.4rem, 0.8rem + 2vw, 2.6rem); }
-  .lage-hero h1 { font-size: clamp(1.9rem, 1.4rem + 2vw, 2.8rem); margin: 0.1rem 0 0.3rem; }
-  .lage-hero .eyebrow { margin-bottom: 0.3rem; }
-  .lage-hero .lead { font-size: 1.05rem; margin-top: 0.2rem; }
-  .lage-apts-link { margin-top: 1.1rem; }
+  .lage-hero { padding-block: clamp(1.8rem, 1rem + 2.5vw, 3rem); }
+  .anreise-text { max-width: 62ch; }
+  .park-note { color: var(--brand); font-weight: 600; margin-top: 0.4rem; }
+  .lage-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.2rem; }
 
-  .hl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-  .hl {
-    appearance: none; font: inherit; text-align: left; cursor: pointer;
-    padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.2rem;
-    transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  }
-  .hl:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--c-aqua-300); }
-  .hl-top { display: flex; align-items: center; justify-content: space-between; }
-  .hl-icon { font-size: 1.55rem; }
-  .hl-dist { font-size: 0.78rem; font-weight: 700; color: var(--brand); background: var(--c-aqua-100); border-radius: 999px; padding: 0.2rem 0.6rem; white-space: nowrap; }
-  .hl-h { margin: 0.35rem 0 0.15rem; font-size: 1.1rem; }
-  .hl p { color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.45; flex: 1; }
-  .hl-open { margin-top: 0.55rem; color: var(--brand); font-weight: 600; font-size: 0.88rem; }
-  @media (max-width: 900px) { .hl-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 520px) { .hl-grid { grid-template-columns: 1fr; } }
-
-  /* Aktivitäts-Dialog */
-  .lage-dialog { border: 0; border-radius: var(--radius-lg); padding: 0 0 0.4rem; max-width: 560px; width: calc(100% - 2rem); box-shadow: var(--shadow-lg); color: var(--text); }
-  .lage-dialog::backdrop { background: rgba(13, 59, 68, 0.55); backdrop-filter: blur(2px); }
-  .ld-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.2rem 1.4rem 0; }
-  .ld-head h2 { margin: 0; font-size: 1.4rem; }
-  .ld-close { background: none; border: 0; font-size: 2rem; line-height: 1; cursor: pointer; color: var(--text-muted); }
-  .ld-close:hover { color: var(--text); }
-  .ld-dist { padding: 0.5rem 1.4rem 0; color: var(--brand); font-weight: 600; margin: 0; }
-  .ld-sub { padding: 0.6rem 1.4rem 0; margin: 0; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; }
-  .ld-grid { display: grid; gap: 0.6rem; padding: 0.8rem 1.4rem 1.2rem; }
-  .ld-act { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.9rem 1.1rem; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: var(--brand-strong); font-weight: 600; background: var(--c-sand-50); }
-  a.ld-act:hover { border-color: var(--c-aqua-300); background: var(--c-aqua-100); }
-  .ld-act--info { color: var(--text-muted); font-weight: 500; }
-
-  .map-intro { color: var(--text-muted); margin-top: 0.3rem; font-size: 0.95rem; }
-  .lage-map {
-    height: 460px; margin-top: 1rem; border-radius: var(--radius-lg);
-    overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--line);
-    background: var(--c-aqua-100); z-index: 0;
-  }
-  @media (max-width: 600px) { .lage-map { height: 380px; } }
+  .dist-list { list-style: none; padding: 0; margin: 0 0 1.4rem; display: grid; gap: 0.1rem; max-width: 34rem; }
+  .dist-list li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem 0.2rem; border-bottom: 1px solid var(--line); }
+  .dist-list strong { color: var(--brand-strong); white-space: nowrap; }
   .map-addr { color: var(--text-muted); margin-top: 0.8rem; }
-
-  /* Leaflet-generierte Elemente liegen außerhalb des Astro-Scopes -> :global */
-  .lage-map :global(.mp-pin) {
-    display: grid; place-items: center; width: 34px; height: 34px;
-    background: #fff; border: 2px solid var(--c-aqua-300); border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(13,59,68,0.25); font-size: 1.1rem; line-height: 1;
-  }
-  .lage-map :global(.mp-pin--home) { border-color: var(--c-gold); background: #fff7e0; width: 38px; height: 38px; font-size: 1.25rem; }
-  .lage-map :global(.leaflet-popup-content) { margin: 0.8rem 1rem; font-family: var(--font-body); }
-  .lage-map :global(.mp-title) { display: block; font-family: var(--font-head); font-size: 1.1rem; color: var(--brand-strong); }
-  .lage-map :global(.mp-dist) { display: inline-block; margin-top: 0.25rem; font-size: 0.8rem; font-weight: 700; color: var(--brand); background: var(--c-aqua-100); border-radius: 999px; padding: 0.15rem 0.55rem; }
-  .lage-map :global(.mp-text) { margin: 0.5rem 0 0.6rem; color: var(--text-muted); font-size: 0.9rem; line-height: 1.45; }
-  .lage-map :global(.mp-acts) { display: grid; gap: 0.4rem; }
-  .lage-map :global(.mp-act) { display: block; padding: 0.5rem 0.7rem; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--brand-strong); font-weight: 600; font-size: 0.88rem; background: var(--c-sand-50); }
-  .lage-map :global(a.mp-act:hover) { border-color: var(--c-aqua-300); background: var(--c-aqua-100); }
-  .lage-map :global(.mp-act--info) { color: var(--text-muted); font-weight: 500; background: none; border-style: dashed; }
-  .lage-map :global(.leaflet-popup-content-wrapper) { border-radius: 12px; }
 </style>
-
-<script>
-  document.querySelectorAll<HTMLButtonElement>('[data-dialog]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-dialog');
-      const dlg = (id && document.getElementById(id)) as HTMLDialogElement | null;
-      dlg?.showModal?.();
-    });
-  });
-  document.querySelectorAll<HTMLDialogElement>('dialog.lage-dialog').forEach((dlg) => {
-    dlg.querySelector('[data-close]')?.addEventListener('click', () => dlg.close());
-    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-  });
-</script>
-
-<script>
-  import L from 'leaflet';
-  import 'leaflet/dist/leaflet.css';
-
-  const mapEl = document.getElementById('lage-map');
-  const dataEl = document.getElementById('lage-map-data');
-
-  if (mapEl && dataEl) {
-    const data = JSON.parse(dataEl.textContent || '{}');
-    const esc = (s: unknown) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-    const actsHtml = (acts: any[]) => acts.map((a) =>
-      a.url
-        ? `<a class="mp-act" href="${a.url}" target="_blank" rel="noopener">${esc(a.name)} ↗</a>`
-        : `<span class="mp-act mp-act--info">${esc(a.name)}</span>`
-    ).join('');
-
-    const catPopup = (p: any) =>
-      `<div class="mp"><strong class="mp-title">${esc(p.icon)} ${esc(p.title)}</strong>` +
-      `<span class="mp-dist">📍 ${esc(p.dist)}</span>` +
-      `<p class="mp-text">${esc(p.text)}</p>` +
-      `<div class="mp-acts">${actsHtml(p.activities)}</div></div>`;
-
-    const homePopup = (h: any) =>
-      `<div class="mp"><strong class="mp-title">🏡 ${esc(h.name)}</strong>` +
-      `<span class="mp-dist">${esc(h.here)}</span>` +
-      `<p class="mp-text">${esc(h.address)}<br>${esc(h.text)}</p>` +
-      `<div class="mp-acts">${actsHtml(h.activities)}</div></div>`;
-
-    const pin = (emoji: string, extra?: string, size = 34) =>
-      L.divIcon({
-        className: ('mp-pin ' + (extra || '')).trim(),
-        html: `<span>${emoji}</span>`,
-        iconSize: [size, size],
-        iconAnchor: [size / 2, size / 2],
-        popupAnchor: [0, -(size / 2) - 2],
-      });
-
-    let inited = false;
-    const init = () => {
-      if (inited) return;
-      inited = true;
-      const map = L.map(mapEl as HTMLElement, { scrollWheelZoom: false }).setView(data.home.coords, 14);
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
-      }).addTo(map);
-
-      const bounds: [number, number][] = [data.home.coords];
-      L.marker(data.home.coords, { icon: pin('🏡', 'mp-pin--home', 40), title: data.home.name, riseOnHover: true })
-        .addTo(map)
-        .bindPopup(homePopup(data.home), { maxWidth: 280 });
-
-      data.points.forEach((p: any) => {
-        bounds.push(p.coords);
-        L.marker(p.coords, { icon: pin(p.icon), title: p.title, riseOnHover: true })
-          .addTo(map)
-          .bindPopup(catPopup(p), { maxWidth: 280 });
-      });
-
-      map.fitBounds(bounds, { padding: [40, 40] });
-    };
-
-    // Robustes Lazy-Init: nach 'load' im Idle starten (nach LCP, unter der Falz -> CWV-schonend).
-    const start = () => {
-      const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, o?: any) => void);
-      if (ric) ric(() => init(), { timeout: 1500 });
-      else setTimeout(init, 200);
-    };
-    if (document.readyState === 'complete') start();
-    else window.addEventListener('load', start, { once: true });
-  }
-</script>
