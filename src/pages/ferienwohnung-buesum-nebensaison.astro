@@ -1,22 +1,4 @@
 ---
-import { getCollection } from 'astro:content';
 import ThemeLandingView from '../components/ThemeLandingView.astro';
-
-const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
 ---
-<ThemeLandingView
-  lang="de"
-  pageKey="ferienwohnung-buesum-nebensaison"
-  metaTitle="Ferienwohnung Büsum Nebensaison & Winter · Haus Aquamarin"
-  metaDescription="Nordsee-Urlaub in der Nebensaison: ruhige Ferienwohnungen in Büsum für Herbst und Winter, ideal für längere Aufenthalte und mit Hund. Direkt buchen, ohne Buchungsgebühr."
-  eyebrow="Nebensaison & Winter · Büsum"
-  h1="Ferienwohnung in Büsum für die Nebensaison"
-  intro={[
-    "Die Nordsee außerhalb der Hauptsaison hat ihren eigenen Reiz: leere Strände, klare Luft und Ruhe.",
-    "Die Apartments im Haus Aquamarin eignen sich besonders für längere Aufenthalte in Herbst und Winter. Alle Wohnungen sind beheizt, verfügen über kostenloses WLAN und eine voll ausgestattete Küche – ideal auch für Workation und mobiles Arbeiten mit Meeresrauschen vor dem Fenster.",
-    "Stürmische Spaziergänge auf dem Deich, Wattwanderungen und gemütliche Abende auf der Couch: Die Nebensaison ist die Zeit für Entschleunigung. Wer länger bleibt, erlebt Büsum von seiner ruhigsten Seite.",
-    "Hunde sind herzlich willkommen – gerade in den ruhigen Monaten ein Gewinn für lange Strandspaziergänge. Bettwäsche, Handtücher und weitere Optionen sind transparent ausgewiesen.",
-    "Sichere dir deinen Wunschzeitraum direkt im Buchungskalender, ohne Buchungsgebühr. Für längere Aufenthalte lohnt sich eine direkte Anfrage beim Gastgeber.",
-  ]}
-  apartments={apartments}
-/>
+<ThemeLandingView lang="de" pageKey="ferienwohnung-buesum-nebensaison" />

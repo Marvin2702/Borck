@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ApartmentCard from './ApartmentCard.astro';
 import Faq from './Faq.astro';
+import ThemeLinks from './ThemeLinks.astro';
 import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 import { trExtra, trUnit } from '../data/extras-i18n';
@@ -66,18 +67,7 @@ const description = t('apartments.subtitle');
     </div>
   </section>
 
-  {lang === 'de' && (
-    <section class="section section--alt theme-section">
-      <div class="container-narrow text-center">
-        <p class="eyebrow">Beliebte Themen</p>
-        <div class="theme-links">
-          <a href={localizedPath('ferienwohnung-buesum-mit-hund', 'de')}>Ferienwohnung mit Hund</a>
-          <a href={localizedPath('ferienwohnung-buesum-meerblick', 'de')}>Ferienwohnung mit Meerblick</a>
-          <a href={localizedPath('ferienwohnung-buesum-nebensaison', 'de')}>Nebensaison &amp; Winter</a>
-        </div>
-      </div>
-    </section>
-  )}
+  <ThemeLinks lang={lang} />
 
   <Faq lang={lang} />
 </BaseLayout>

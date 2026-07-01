@@ -1,0 +1,31 @@
+---
+// Interne Verlinkung zu den Themen-Landingpages (Long-Tail-SEO), lokalisiert.
+import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const items = [
+  { key: 'ferienwohnung-buesum-mit-hund', label: t('landing.withDog') },
+  { key: 'ferienwohnung-buesum-meerblick', label: t('landing.seaView') },
+  { key: 'ferienwohnung-buesum-nebensaison', label: t('landing.offSeason') },
+];
+---
+<section class="section section--alt theme-section">
+  <div class="container-narrow text-center">
+    <p class="eyebrow">{t('landing.popularThemes')}</p>
+    <div class="theme-links">
+      {items.map((i) => <a href={localizedPath(i.key, lang)}>{i.label}</a>)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .theme-links { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin-top: 1rem; }
+  .theme-links a {
+    display: inline-block; padding: 0.6rem 1.1rem; border: 1px solid var(--line);
+    border-radius: 999px; text-decoration: none; color: var(--brand-strong);
+    font-weight: 600; background: var(--surface);
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .theme-links a:hover { border-color: var(--c-aqua-300); background: var(--c-aqua-100); }
+</style>

@@ -1,0 +1,12 @@
+---
+import ThemeLandingView from '../../components/ThemeLandingView.astro';
+import { locales, defaultLang, type Lang } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return locales
+    .filter((l) => l !== defaultLang)
+    .map((lang) => ({ params: { lang }, props: { lang } }));
+}
+const { lang } = Astro.props as { lang: Lang };
+---
+<ThemeLandingView lang={lang} pageKey="ferienwohnung-buesum-meerblick" />

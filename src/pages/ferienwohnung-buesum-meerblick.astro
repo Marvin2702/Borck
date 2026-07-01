@@ -1,26 +1,4 @@
 ---
-import { getCollection } from 'astro:content';
 import ThemeLandingView from '../components/ThemeLandingView.astro';
-
-const all = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
-// Meerblick zuerst, ergänzt um Wohnungen mit Deich-/Balkonblick.
-const seaview = all.filter((a) => a.data.view.toLowerCase().includes('meerblick'));
-const withView = all.filter((a) => /meer|deich|balkon/i.test(a.data.view));
-const apartments = seaview.length ? withView : all;
 ---
-<ThemeLandingView
-  lang="de"
-  pageKey="ferienwohnung-buesum-meerblick"
-  metaTitle="Ferienwohnung Büsum mit Meerblick · Haus Aquamarin"
-  metaDescription="Ferienwohnung in Büsum mit Meerblick und Deichblick. Im obersten Apartment Topas siehst du die Nordsee zuerst – bis 5 Personen, Balkon, ohne Buchungsgebühr direkt buchen."
-  eyebrow="Meer- & Deichblick · Büsum"
-  h1="Ferienwohnung in Büsum mit Meerblick"
-  intro={[
-    "Wer ganz oben wohnt, sieht das Meer zuerst: Das Apartment Topas in der zweiten Etage bietet echten Meerblick für bis zu fünf Personen.",
-    "Echten Meerblick gibt es im Haus Aquamarin im obersten Apartment Topas (2. Etage, ca. 76 m², Balkon). Mehrere weitere Wohnungen punkten mit Deichblick – etwa Türkis (1. Etage) und Opal mit gleich zwei Balkonen, davon einer mit weitem Deichblick.",
-    "Der Unterschied: Meerblick richtet den Blick direkt auf die Nordsee, Deichblick auf die grüne Deichkante mit ihrem typischen Nordsee-Panorama. Beides bedeutet Licht, Weite und das Gefühl, mitten in der Landschaft zu sein.",
-    "Alle Apartments liegen direkt hinter der Familienlagune Perlebucht, wenige Schritte von Strand und Promenade. Morgens Kaffee auf dem Balkon, abends das Farbenspiel der untergehenden Sonne.",
-    "Verfügbarkeit und Preise prüfst du direkt im Kalender des jeweiligen Apartments – ohne Buchungsgebühr, direkt beim Gastgeber.",
-  ]}
-  apartments={apartments}
-/>
+<ThemeLandingView lang="de" pageKey="ferienwohnung-buesum-meerblick" />

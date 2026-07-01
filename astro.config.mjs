@@ -26,17 +26,11 @@ export default defineConfig({
       i18n: {
         defaultLocale: 'de',
         locales: {
-          de: 'de-DE',
-          en: 'en-US',
-          nl: 'nl-NL',
-          da: 'da-DK',
+          de: 'de',
+          en: 'en',
+          nl: 'nl',
+          da: 'da',
         },
-      },
-      // DE-only Landingpages haben keine Sprachversionen -> keine hreflang-Alternates
-      // in der Sitemap (sonst Verweise auf nicht existente /en|nl|da-Seiten).
-      serialize(item) {
-        if (item.url.includes('/ferienwohnung-buesum-')) delete item.links;
-        return item;
       },
     }),
   ],

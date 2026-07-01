@@ -6,6 +6,7 @@ import UspGrid from './UspGrid.astro';
 import ApartmentCard from './ApartmentCard.astro';
 import Reviews from './Reviews.astro';
 import CtaBanner from './CtaBanner.astro';
+import ThemeLinks from './ThemeLinks.astro';
 import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
@@ -42,6 +43,7 @@ const description = t('meta.homeDesc');
     </div>
   </section>
 
+  <ThemeLinks lang={lang} />
   <Reviews lang={lang} />
   <CtaBanner lang={lang} />
 </BaseLayout>
