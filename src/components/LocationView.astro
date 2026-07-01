@@ -22,7 +22,7 @@ const parkNote = anreise.activities[lang].find((a) => !a.url)?.name;
 const L: Record<string, Record<Lang, string>> = {
   anreise: { de: 'Anreise & Parken', en: 'Getting here & parking', nl: 'Aankomst & parkeren', da: 'Ankomst & parkering' },
   route: { de: 'Route planen', en: 'Plan route', nl: 'Route plannen', da: 'Planlæg rute' },
-  dist: { de: 'Entfernungen & Karte', en: 'Distances & map', nl: 'Afstanden & kaart', da: 'Afstande & kort' },
+  dist: { de: 'Entfernungen', en: 'Distances', nl: 'Afstanden', da: 'Afstande' },
 };
 
 // Orientierungspunkte (Karte + Entfernungsliste).
@@ -45,30 +45,31 @@ const orientPoints = orient.map((o) => ({ name: o.name[lang], icon: o.icon, coor
   </section>
 
   <section class="section" style="padding-top:0">
-    <div class="container-narrow">
-      <h2>{L.anreise[lang]}</h2>
-      <p class="anreise-text">{anreise.text[lang]}</p>
-      {parkNote && <p class="park-note">✓ {parkNote}</p>}
-      <div class="lage-actions">
-        {routeLink && <a class="btn btn--gold" href={routeLink} target="_blank" rel="noopener">{L.route[lang]}</a>}
-        <a class="btn btn--ghost" href={localizedPath('apartments', lang)}>{t('apartments.all')}</a>
+    <div class="container">
+      <div class="lage-grid">
+        <div class="lage-info">
+          <h2>{L.anreise[lang]}</h2>
+          <p class="anreise-text">{anreise.text[lang]}</p>
+          {parkNote && <p class="park-note">✓ {parkNote}</p>}
+          <div class="lage-actions">
+            {routeLink && <a class="btn btn--gold" href={routeLink} target="_blank" rel="noopener">{L.route[lang]}</a>}
+            <a class="btn btn--ghost" href={localizedPath('apartments', lang)}>{t('apartments.all')}</a>
+          </div>
+          <h2 class="dist-h">{L.dist[lang]}</h2>
+          <ul class="dist-list">
+            {orient.map((o) => (
+              <li>
+                <span><span aria-hidden="true">{o.icon}</span> {o.name[lang]}</span>
+                <strong>{formatKm(haversineKm(house.coords, o.coords), lang)}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="lage-mapcol">
+          <ExperienceMap lang={lang} home={house} points={orientPoints} showCards={false} mapId="lage-map" />
+          <p class="text-center map-addr">{site.name} · {site.address.street} · {site.address.postalCode} {site.address.city}</p>
+        </div>
       </div>
-    </div>
-  </section>
-
-  <section class="section section--alt">
-    <div class="container-narrow">
-      <h2>{L.dist[lang]}</h2>
-      <ul class="dist-list">
-        {orient.map((o) => (
-          <li>
-            <span><span aria-hidden="true">{o.icon}</span> {o.name[lang]}</span>
-            <strong>{formatKm(haversineKm(house.coords, o.coords), lang)}</strong>
-          </li>
-        ))}
-      </ul>
-      <ExperienceMap lang={lang} home={house} points={orientPoints} showCards={false} mapId="lage-map" />
-      <p class="text-center map-addr">{site.name} · {site.address.street} · {site.address.postalCode} {site.address.city}</p>
     </div>
   </section>
 
@@ -81,7 +82,13 @@ const orientPoints = orient.map((o) => ({ name: o.name[lang], icon: o.icon, coor
   .park-note { color: var(--brand); font-weight: 600; margin-top: 0.4rem; }
   .lage-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.2rem; }
 
-  .dist-list { list-style: none; padding: 0; margin: 0 0 1.4rem; display: grid; gap: 0.1rem; max-width: 34rem; }
+  .lage-grid { display: grid; grid-template-columns: 1fr 1.05fr; gap: 2.5rem; align-items: start; }
+  @media (max-width: 900px) { .lage-grid { grid-template-columns: 1fr; gap: 1.6rem; } }
+  .dist-h { margin-top: 1.8rem; }
+  .lage-mapcol { position: sticky; top: 90px; }
+  @media (max-width: 900px) { .lage-mapcol { position: static; } }
+
+  .dist-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.1rem; }
   .dist-list li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem 0.2rem; border-bottom: 1px solid var(--line); }
   .dist-list strong { color: var(--brand-strong); white-space: nowrap; }
   .map-addr { color: var(--text-muted); margin-top: 0.8rem; }
