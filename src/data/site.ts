@@ -40,15 +40,16 @@ export const site = {
   checkinTime: '15:00',
   checkoutTime: '10:00',
 
-  // Zusatzleistungen (aus Original-Buchungsbedingungen)
+  // Zusatzleistungen (aus Original-Buchungsbedingungen).
+  // Labels/Einheiten lokalisiert in src/data/extras-i18n.ts (id + unit-key), Preise hier.
   extras: [
-    { label: 'Bettwäsche', price: 12, unit: 'pro Person' },
-    { label: 'Handtücher', price: 9, unit: 'pro Satz' },
-    { label: 'Hund (1.)', price: 46, unit: 'pro Buchung' },
-    { label: 'Hund (2.)', price: 23, unit: 'pro Buchung' },
-    { label: 'Babybett', price: 5, unit: 'pro Aufenthalt' },
-    { label: 'Hochstuhl', price: 5, unit: 'pro Aufenthalt' },
-    { label: 'Kurzreise-Zuschlag (unter 5 Nächten)', price: 85, unit: 'einmalig' },
+    { id: 'linen', price: 12, unit: 'perPerson' },
+    { id: 'towels', price: 9, unit: 'perSet' },
+    { id: 'dog1', price: 46, unit: 'perBooking' },
+    { id: 'dog2', price: 23, unit: 'perBooking' },
+    { id: 'cot', price: 5, unit: 'perStay' },
+    { id: 'highchair', price: 5, unit: 'perStay' },
+    { id: 'shortStay', price: 85, unit: 'oneOff' },
   ],
 
   // Impressum / Betreiber-Anschrift (abweichend von der Objekt-Adresse)

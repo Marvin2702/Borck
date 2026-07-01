@@ -5,6 +5,7 @@ import ApartmentCard from './ApartmentCard.astro';
 import Faq from './Faq.astro';
 import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
+import { trExtra, trUnit } from '../data/extras-i18n';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -49,14 +50,14 @@ const description = t('apartments.subtitle');
 
   <section class="section">
     <div class="container-narrow">
-      <h2>{t('apartments.features')} &amp; Optionen</h2>
+      <h2>{t('apartments.extrasTitle')}</h2>
       <table class="extras">
         <tbody>
           {site.extras.map((e) => (
             <tr>
-              <td>{e.label}</td>
+              <td>{trExtra(e.id, lang)}</td>
               <td class="extras-price">{e.price.toFixed(2).replace('.', ',')} €</td>
-              <td class="extras-unit">{e.unit}</td>
+              <td class="extras-unit">{trUnit(e.unit, lang)}</td>
             </tr>
           ))}
         </tbody>
