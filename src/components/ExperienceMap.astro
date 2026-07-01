@@ -19,9 +19,10 @@ interface Props {
   home: { name: string; coords: [number, number]; address?: string; label?: string };
   points: MapPoint[];
   showCards?: boolean;
+  cluster?: boolean;
   mapId?: string;
 }
-const { lang, home, points, showCards = false, mapId = 'exp-map' } = Astro.props;
+const { lang, home, points, showCards = false, cluster = false, mapId = 'exp-map' } = Astro.props;
 
 const moreLabel: Record<Lang, string> = { de: 'Zur Website', en: 'Visit website', nl: 'Naar de website', da: 'Til websiden' };
 const hint: Record<Lang, string> = {
@@ -30,6 +31,7 @@ const hint: Record<Lang, string> = {
   nl: 'Tik op een marker voor info, afstand en boeking.',
   da: 'Tryk på en markør for info, afstand og booking.',
 };
+const clusterLabel: Record<Lang, string> = { de: 'Ziele hier', en: 'places here', nl: 'plekken hier', da: 'steder her' };
 
 const enriched = points.map((p) => ({
   ...p,
@@ -39,6 +41,8 @@ const enriched = points.map((p) => ({
 const payload = {
   home: { name: home.name, coords: home.coords, address: home.address ?? '' },
   moreLabel: moreLabel[lang],
+  cluster,
+  clusterLabel: clusterLabel[lang],
   points: enriched.map((p) => ({ icon: p.icon, name: p.name, coords: p.coords, dist: p.dist, description: p.description ?? '', url: p.url ?? '' })),
 };
 ---
@@ -100,11 +104,20 @@ const payload = {
   .exp-map :global(.mp-act) { display: inline-block; padding: 0.45rem 0.7rem; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--brand-strong); font-weight: 600; font-size: 0.86rem; background: var(--c-sand-50); }
   .exp-map :global(a.mp-act:hover) { border-color: var(--c-aqua-300); background: var(--c-aqua-100); }
   .exp-map :global(.leaflet-popup-content-wrapper) { border-radius: 12px; }
+
+  /* Cluster + Auswahlliste bei Ueberlappung */
+  .exp-map :global(.mp-cluster-pin) { display: grid; place-items: center; width: 40px; height: 40px; background: var(--brand); color: #fff; border: 2px solid #fff; border-radius: 50%; font-weight: 700; box-shadow: 0 2px 8px rgba(13,59,68,0.35); }
+  .exp-map :global(.mp-clist) { list-style: none; margin: 0.5rem 0 0; padding: 0; display: grid; gap: 0.3rem; max-height: 240px; overflow-y: auto; }
+  .exp-map :global(.mp-clink) { width: 100%; text-align: left; background: var(--c-sand-50); border: 1px solid var(--line); border-radius: 8px; padding: 0.5rem 0.6rem; font: inherit; font-size: 0.88rem; color: var(--brand-strong); font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; }
+  .exp-map :global(.mp-clink:hover) { border-color: var(--c-aqua-300); background: var(--c-aqua-100); }
+  .exp-map :global(.mp-cdist) { color: var(--brand); font-weight: 700; font-size: 0.74rem; white-space: nowrap; }
 </style>
 
 <script>
   import L from 'leaflet';
   import 'leaflet/dist/leaflet.css';
+  import 'leaflet.markercluster';
+  import 'leaflet.markercluster/dist/MarkerCluster.css';
 
   document.querySelectorAll<HTMLScriptElement>('[data-map-data]').forEach((dataEl) => {
     const id = dataEl.getAttribute('data-map-data');
@@ -144,11 +157,59 @@ const payload = {
       const bounds: [number, number][] = [data.home.coords];
       L.marker(data.home.coords, { icon: pin('🏡', 'mp-pin--home', 40), title: data.home.name, riseOnHover: true })
         .addTo(map).bindPopup(homePopup(data.home), { maxWidth: 280 });
+
+      const canCluster = data.cluster && typeof (L as any).markerClusterGroup === 'function';
+      const cluster = canCluster
+        ? (L as any).markerClusterGroup({
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: false,
+            spiderfyOnMaxZoom: false,
+            maxClusterRadius: 44,
+            iconCreateFunction: (c: any) =>
+              L.divIcon({ html: `<span>${c.getChildCount()}</span>`, className: 'mp-cluster-pin', iconSize: [40, 40] }),
+          })
+        : null;
+
       data.points.forEach((p: any) => {
         bounds.push(p.coords);
-        L.marker(p.coords, { icon: pin(p.icon), title: p.name, riseOnHover: true })
-          .addTo(map).bindPopup(pointPopup(p), { maxWidth: 280 });
+        const mk = L.marker(p.coords, { icon: pin(p.icon), title: p.name, riseOnHover: true }).bindPopup(pointPopup(p), { maxWidth: 280 });
+        (mk as any)._p = p;
+        if (cluster) cluster.addLayer(mk);
+        else mk.addTo(map);
       });
+
+      if (cluster) {
+        cluster.addTo(map);
+        // Ueberlappen sich Marker -> Cluster; Klick oeffnet eine Auswahlliste.
+        cluster.on('clusterclick', (e: any) => {
+          const children = e.layer.getAllChildMarkers();
+          const box = document.createElement('div');
+          box.className = 'mp-cluster';
+          const head = document.createElement('strong');
+          head.className = 'mp-title';
+          head.textContent = `${children.length} ${data.clusterLabel || ''}`.trim();
+          box.appendChild(head);
+          const ul = document.createElement('ul');
+          ul.className = 'mp-clist';
+          children.forEach((m: any) => {
+            const p = m._p;
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'mp-clink';
+            btn.innerHTML = `<span>${esc(p.icon)} ${esc(p.name)}</span><span class="mp-cdist">${esc(p.dist)}</span>`;
+            btn.addEventListener('click', () => {
+              map.closePopup();
+              L.popup({ maxWidth: 280 }).setLatLng(m.getLatLng()).setContent(pointPopup(p)).openOn(map);
+            });
+            li.appendChild(btn);
+            ul.appendChild(li);
+          });
+          box.appendChild(ul);
+          L.popup({ maxWidth: 300 }).setLatLng(e.latlng).setContent(box).openOn(map);
+        });
+      }
+
       map.fitBounds(bounds, { padding: [40, 40] });
     };
 

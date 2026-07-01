@@ -24,7 +24,7 @@ const house = { name: site.name, coords: [site.geo.lat, site.geo.lng] as [number
   <section class="section" style="padding-top:0">
     <div class="container">
       <h2 class="text-center sec-h2">Erlebnisse & Ausflugsziele auf der Karte</h2>
-      <ExperienceMap lang="de" home={house} points={experiences} showCards={true} mapId="reisefuehrer-map" />
+      <ExperienceMap lang="de" home={house} points={experiences} showCards={true} cluster={true} mapId="reisefuehrer-map" />
     </div>
   </section>
 
