@@ -1,15 +1,15 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import { useTranslations, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
+import { getDisplayReviews } from '../data/reviews';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
-const entries = (await getCollection('reviews')).sort(
-  (a, b) => (b.data.date ?? '').localeCompare(a.data.date ?? '')
-);
+// Anzeige-Regel: nur die 10 neuesten 5-Sterne-Bewertungen (siehe data/reviews.ts).
+const entries = await getDisplayReviews();
 const reviews = await Promise.all(
   entries.map(async (r) => ({ data: r.data, Content: (await render(r)).Content }))
 );

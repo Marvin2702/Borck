@@ -9,13 +9,15 @@ import CtaBanner from './CtaBanner.astro';
 import ThemeLinks from './ThemeLinks.astro';
 import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
+import { getDisplayReviews } from '../data/reviews';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
-const reviews = (await getCollection('reviews')).map((r) => ({
+// JSON-LD spiegelt exakt die sichtbaren Bewertungen (10 neueste 5-Sterne).
+const reviews = (await getDisplayReviews()).map((r) => ({
   author: r.data.author,
   rating: r.data.rating,
   body: (r.body ?? '').trim(),
