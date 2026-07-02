@@ -242,19 +242,35 @@ const payload = {
       const mk = markerByIdx[idx];
       if (!mapRef || !mk) return;
       mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const targetZoom = Math.max(mapRef.getZoom(), 14);
       const open = () => {
+        if (!mapRef) return;
         // Im Cluster versteckte Marker erst freistellen, dann Popup öffnen.
         if (clusterRef && typeof clusterRef.zoomToShowLayer === 'function' && clusterRef.hasLayer(mk)) {
           clusterRef.zoomToShowLayer(mk, () => mk.openPopup());
+          // Animationsfreier Fallback (gedrosselte Tabs, reduced motion): Zoom
+          // hart setzen — beim Re-Clustern wird der Marker frei und Popup öffnet.
+          setTimeout(() => {
+            if (mapRef && !mk.isPopupOpen()) {
+              mapRef.setView(mk.getLatLng(), Math.max(targetZoom, 15), { animate: false });
+              mk.openPopup();
+            }
+          }, 900);
         } else {
           mk.openPopup();
         }
       };
       let opened = false;
       const openOnce = () => { if (opened) return; opened = true; open(); };
+      if (document.hidden) {
+        // Ohne Rendering keine Leaflet-Animationen — direkt springen.
+        mapRef.setView(mk.getLatLng(), targetZoom, { animate: false });
+        openOnce();
+        return;
+      }
       mapRef.once('moveend', openOnce);
       setTimeout(openOnce, 1100); // Fallback: flyTo ohne Bewegung feuert kein moveend
-      mapRef.flyTo(mk.getLatLng(), Math.max(mapRef.getZoom(), 14), { duration: 0.8 });
+      mapRef.flyTo(mk.getLatLng(), targetZoom, { duration: 0.8 });
     };
     document.querySelectorAll<HTMLElement>(`[data-exp-cards="${id}"] [data-exp-idx]`).forEach((card) => {
       card.addEventListener('click', (e) => {
