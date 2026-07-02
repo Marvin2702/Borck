@@ -25,6 +25,7 @@ interface Props {
 const { lang, home, points, showCards = false, cluster = false, mapId = 'exp-map' } = Astro.props;
 
 const moreLabel: Record<Lang, string> = { de: 'Zur Website', en: 'Visit website', nl: 'Naar de website', da: 'Til websiden' };
+const mapLabel: Record<Lang, string> = { de: 'Auf der Karte zeigen', en: 'Show on map', nl: 'Toon op de kaart', da: 'Vis på kortet' };
 const hint: Record<Lang, string> = {
   de: 'Tippe auf einen Marker für Infos, Entfernung und Buchung.',
   en: 'Tap a marker for info, distance and booking.',
@@ -52,9 +53,9 @@ const payload = {
 <script type="application/json" data-map-data={mapId} set:html={JSON.stringify(payload)} />
 
 {showCards && (
-  <div class="exp-grid">
-    {enriched.map((p) => (
-      <article class="exp-card card">
+  <div class="exp-grid" data-exp-cards={mapId}>
+    {enriched.map((p, i) => (
+      <article class="exp-card card" data-exp-idx={i} role="button" tabindex="0" aria-label={`${p.name} – ${mapLabel[lang]}`}>
         <span class="exp-top">
           <span class="exp-icon" aria-hidden="true">{p.icon}</span>
           <span class="exp-dist">📍 {p.dist}</span>
@@ -62,7 +63,10 @@ const payload = {
         <h3 class="exp-name">{p.name}</h3>
         {p.area && <span class="exp-area">{p.area}</span>}
         {p.description && <p class="exp-desc">{p.description}</p>}
-        {p.url && <a class="exp-link" href={p.url} target="_blank" rel="noopener">{moreLabel[lang]} <span aria-hidden="true">↗</span></a>}
+        <span class="exp-actions">
+          <span class="exp-maplink">🗺 {mapLabel[lang]}</span>
+          {p.url && <a class="exp-link" href={p.url} target="_blank" rel="noopener">{moreLabel[lang]} <span aria-hidden="true">↗</span></a>}
+        </span>
       </article>
     ))}
   </div>
@@ -80,14 +84,18 @@ const payload = {
   .exp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.4rem; }
   @media (max-width: 1000px) { .exp-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 560px) { .exp-grid { grid-template-columns: 1fr; } }
-  .exp-card { padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.25rem; }
+  .exp-card { padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.25rem; cursor: pointer; transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+  .exp-card:hover, .exp-card:focus-visible { transform: translateY(-3px); border-color: var(--c-aqua-300); box-shadow: var(--shadow-md); }
   .exp-top { display: flex; align-items: center; justify-content: space-between; }
   .exp-icon { font-size: 1.55rem; }
   .exp-dist { font-size: 0.76rem; font-weight: 700; color: var(--brand); background: var(--c-aqua-100); border-radius: 999px; padding: 0.2rem 0.55rem; white-space: nowrap; }
   .exp-name { margin: 0.35rem 0 0; font-size: 1.08rem; color: var(--brand-strong); }
   .exp-area { color: var(--text-muted); font-size: 0.8rem; }
   .exp-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.45; flex: 1; margin: 0.3rem 0 0; }
-  .exp-link { margin-top: 0.6rem; color: var(--brand); font-weight: 600; font-size: 0.9rem; text-decoration: none; }
+  .exp-actions { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; align-items: baseline; }
+  .exp-maplink { color: var(--brand); font-weight: 600; font-size: 0.9rem; }
+  .exp-card:hover .exp-maplink { text-decoration: underline; }
+  .exp-link { color: var(--brand); font-weight: 600; font-size: 0.9rem; text-decoration: none; }
   .exp-link:hover { text-decoration: underline; }
 
   /* Leaflet-generierte Elemente liegen außerhalb des Astro-Scopes -> :global */
@@ -145,10 +153,14 @@ const payload = {
       (h.address ? `<p class="mp-text">${esc(h.address)}</p>` : '') + `</div>`;
 
     let inited = false;
+    let mapRef: L.Map | null = null;
+    let clusterRef: any = null;
+    const markerByIdx: L.Marker[] = [];
     const init = () => {
       if (inited) return;
       inited = true;
       const map = L.map(mapEl as HTMLElement, { scrollWheelZoom: false }).setView(data.home.coords, 12);
+      mapRef = map;
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         detectRetina: true,
@@ -170,10 +182,12 @@ const payload = {
           })
         : null;
 
-      data.points.forEach((p: any) => {
+      clusterRef = cluster;
+      data.points.forEach((p: any, idx: number) => {
         bounds.push(p.coords);
         const mk = L.marker(p.coords, { icon: pin(p.icon), title: p.name, riseOnHover: true }).bindPopup(pointPopup(p), { maxWidth: 280 });
         (mk as any)._p = p;
+        markerByIdx[idx] = mk;
         if (cluster) cluster.addLayer(mk);
         else mk.addTo(map);
       });
@@ -220,5 +234,39 @@ const payload = {
     };
     if (document.readyState === 'complete') start();
     else window.addEventListener('load', start, { once: true });
+
+    // Kachel-Klick: Karte in Sicht scrollen, aufs Ziel zoomen, Popup öffnen —
+    // der Gast muss den Marker nicht selbst suchen.
+    const focusPoint = (idx: number) => {
+      init();
+      const mk = markerByIdx[idx];
+      if (!mapRef || !mk) return;
+      mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const open = () => {
+        // Im Cluster versteckte Marker erst freistellen, dann Popup öffnen.
+        if (clusterRef && typeof clusterRef.zoomToShowLayer === 'function' && clusterRef.hasLayer(mk)) {
+          clusterRef.zoomToShowLayer(mk, () => mk.openPopup());
+        } else {
+          mk.openPopup();
+        }
+      };
+      let opened = false;
+      const openOnce = () => { if (opened) return; opened = true; open(); };
+      mapRef.once('moveend', openOnce);
+      setTimeout(openOnce, 1100); // Fallback: flyTo ohne Bewegung feuert kein moveend
+      mapRef.flyTo(mk.getLatLng(), Math.max(mapRef.getZoom(), 14), { duration: 0.8 });
+    };
+    document.querySelectorAll<HTMLElement>(`[data-exp-cards="${id}"] [data-exp-idx]`).forEach((card) => {
+      card.addEventListener('click', (e) => {
+        if ((e.target as Element).closest('a')) return; // „Zur Website“-Link nicht abfangen
+        focusPoint(Number(card.dataset.expIdx));
+      });
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          focusPoint(Number(card.dataset.expIdx));
+        }
+      });
+    });
   });
 </script>

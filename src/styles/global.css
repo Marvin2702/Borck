@@ -105,6 +105,12 @@ picture { display: contents; } /* Wrapper beeinflusst Layout nicht; <img> bleibt
 .container-narrow { width: min(100% - 2.4rem, var(--maxw-narrow)); margin-inline: auto; }
 .section { padding-block: var(--section-y); }
 .section--alt { background: var(--bg-alt); }
+/* Kompakter Seiteneinstieg: die erste Sektion direkt unter dem Header bekommt
+   deutlich weniger oberen Abstand — Inhalt beginnt früher, weniger Leerraum. */
+main > .section:first-child,
+main > article:first-child > .section:first-child {
+  padding-top: clamp(1.4rem, 1rem + 1.5vw, 2.4rem);
+}
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.18em;
