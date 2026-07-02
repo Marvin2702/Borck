@@ -69,5 +69,24 @@ const privacyHref = localizedPath('datenschutz', 'de');
       localStorage.setItem(KEY, 'denied');
       el.hidden = true;
     });
+
+    // Widerruf/Änderung jederzeit: Footer-Link "Cookie-Einstellungen" öffnet den Banner erneut
+    // (DSGVO Art. 7 Abs. 3 – Widerruf so einfach wie die Erteilung).
+    document.querySelectorAll<HTMLElement>('[data-consent-open]').forEach((btn) => {
+      btn.addEventListener('click', () => { el.hidden = false; });
+    });
+
+    // Conversion-Signale (nur wenn GA nach Einwilligung geladen wurde): Klicks auf
+    // Buchung, Telefon und WhatsApp – die drei Wege, über die Buchungen entstehen.
+    document.addEventListener('click', (e) => {
+      const gtag = (window as any).gtag;
+      if (typeof gtag !== 'function') return;
+      const a = (e.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
+      if (!a) return;
+      const href = a.href;
+      if (href.includes('booking.smoobu.com')) gtag('event', 'begin_booking', { link_url: href });
+      else if (href.startsWith('tel:')) gtag('event', 'contact_phone');
+      else if (href.includes('wa.me')) gtag('event', 'contact_whatsapp');
+    });
   }
 </script>

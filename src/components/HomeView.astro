@@ -19,6 +19,7 @@ const reviews = (await getCollection('reviews')).map((r) => ({
   author: r.data.author,
   rating: r.data.rating,
   body: (r.body ?? '').trim(),
+  date: r.data.date,
 }));
 
 const title = `${t('meta.fewoBuesum')} · ${site.name}`;

@@ -14,7 +14,7 @@ const t = useTranslations(lang);
 const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
 
 const title = `${t('meta.apartmentsTitle')} · ${site.name}`;
-const description = t('apartments.subtitle');
+const description = t('meta.apartmentsDesc');
 ---
 <BaseLayout title={title} description={description} pageKey="apartments">
   <section class="section page-head">
@@ -64,6 +64,7 @@ const description = t('apartments.subtitle');
         </tbody>
       </table>
       <p class="muted-note">{t('apartments.priceNote')}</p>
+      <p class="muted-note">{t('apartments.kurtaxeNote')}</p>
     </div>
   </section>
 

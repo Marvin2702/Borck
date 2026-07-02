@@ -33,8 +33,9 @@ const reviews = defineCollection({
   schema: z.object({
     author: z.string(),
     rating: z.number().min(1).max(5).default(5),
-    date: z.string().optional(),
+    date: z.string().optional(), // ISO YYYY-MM-DD – wird angezeigt + als datePublished ins JSON-LD übernommen
     apartment: z.string().optional(),
+    source: z.string().optional(), // z. B. "Google-Bewertung" (Default aus i18n) – muss der echten Herkunft entsprechen
   }),
 });
 

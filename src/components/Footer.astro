@@ -50,7 +50,11 @@ const legal = [
       <ul>
         {/* Rechtstexte zentral auf Deutsch (rechtlich verbindliche Originale). */}
         {legal.map((i) => <li><a href={localizedPath(i.key, 'de')}>{i.label}</a></li>)}
+        {site.googleAnalyticsId && (
+          <li><button type="button" class="linklike" data-consent-open>{t('footer.cookies')}</button></li>
+        )}
       </ul>
+      {lang !== 'de' && <p class="legal-note">{t('footer.legalNote')}</p>}
     </nav>
   </div>
 
@@ -81,6 +85,9 @@ const legal = [
   .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
   .site-footer a { color: rgba(255, 255, 255, 0.82); text-decoration: none; }
   .site-footer a:hover { color: #fff; text-decoration: underline; }
+  .linklike { background: none; border: 0; padding: 0; font: inherit; color: rgba(255, 255, 255, 0.82); cursor: pointer; text-align: left; }
+  .linklike:hover { color: #fff; text-decoration: underline; }
+  .legal-note { color: rgba(255, 255, 255, 0.55); font-size: 0.78rem; margin: 0.7rem 0 0; max-width: 26ch; }
   .brand-name { font-family: var(--font-head); font-size: 1.35rem; color: #fff; }
   .brand-name span { color: var(--c-gold); }
   .muted { color: rgba(255, 255, 255, 0.6); margin: 0.6rem 0 1rem; max-width: 34ch; }

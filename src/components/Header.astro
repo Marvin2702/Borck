@@ -22,7 +22,10 @@ const bookHref = localizedPath('apartments', lang);
 <header class="site-header">
   <div class="container header-inner">
     <a href={home} class="brand" aria-label={site.name}>
-      <img src={withBase('/images/logo.png')} alt="" class="brand-logo" width="44" height="44" />
+      <picture>
+        <source srcset={withBase('/images/logo.webp')} type="image/webp" />
+        <img src={withBase('/images/logo.png')} alt="" class="brand-logo" width="44" height="44" />
+      </picture>
       <span class="brand-name">{site.name}</span>
     </a>
 

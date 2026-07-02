@@ -18,7 +18,7 @@ interface Props {
   jsonLd?: Record<string, unknown>[];
   noindex?: boolean;
   /** Bewertungen für JSON-LD (nur auf der Startseite ausgegeben). */
-  reviews?: { author: string; rating: number; body: string }[];
+  reviews?: { author: string; rating: number; body: string; date?: string }[];
   /** hreflang-Alternates unterdrücken (für einsprachige Seiten, z. B. DE-Landingpages). */
   noAlternates?: boolean;
 }
@@ -29,7 +29,10 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 // Origin aus Astro-Config (passt sich Prod-Domain bzw. Staging automatisch an).
 const origin = Astro.site ?? new URL(site.domain);
-const canonical = new URL(Astro.url.pathname, origin).href;
+// Canonical konsistent MIT Trailing-Slash (Astros Verzeichnis-Ausgabe; die Root
+// liefert der Server sonst ohne Slash -> Duplicate-Content-Risiko).
+const canonicalPath = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonical = new URL(canonicalPath, origin).href;
 const ogImage = new URL(image ? withBase(image) : withBase('images/og-default.jpg'), origin).href;
 const alternates = alternateLinks(pageKey, origin);
 // Staging-Deploys (z. B. GitHub Pages) NICHT indexieren – schützt Prod-SEO.
@@ -53,10 +56,10 @@ const amenityNames: Record<string, string[]> = {
 const lodging: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'LodgingBusiness',
-  '@id': new URL('/#lodging', origin).href,
+  '@id': new URL(withBase('#lodging'), origin).href,
   name: site.name,
   description,
-  url: origin.href,
+  url: new URL(withBase(''), origin).href,
   telephone: site.phone,
   email: site.email,
   priceRange: site.priceRange,
@@ -95,6 +98,7 @@ if (isHome) {
       author: { '@type': 'Person', name: r.author },
       reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
       reviewBody: r.body,
+      ...(r.date ? { datePublished: r.date } : {}),
     }));
   }
 }

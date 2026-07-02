@@ -104,7 +104,7 @@ export const legal = {
 
   agb: {
     title: 'AGB & Buchungsbedingungen',
-    stand: '30.01.2026',
+    stand: '02.07.2026',
     html: `
 <p>Haus Aquamarin, Große Tiefe 31, 25761 Büsum<br>Vermieterin: Iris Borck-M. (nachfolgend „Vermieterin")</p>
 
@@ -121,6 +121,8 @@ export const legal = {
 
 <h3>4. Preise, Leistungen, Zahlung</h3>
 <p>Es gelten die zum Buchungszeitpunkt bestätigten Preise. Zusatzleistungen (z. B. Bettwäsche/Handtücher, Hunde, Kurabgabe) sind – sofern nicht ausdrücklich inklusive – zusätzlich zu vergüten.</p>
+<p><strong>Kurabgabe:</strong> Die Gemeinde Büsum erhebt von Übernachtungsgästen eine Kurabgabe (Gästekarte); sie ist nicht im Übernachtungspreis enthalten. Stand 2026: 4,00 € pro Person und Nacht in der Hauptsaison bzw. 2,80 € in der Nebensaison; ermäßigte Sätze gemäß der jeweils gültigen Kurabgabesatzung der Gemeinde Büsum.</p>
+<p><strong>Kurzaufenthalte:</strong> Bei Aufenthalten unter 5 Nächten fällt ein Kurzreise-Zuschlag an (aktuell 85,00 €).</p>
 <p><strong>Zahlung:</strong></p>
 <ul>
 <li>Anzahlung: pauschal 50,00 € innerhalb von 7 Tagen nach Buchungsbestätigung</li>
