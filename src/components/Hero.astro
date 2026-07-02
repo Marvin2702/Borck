@@ -7,6 +7,8 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 const bookHref = localizedPath('apartments', lang);
 const apartmentsHref = '#apartments-preview';
+// Bewertungswert mit lokalisiertem Dezimaltrennzeichen (4,6 vs. 4.6).
+const ratingStr = site.rating.value.toFixed(1).replace('.', lang === 'en' ? '.' : ',');
 ---
 
 <section class="hero">
@@ -28,8 +30,8 @@ const apartmentsHref = '#apartments-preview';
       <a href={apartmentsHref} class="btn btn--ghost btn--lg">{t('hero.cta.apartments')}</a>
     </div>
     <a class="hero-trust" href="#bewertungen">
-      <span class="stars" aria-hidden="true">★★★★★</span>
-      <span>{site.rating.value.toFixed(1)} · {site.rating.count} {t('reviews.count')}</span>
+      <span class="stars" aria-hidden="true">★</span>
+      <span>{ratingStr} · {site.rating.count} {t('reviews.count')}</span>
     </a>
   </div>
 </section>

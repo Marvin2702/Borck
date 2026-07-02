@@ -28,8 +28,8 @@ const fmtDate = (iso?: string) => {
       <p class="eyebrow">{t('reviews.title')}</p>
       <h2>{t('reviews.subtitle')}</h2>
       <p class="reviews-aggregate">
-        <span class="stars" aria-hidden="true">★★★★★</span>
-        <strong>{site.rating.value.toFixed(1)}</strong> · {site.rating.count} {t('reviews.count')}
+        <span class="stars" aria-hidden="true">★</span>
+        <strong>{site.rating.value.toFixed(1).replace('.', lang === 'en' ? '.' : ',')}</strong> · {site.rating.count} {t('reviews.count')}
         {site.googleProfileUrl && (
           <> · <a class="reviews-glink" href={site.googleProfileUrl} target="_blank" rel="noopener">{t('reviews.googleLink')} ↗</a></>
         )}

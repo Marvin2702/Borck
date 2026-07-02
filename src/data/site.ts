@@ -31,11 +31,10 @@ export const site = {
   // Geo (Große Tiefe 31, geocodiert via OSM/Nominatim – nahe Familienlagune Perlebucht)
   geo: { lat: 54.1376163, lng: 8.8448759 },
 
-  // Aggregat-Bewertung (Google – TODO: Live-Werte pflegen)
-  rating: { value: 5.0, count: 8 },
-  // Google-Unternehmensprofil (TODO: Link zum Bewertungsprofil eintragen,
-  // z. B. https://g.page/r/... — dann erscheint "Alle Google-Bewertungen ansehen").
-  googleProfileUrl: '' as string,
+  // Aggregat-Bewertung (Google, Stand 02.07.2026 – vom Live-Profil abgelesen)
+  rating: { value: 4.6, count: 46 },
+  // Google-Unternehmensprofil (stabiler Maps-CID-Link, öffnet den Eintrag mit Bewertungen)
+  googleProfileUrl: 'https://www.google.com/maps?cid=18045129901455022857' as string,
 
   priceRange: '€€',
 
