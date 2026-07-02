@@ -213,8 +213,8 @@ const payload = {
             btn.className = 'mp-clink';
             btn.innerHTML = `<span>${esc(p.icon)} ${esc(p.name)}</span><span class="mp-cdist">${esc(p.dist)}</span>`;
             btn.addEventListener('click', () => {
-              map.closePopup();
-              L.popup({ maxWidth: 280 }).setLatLng(m.getLatLng()).setContent(pointPopup(p)).openOn(map);
+              // Auswahl aus der Cluster-Liste: reinzoomen + Popup öffnen.
+              flyToPoint(m.getLatLng(), pointPopup(p), 15);
             });
             li.appendChild(btn);
             ul.appendChild(li);
@@ -235,6 +235,32 @@ const payload = {
     if (document.readyState === 'complete') start();
     else window.addEventListener('load', start, { once: true });
 
+    // Karte auf einen Punkt zoomen und dessen Popup öffnen. Popup eigenständig
+    // (nicht über den Marker): funktioniert auch, wenn der Marker im Cluster
+    // steckt — mehrere Hafen-Ziele teilen sich fast dieselben Koordinaten und
+    // lassen sich nie freizoomen. Animationsfrei, sobald der Tab nicht rendert.
+    const flyToPoint = (latlng: any, content: string, minZoom = 14) => {
+      if (!mapRef) return;
+      mapRef.closePopup();
+      const targetZoom = Math.max(mapRef.getZoom(), minZoom);
+      const open = () => {
+        if (!mapRef) return;
+        mapRef.closePopup();
+        L.popup({ maxWidth: 280 }).setLatLng(latlng).setContent(content).openOn(mapRef);
+      };
+      let opened = false;
+      const openOnce = () => { if (opened) return; opened = true; open(); };
+      if (document.hidden) {
+        // Ohne Rendering keine Leaflet-Animationen — direkt springen.
+        mapRef.setView(latlng, targetZoom, { animate: false });
+        openOnce();
+        return;
+      }
+      mapRef.once('moveend', openOnce);
+      setTimeout(openOnce, 1100); // Fallback: flyTo ohne Bewegung feuert kein moveend
+      mapRef.flyTo(latlng, targetZoom, { duration: 0.8 });
+    };
+
     // Kachel-Klick: Karte in Sicht scrollen, aufs Ziel zoomen, Popup öffnen —
     // der Gast muss den Marker nicht selbst suchen.
     const focusPoint = (idx: number) => {
@@ -242,26 +268,7 @@ const payload = {
       const mk = markerByIdx[idx];
       if (!mapRef || !mk) return;
       mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const targetZoom = Math.max(mapRef.getZoom(), 14);
-      // Popup eigenständig öffnen (nicht über den Marker): funktioniert auch,
-      // wenn der Marker im Cluster steckt — mehrere Hafen-Ziele teilen sich
-      // fast dieselben Koordinaten und lassen sich nie freizoomen.
-      const open = () => {
-        if (!mapRef) return;
-        mapRef.closePopup();
-        L.popup({ maxWidth: 280 }).setLatLng(mk.getLatLng()).setContent(pointPopup((mk as any)._p)).openOn(mapRef);
-      };
-      let opened = false;
-      const openOnce = () => { if (opened) return; opened = true; open(); };
-      if (document.hidden) {
-        // Ohne Rendering keine Leaflet-Animationen — direkt springen.
-        mapRef.setView(mk.getLatLng(), targetZoom, { animate: false });
-        openOnce();
-        return;
-      }
-      mapRef.once('moveend', openOnce);
-      setTimeout(openOnce, 1100); // Fallback: flyTo ohne Bewegung feuert kein moveend
-      mapRef.flyTo(mk.getLatLng(), targetZoom, { duration: 0.8 });
+      flyToPoint(mk.getLatLng(), pointPopup((mk as any)._p));
     };
     document.querySelectorAll<HTMLElement>(`[data-exp-cards="${id}"] [data-exp-idx]`).forEach((card) => {
       card.addEventListener('click', (e) => {
