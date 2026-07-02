@@ -243,22 +243,13 @@ const payload = {
       if (!mapRef || !mk) return;
       mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       const targetZoom = Math.max(mapRef.getZoom(), 14);
+      // Popup eigenständig öffnen (nicht über den Marker): funktioniert auch,
+      // wenn der Marker im Cluster steckt — mehrere Hafen-Ziele teilen sich
+      // fast dieselben Koordinaten und lassen sich nie freizoomen.
       const open = () => {
         if (!mapRef) return;
-        // Im Cluster versteckte Marker erst freistellen, dann Popup öffnen.
-        if (clusterRef && typeof clusterRef.zoomToShowLayer === 'function' && clusterRef.hasLayer(mk)) {
-          clusterRef.zoomToShowLayer(mk, () => mk.openPopup());
-          // Animationsfreier Fallback (gedrosselte Tabs, reduced motion): Zoom
-          // hart setzen — beim Re-Clustern wird der Marker frei und Popup öffnet.
-          setTimeout(() => {
-            if (mapRef && !mk.isPopupOpen()) {
-              mapRef.setView(mk.getLatLng(), Math.max(targetZoom, 15), { animate: false });
-              mk.openPopup();
-            }
-          }, 900);
-        } else {
-          mk.openPopup();
-        }
+        mapRef.closePopup();
+        L.popup({ maxWidth: 280 }).setLatLng(mk.getLatLng()).setContent(pointPopup((mk as any)._p)).openOn(mapRef);
       };
       let opened = false;
       const openOnce = () => { if (opened) return; opened = true; open(); };
