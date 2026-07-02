@@ -136,4 +136,15 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
     }, { rootMargin: '500px' });
     io.observe(el);
   });
+
+  // Sicherheitsnetz: Feuert der Observer nie (gedrosselte/versteckte Tabs,
+  // exotische Browser), bliebe sonst dauerhaft "Kalender wird geladen …" stehen —
+  // auch der 8-s-Kontakt-Fallback startet erst in initSmoobu. Deshalb spätestens
+  // 6 s nach Load initialisieren (LCP/CWV sind dann längst gemessen; Doppel-Init
+  // verhindert das dataset.loaded-Guard).
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll<HTMLElement>('.booking-embed').forEach((el) => initSmoobu(el));
+    }, 6000);
+  }, { once: true });
 </script>
