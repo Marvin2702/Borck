@@ -38,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check (astro check)
+        run: npm run check
+
       - name: Fetch Smoobu prices (optional, nur mit Secret)
         run: node scripts/fetch-prices.mjs
         env:

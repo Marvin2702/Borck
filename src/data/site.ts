@@ -33,6 +33,9 @@ export const site = {
 
   // Aggregat-Bewertung (Google – TODO: Live-Werte pflegen)
   rating: { value: 5.0, count: 8 },
+  // Google-Unternehmensprofil (TODO: Link zum Bewertungsprofil eintragen,
+  // z. B. https://g.page/r/... — dann erscheint "Alle Google-Bewertungen ansehen").
+  googleProfileUrl: '' as string,
 
   priceRange: '€€',
 

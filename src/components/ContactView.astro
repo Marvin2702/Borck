@@ -13,7 +13,7 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
 <BaseLayout title={title} description={t('contact.subtitle')} pageKey="kontakt">
   <section class="section">
     <div class="container-narrow">
-      <p class="eyebrow">{site.tagline}</p>
+      <p class="eyebrow">{t('site.tagline')}</p>
       <h1>{t('contact.title')}</h1>
       <p class="lead">{t('contact.subtitle')}</p>
 
@@ -49,6 +49,7 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
         data-email={site.email}
         data-success={t('form.success')}
         data-error={t('form.error')}
+        data-mailtohint={`${t('form.mailtoHint')} ${site.email} · ${site.phoneDisplay}`}
       >
         <input type="hidden" name="access_key" value={site.formAccessKey} />
         <input type="hidden" name="subject" value={`Anfrage über ${site.name} Website`} />
@@ -129,6 +130,9 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
           `Reisezeitraum: ${data.get('dates')}\nPersonen: ${data.get('guests')}\n\n${data.get('message')}`
         );
         window.location.href = `mailto:${form.dataset.email}?subject=${subject}&body=${body}`;
+        // Ehrliches Feedback: ohne eingerichtetes Mail-Programm passiert sonst
+        // scheinbar nichts — Hinweis mit direkter Kontaktmöglichkeit anzeigen.
+        if (status) { status.textContent = form.dataset.mailtohint || ''; status.className = 'form-status is-ok'; }
         return;
       }
       if (status) { status.textContent = '…'; status.className = 'form-status'; }

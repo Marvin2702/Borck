@@ -30,6 +30,9 @@ const fmtDate = (iso?: string) => {
       <p class="reviews-aggregate">
         <span class="stars" aria-hidden="true">★★★★★</span>
         <strong>{site.rating.value.toFixed(1)}</strong> · {site.rating.count} {t('reviews.count')}
+        {site.googleProfileUrl && (
+          <> · <a class="reviews-glink" href={site.googleProfileUrl} target="_blank" rel="noopener">{t('reviews.googleLink')} ↗</a></>
+        )}
       </p>
       {lang !== 'de' && <p class="reviews-orig">{t('reviews.origGerman')}</p>}
     </div>
@@ -57,6 +60,8 @@ const fmtDate = (iso?: string) => {
   .reviews-aggregate { margin-top: 0.6rem; color: var(--text-muted); }
   .reviews-aggregate .stars { color: var(--c-gold); letter-spacing: 2px; }
   .reviews-aggregate strong { color: var(--brand-strong); }
+  .reviews-glink { color: var(--brand); font-weight: 600; text-decoration: none; }
+  .reviews-glink:hover { text-decoration: underline; }
   .reviews-orig { color: var(--text-muted); font-size: 0.82rem; font-style: italic; margin-top: 0.4rem; }
   .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
   .review { padding: 1.5rem 1.5rem 1.3rem; display: flex; flex-direction: column; gap: 0.8rem; }
