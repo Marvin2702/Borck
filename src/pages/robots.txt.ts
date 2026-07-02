@@ -12,6 +12,11 @@ const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
 export const GET: APIRoute = ({ site: astroSite }) => {
   const origin = astroSite ?? new URL(site.domain);
   const sitemap = new URL(`${BASE}/sitemap-index.xml`, origin).href;
-  const body = `User-agent: *\nAllow: /\n\nSitemap: ${sitemap}\n`;
+  const llms = new URL(`${BASE}/llms.txt`, origin).href;
+  // AI-Crawler ausdrücklich erlaubt (Sichtbarkeit in ChatGPT/Perplexity/Gemini);
+  // `User-agent: *` erlaubt sie ohnehin — explizit dokumentiert die Absicht.
+  const aiBots = ['GPTBot', 'OAI-SearchBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended', 'CCBot'];
+  const aiSection = aiBots.map((b) => `User-agent: ${b}\nAllow: /`).join('\n\n');
+  const body = `User-agent: *\nAllow: /\n\n${aiSection}\n\nSitemap: ${sitemap}\n# AI-Kurzprofil: ${llms}\n`;
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };

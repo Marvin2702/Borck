@@ -79,8 +79,10 @@ const lodging: Record<string, unknown> = {
   amenityFeature: (amenityNames[lang] ?? amenityNames.de).map((name) => ({
     '@type': 'LocationFeatureSpecification', name, value: true,
   })),
-  ...(site.facebook || site.instagram
-    ? { sameAs: [site.facebook, site.instagram].filter(Boolean) }
+  // Knowledge-Graph-Verknüpfung: Google-Unternehmensprofil (Maps) + Social.
+  ...(site.googleProfileUrl ? { hasMap: site.googleProfileUrl } : {}),
+  ...(site.facebook || site.instagram || site.googleProfileUrl
+    ? { sameAs: [site.facebook, site.instagram, site.googleProfileUrl].filter(Boolean) }
     : {}),
 };
 // AggregateRating + einzelne Reviews NUR auf der Startseite ausgeben (dort sind
