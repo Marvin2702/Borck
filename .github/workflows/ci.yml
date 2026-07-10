@@ -1,0 +1,60 @@
+name: CI
+
+# Qualitätssicherung für Branches/PRs (Deploy nach main läuft in deploy.yml).
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Astro Check (Typen + Templates)
+        run: npm run check
+
+      # Staging-Build wie beim GitHub-Pages-Deploy: Content-Gate warnt,
+      # check-dist erzwingt noindex auf jeder Seite.
+      - name: Staging-Build (Unterpfad, noindex)
+        run: npm run build
+        env:
+          PUBLIC_STAGING: 'true'
+          SITE: https://marvin2702.github.io
+          BASE: /Borck
+
+      # Produktions-Simulation: astro build direkt (ohne Content-Gate, s. u.),
+      # danach der harte Dist-Check: kein noindex, Canonicals/Sitemap = Prod-Domain.
+      - name: Produktions-Build-Simulation + Dist-Gate
+        run: |
+          npx astro build
+          node scripts/check-dist.mjs
+
+      # Zeigt fehlende Pflichtdaten (z. B. size_qm) sichtbar an, ohne den
+      # CI-Lauf zu blockieren. Ein ECHTER Produktions-Build via `npm run build`
+      # bricht bei diesen Fehlern ab (prebuild-Gate).
+      - name: Produktions-Content-Gate (informativ)
+        run: node scripts/validate-content.mjs
+        continue-on-error: true
+
+      - name: Playwright-Browser installieren
+        run: npx playwright install --with-deps chromium
+
+      # npm test baut den Staging-Output am Root-Pfad neu und startet die E2E-
+      # und Accessibility-Tests gegen astro preview.
+      - name: E2E- & Accessibility-Tests
+        run: npm test
+        env:
+          CI: 'true'

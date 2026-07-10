@@ -107,28 +107,48 @@ const bookHref = localizedPath('apartments', lang);
       transform: translateY(-8px);
       opacity: 0;
       pointer-events: none;
+      /* visibility nimmt die Links zusätzlich aus Tab-Reihenfolge & A11y-Tree;
+         das visibility-Delay lässt die Ausblend-Animation zu Ende laufen. */
+      visibility: hidden;
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+    }
+    .site-nav.is-open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      visibility: visible;
       transition: opacity 0.18s ease, transform 0.18s ease;
     }
-    .site-nav.is-open { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .nav-link { padding: 0.6rem 0.2rem; border-bottom: 1px solid var(--line); }
     .nav-cta { margin-top: 0.6rem; justify-content: center; }
   }
 </style>
 
 <script>
-  // Mobiles Menü: echter Button mit aria-expanded (A11y).
+  // Mobiles Menü: echter Button mit aria-expanded, Escape schließt und gibt den
+  // Fokus an den Button zurück (A11y). Geschlossen ist das Menü via CSS
+  // visibility:hidden auch aus der Tab-Reihenfolge entfernt.
   document.querySelectorAll<HTMLButtonElement>('[data-navtoggle]').forEach((btn) => {
     const nav = document.getElementById('site-nav');
     if (!nav) return;
-    btn.addEventListener('click', () => {
-      const open = nav.classList.toggle('is-open');
+    const isOpen = () => nav.classList.contains('is-open');
+    const setOpen = (open: boolean) => {
+      nav.classList.toggle('is-open', open);
       btn.setAttribute('aria-expanded', String(open));
+    };
+    btn.addEventListener('click', () => setOpen(!isOpen()));
+    nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen()) {
+        setOpen(false);
+        btn.focus();
+      }
     });
-    nav.querySelectorAll('a').forEach((a) =>
-      a.addEventListener('click', () => {
-        nav.classList.remove('is-open');
-        btn.setAttribute('aria-expanded', 'false');
-      })
-    );
+    // Klick außerhalb schließt das offene Menü (mobil).
+    document.addEventListener('click', (e) => {
+      if (isOpen() && e.target instanceof Node && !nav.contains(e.target) && !btn.contains(e.target)) {
+        setOpen(false);
+      }
+    });
   });
 </script>

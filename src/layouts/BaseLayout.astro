@@ -17,13 +17,11 @@ interface Props {
   /** Zusätzliche JSON-LD-Objekte (z. B. Apartment/Offer je Detailseite). */
   jsonLd?: Record<string, unknown>[];
   noindex?: boolean;
-  /** Bewertungen für JSON-LD (nur auf der Startseite ausgegeben). */
-  reviews?: { author: string; rating: number; body: string; date?: string }[];
   /** hreflang-Alternates unterdrücken (für einsprachige Seiten, z. B. DE-Landingpages). */
   noAlternates?: boolean;
 }
 
-const { title, description, pageKey = '', image, jsonLd = [], noindex = false, reviews = [], noAlternates = false } = Astro.props;
+const { title, description, pageKey = '', image, jsonLd = [], noindex = false, noAlternates = false } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -39,7 +37,6 @@ const alternates = alternateLinks(pageKey, origin);
 const staging = import.meta.env.PUBLIC_STAGING === 'true';
 const robotsNoindex = noindex || staging;
 
-const isHome = pageKey === '';
 const ogLocaleMap: Record<string, string> = { de: 'de_DE', en: 'en_US', nl: 'nl_NL', da: 'da_DK' };
 const ogLocale = ogLocaleMap[lang] ?? 'de_DE';
 const localeAlternates = (['de', 'en', 'nl', 'da'] as const).filter((l) => l !== lang).map((l) => ogLocaleMap[l]);
@@ -85,25 +82,10 @@ const lodging: Record<string, unknown> = {
     ? { sameAs: [site.facebook, site.instagram, site.googleProfileUrl].filter(Boolean) }
     : {}),
 };
-// AggregateRating + einzelne Reviews NUR auf der Startseite ausgeben (dort sind
-// die Bewertungen sichtbar) — entspricht Googles Rich-Result-Policy.
-if (isHome) {
-  lodging.aggregateRating = {
-    '@type': 'AggregateRating',
-    ratingValue: site.rating.value,
-    reviewCount: site.rating.count,
-    bestRating: 5,
-  };
-  if (reviews.length) {
-    lodging.review = reviews.map((r) => ({
-      '@type': 'Review',
-      author: { '@type': 'Person', name: r.author },
-      reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
-      reviewBody: r.body,
-      ...(r.date ? { datePublished: r.date } : {}),
-    }));
-  }
-}
+// Bewusst KEIN aggregateRating/review im eigenen LodgingBusiness-Markup:
+// Die Bewertungen stammen von Google (Drittquelle) und wären zudem
+// "self-serving" — beides schließt Googles Review-Snippet-Richtlinie aus.
+// Sichtbar bleiben die Bewertungen (inkl. Link zum Google-Profil) natürlich.
 const allJsonLd = [lodging, ...jsonLd];
 ---
 
@@ -152,7 +134,7 @@ const allJsonLd = [lodging, ...jsonLd];
     ))}
   </head>
   <body>
-    <a href="#main" class="skip-link">{t('nav.home')}</a>
+    <a href="#main" class="skip-link">{t('a11y.skipToContent')}</a>
     <Header lang={lang} noAlternates={noAlternates} />
     <main id="main">
       <slot />

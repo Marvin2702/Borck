@@ -12,14 +12,18 @@ const targetFor = (l: Lang) => (noAlternates && l !== lang ? '' : pageKey);
 ---
 
 <div class="lang" data-lang>
-  <button type="button" class="lang-btn" aria-haspopup="true" aria-expanded="false">
+  <button type="button" class="lang-btn" aria-expanded="false" aria-controls={`lang-menu-${lang}`}>
     <span aria-hidden="true">🌐</span> {lang.toUpperCase()}
+    <span class="visually-hidden">{languages[lang]}</span>
   </button>
-  <ul class="lang-menu" role="menu">
+  {/* Einfache Linkliste statt ARIA-Menü-Pattern: native Links brauchen keine
+      Pfeiltasten-Steuerung und funktionieren ohne JS. */}
+  <ul class="lang-menu" id={`lang-menu-${lang}`}>
     {locales.map((l) => (
-      <li role="none">
-        <a role="menuitem" href={localizedPath(targetFor(l), l)} hreflang={l}
-           class={l === lang ? 'is-active' : ''} lang={l}>
+      <li>
+        <a href={localizedPath(targetFor(l), l)} hreflang={l}
+           class={l === lang ? 'is-active' : ''} lang={l}
+           aria-current={l === lang ? 'true' : undefined}>
           {languages[l]}
         </a>
       </li>
@@ -43,10 +47,14 @@ const targetFor = (l: Lang) => (noAlternates && l !== lang ? '' : pageKey);
     background: var(--surface); border: 1px solid var(--line);
     border-radius: 12px; box-shadow: var(--shadow-md);
     min-width: 150px; opacity: 0; transform: translateY(-6px);
-    pointer-events: none; transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none; visibility: hidden;
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
     z-index: 120;
   }
-  .lang[data-open] .lang-menu { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .lang[data-open] .lang-menu {
+    opacity: 1; transform: translateY(0); pointer-events: auto; visibility: visible;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
   .lang-menu a {
     display: block; padding: 0.5rem 0.7rem; border-radius: 8px;
     text-decoration: none; color: var(--text); font-size: 0.92rem;
@@ -54,24 +62,38 @@ const targetFor = (l: Lang) => (noAlternates && l !== lang ? '' : pageKey);
   .lang-menu a:hover { background: var(--c-aqua-100); }
   .lang-menu a.is-active { color: var(--brand); font-weight: 700; }
   @media (max-width: 860px) {
-    .lang-menu { position: static; opacity: 1; transform: none; pointer-events: auto; box-shadow: none; margin-top: 0.4rem; }
+    /* visibility: inherit (NICHT visible): die Liste folgt dem geschlossenen/
+       geöffneten Zustand des mobilen Menüs — sonst blieben ihre Links trotz
+       visibility:hidden des Menü-Containers fokussierbar. */
+    .lang-menu { position: static; opacity: 1; transform: none; pointer-events: auto; visibility: inherit; box-shadow: none; margin-top: 0.4rem; }
     .lang-btn { display: none; }
   }
 </style>
 
 <script>
   // Dropdown per Klick (Desktop). Mobil ist die Liste ohnehin offen.
+  // Geschlossen ist die Liste via visibility:hidden aus der Tab-Reihenfolge.
+  const closeAll = () => {
+    document.querySelectorAll('[data-lang]').forEach((x) => {
+      x.removeAttribute('data-open');
+      x.querySelector('.lang-btn')?.setAttribute('aria-expanded', 'false');
+    });
+  };
   document.querySelectorAll('[data-lang]').forEach((el) => {
-    const btn = el.querySelector('.lang-btn');
+    const btn = el.querySelector<HTMLButtonElement>('.lang-btn');
     btn?.addEventListener('click', (e) => {
       e.stopPropagation();
       const open = el.hasAttribute('data-open');
-      document.querySelectorAll('[data-lang]').forEach((x) => x.removeAttribute('data-open'));
+      closeAll();
       if (!open) el.setAttribute('data-open', '');
       btn.setAttribute('aria-expanded', String(!open));
     });
+    el.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Escape' && el.hasAttribute('data-open')) {
+        closeAll();
+        btn?.focus();
+      }
+    });
   });
-  document.addEventListener('click', () => {
-    document.querySelectorAll('[data-lang]').forEach((x) => x.removeAttribute('data-open'));
-  });
+  document.addEventListener('click', closeAll);
 </script>

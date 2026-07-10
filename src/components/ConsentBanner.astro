@@ -5,16 +5,18 @@ import { site } from '../data/site';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 
-const txt: Record<Lang, { text: string; more: string; accept: string; decline: string }> = {
-  de: { text: 'Wir nutzen Statistik-Cookies, um die Website zu verbessern. Nur mit deiner Einwilligung.', more: 'Datenschutz', accept: 'Akzeptieren', decline: 'Ablehnen' },
-  en: { text: 'We use statistics cookies to improve the website. Only with your consent.', more: 'Privacy', accept: 'Accept', decline: 'Decline' },
-  nl: { text: 'We gebruiken statistiek-cookies om de website te verbeteren. Alleen met je toestemming.', more: 'Privacy', accept: 'Accepteren', decline: 'Weigeren' },
-  da: { text: 'Vi bruger statistik-cookies for at forbedre websitet. Kun med dit samtykke.', more: 'Privatliv', accept: 'Acceptér', decline: 'Afvis' },
+const txt: Record<Lang, { label: string; text: string; more: string; accept: string; decline: string }> = {
+  de: { label: 'Cookie-Einwilligung', text: 'Wir nutzen Statistik-Cookies, um die Website zu verbessern. Nur mit deiner Einwilligung.', more: 'Datenschutz', accept: 'Akzeptieren', decline: 'Ablehnen' },
+  en: { label: 'Cookie consent', text: 'We use statistics cookies to improve the website. Only with your consent.', more: 'Privacy', accept: 'Accept', decline: 'Decline' },
+  nl: { label: 'Cookietoestemming', text: 'We gebruiken statistiek-cookies om de website te verbeteren. Alleen met je toestemming.', more: 'Privacy', accept: 'Accepteren', decline: 'Weigeren' },
+  da: { label: 'Cookiesamtykke', text: 'Vi bruger statistik-cookies for at forbedre websitet. Kun med dit samtykke.', more: 'Privatliv', accept: 'Acceptér', decline: 'Afvis' },
 };
 const c = txt[lang];
+// Rechtstexte existieren bewusst nur auf Deutsch (rechtlich verbindliches
+// Original, Hinweis dazu im Footer) — daher Link auf die DE-Datenschutzseite.
 const privacyHref = localizedPath('datenschutz', 'de');
 ---
-<div class="consent" data-consent data-ga={site.googleAnalyticsId} hidden role="dialog" aria-label="Cookie-Einwilligung">
+<div class="consent" data-consent data-ga={site.googleAnalyticsId} hidden role="dialog" aria-label={c.label} tabindex="-1">
   <p>{c.text} <a href={privacyHref}>{c.more}</a></p>
   <div class="consent-actions">
     <button type="button" class="btn btn--ghost" data-consent-decline>{c.decline}</button>
@@ -37,9 +39,42 @@ const privacyHref = localizedPath('datenschutz', 'de');
 </style>
 
 <script>
-  const KEY = 'ha-consent-stats';
+  // Consent-Speicherung mit Versionierung: {v, ts, categories}. Ändern sich die
+  // eingesetzten Dienste/Kategorien, CONSENT_VERSION erhöhen — gespeicherte
+  // Entscheidungen älterer Versionen verfallen und der Banner erscheint erneut.
+  const KEY = 'ha-consent';
+  const LEGACY_KEY = 'ha-consent-stats'; // altes Format ('granted'/'denied')
+  const CONSENT_VERSION = 1;
+  type Consent = { v: number; ts: string; categories: { statistics: boolean } };
+
   const el = document.querySelector<HTMLElement>('[data-consent]');
   const gaId = el?.dataset.ga || '';
+
+  function saveConsent(statistics: boolean): Consent {
+    const consent: Consent = { v: CONSENT_VERSION, ts: new Date().toISOString(), categories: { statistics } };
+    try { localStorage.setItem(KEY, JSON.stringify(consent)); } catch { /* Storage blockiert -> nur Session */ }
+    return consent;
+  }
+
+  function readConsent(): Consent | null {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const obj = JSON.parse(raw) as Consent;
+        // Versionswechsel oder kaputte Daten => erneut fragen.
+        if (obj && obj.v === CONSENT_VERSION && obj.categories && typeof obj.categories.statistics === 'boolean') return obj;
+        return null;
+      }
+      // Migration vom alten String-Format (Entscheidung bleibt erhalten).
+      const legacy = localStorage.getItem(LEGACY_KEY);
+      if (legacy === 'granted' || legacy === 'denied') {
+        const migrated = saveConsent(legacy === 'granted');
+        localStorage.removeItem(LEGACY_KEY);
+        return migrated;
+      }
+    } catch { /* Storage blockiert -> wie "keine Entscheidung" behandeln */ }
+    return null;
+  }
 
   function loadGA() {
     const w = window as any;
@@ -56,24 +91,28 @@ const privacyHref = localizedPath('datenschutz', 'de');
   }
 
   if (gaId && el) {
-    const stored = localStorage.getItem(KEY);
-    if (stored === 'granted') loadGA();
-    else if (stored !== 'denied') el.hidden = false;
+    const stored = readConsent();
+    if (stored?.categories.statistics) loadGA();
+    else if (!stored) el.hidden = false;
 
     el.querySelector('[data-consent-accept]')?.addEventListener('click', () => {
-      localStorage.setItem(KEY, 'granted');
+      saveConsent(true);
       el.hidden = true;
       loadGA();
     });
     el.querySelector('[data-consent-decline]')?.addEventListener('click', () => {
-      localStorage.setItem(KEY, 'denied');
+      saveConsent(false);
       el.hidden = true;
     });
 
     // Widerruf/Änderung jederzeit: Footer-Link "Cookie-Einstellungen" öffnet den Banner erneut
     // (DSGVO Art. 7 Abs. 3 – Widerruf so einfach wie die Erteilung).
+    // Fokus in den Dialog, damit Tastatur-Nutzer direkt bei den Optionen sind.
     document.querySelectorAll<HTMLElement>('[data-consent-open]').forEach((btn) => {
-      btn.addEventListener('click', () => { el.hidden = false; });
+      btn.addEventListener('click', () => {
+        el.hidden = false;
+        el.focus();
+      });
     });
 
     // Conversion-Signale (nur wenn GA nach Einwilligung geladen wurde): Klicks auf

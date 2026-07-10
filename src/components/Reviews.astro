@@ -16,6 +16,13 @@ const reviews = await Promise.all(
 
 // Bewertungsdatum lokalisiert (Monat + Jahr); ohne gültiges Datum keine Anzeige.
 const localeMap: Record<Lang, string> = { de: 'de-DE', en: 'en-GB', nl: 'nl-NL', da: 'da-DK' };
+// Sternebewertung als Text für Screenreader.
+const starsLabel: Record<Lang, (r: number) => string> = {
+  de: (r) => `${r} von 5 Sternen`,
+  en: (r) => `${r} out of 5 stars`,
+  nl: (r) => `${r} van 5 sterren`,
+  da: (r) => `${r} ud af 5 stjerner`,
+};
 const fmtDate = (iso?: string) => {
   if (!iso) return '';
   const d = new Date(iso);
@@ -39,8 +46,8 @@ const fmtDate = (iso?: string) => {
     <div class="reviews-grid">
       {reviews.map(({ data, Content }) => (
         <figure class="review card">
-          <div class="review-stars" aria-label={`${data.rating}/5`}>
-            {'★'.repeat(data.rating)}<span class="dim">{'★'.repeat(5 - data.rating)}</span>
+          <div class="review-stars" role="img" aria-label={starsLabel[lang](data.rating)}>
+            {'★'.repeat(data.rating)}<span class="dim" aria-hidden="true">{'★'.repeat(5 - data.rating)}</span>
           </div>
           <blockquote class="review-text"><Content /></blockquote>
           <figcaption class="review-cap">

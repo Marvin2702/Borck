@@ -11,7 +11,7 @@ const t = useTranslations(lang);
 
 // Echter "Über mich"-Text von Iris (Original DE inkl. Original-Zwischenüberschriften),
 // Übersetzungen für EN/NL/DA. Struktur 1:1 wie nordsee-buesum-fewo.de/ueber-mich.
-interface AboutContent { intro: string; sections: { h: string; p: string }[]; signoff: string }
+interface AboutContent { intro: string; sections: { h: string; p: string }[]; signoff: string; photoAlt: string }
 const story: Record<Lang, AboutContent> = {
   de: {
     intro: 'Moin Moin liebe Freunde der Nordsee! ❤️ Ich bin Iris, eure Gastgeberin hier im Haus Aquamarin in Büsum. Direkt hinter der Familienlagune biete ich euch 7 Apartments für unvergessliche Nordsee-Erlebnisse.',
@@ -21,6 +21,7 @@ const story: Record<Lang, AboutContent> = {
       { h: 'Habt ihr Fragen?', p: 'Ich stehe euch jederzeit für Buchungsanfragen oder Tipps zur Verfügung. Ich freue mich darauf, eure Gastgeberin zu sein!' },
     ],
     signoff: 'Mit maritimen Grüßen, Iris',
+    photoAlt: 'Iris, Gastgeberin im Haus Aquamarin, mit Hund Mia',
   },
   en: {
     intro: 'Moin moin, dear friends of the North Sea! ❤️ I am Iris, your host here at Haus Aquamarin in Büsum. Right behind the family lagoon I offer you 7 apartments for unforgettable North Sea moments.',
@@ -30,6 +31,7 @@ const story: Record<Lang, AboutContent> = {
       { h: 'Any questions?', p: 'I am always here for booking enquiries or tips. I look forward to being your host!' },
     ],
     signoff: 'With maritime greetings, Iris',
+    photoAlt: 'Iris, your host at Haus Aquamarin, with her dog Mia',
   },
   nl: {
     intro: 'Moin moin, lieve vrienden van de Noordzee! ❤️ Ik ben Iris, jullie gastvrouw hier in Haus Aquamarin in Büsum. Direct achter de familielagune bied ik jullie 7 appartementen voor onvergetelijke Noordzee-momenten.',
@@ -39,6 +41,7 @@ const story: Record<Lang, AboutContent> = {
       { h: 'Hebben jullie vragen?', p: 'Ik sta altijd klaar voor boekingsvragen of tips. Ik verheug me erop jullie gastvrouw te zijn!' },
     ],
     signoff: 'Met maritieme groeten, Iris',
+    photoAlt: 'Iris, je gastvrouw in Haus Aquamarin, met hond Mia',
   },
   da: {
     intro: 'Moin moin, kære venner af Nordsøen! ❤️ Jeg er Iris, jeres vært her i Haus Aquamarin i Büsum. Lige bag familielagunen tilbyder jeg jer 7 lejligheder til uforglemmelige Nordsø-oplevelser.',
@@ -48,6 +51,7 @@ const story: Record<Lang, AboutContent> = {
       { h: 'Har I spørgsmål?', p: 'Jeg står altid til rådighed for bookingforespørgsler eller tips. Jeg glæder mig til at være jeres vært!' },
     ],
     signoff: 'Med maritime hilsner, Iris',
+    photoAlt: 'Iris, din vært i Haus Aquamarin, med hunden Mia',
   },
 };
 const content = story[lang];
@@ -61,8 +65,8 @@ const title = `${t('about.title')} · ${site.name} Büsum`;
 
       <div class="host">
         <figure class="host-photo">
-          <Img src="/images/iris-mia.jpg" alt="Iris, Gastgeberin im Haus Aquamarin, mit Hund Mia"
-               width={900} height={900} loading="eager" sizes="(max-width: 720px) 100vw, 40vw" />
+          <Img src="/images/iris-mia.jpg" alt={content.photoAlt}
+               width={900} height={900} loading="eager" sizes="(max-width: 720px) 100vw, 340px" />
         </figure>
         <div class="host-text">
           <p class="lead-intro">{content.intro}</p>

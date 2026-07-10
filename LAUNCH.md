@@ -6,9 +6,21 @@ Stand: 02.07.2026. Reihenfolge einhalten; nichts davon ist auf Staging nötig.
 - [ ] Prod-Deploy einrichten (eigener Workflow oder Hosting-Wechsel) mit:
   - `SITE=https://www.nordsee-buesum-fewo.de`
   - `BASE=/`
-  - **`PUBLIC_STAGING` NICHT setzen** → noindex fällt automatisch weg (BaseLayout.astro L.36–37)
+  - **`PUBLIC_STAGING` NICHT setzen** → noindex fällt automatisch weg (BaseLayout.astro)
 - [ ] `.github/workflows/deploy.yml`: Staging-Workflow hat `PUBLIC_STAGING: 'true'` hardcoded — nur für GitHub Pages lassen
 - [ ] Täglichen Preis-Rebuild (cron 4:00) auch im Prod-Deploy übernehmen
+- [ ] Build-Gates beachten: `npm run build` (ohne `PUBLIC_STAGING`) BRICHT AB, solange
+      Pflichtdaten fehlen (`scripts/validate-content.mjs`; aktuell: `size_qm` für
+      Rubin + Saphir) — das ist beabsichtigt. Nach dem Build prüft
+      `scripts/check-dist.mjs` automatisch noindex/Canonicals/Sitemap.
+- [ ] Hosting-Header (GitHub Pages kann das nicht — beim Prod-Hosting setzen):
+      `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`,
+      `Referrer-Policy: strict-origin-when-cross-origin`,
+      `Permissions-Policy: camera=(), microphone=(), geolocation=()`.
+      Eine CSP muss Smoobu (`login.smoobu.com`, `booking.smoobu.com`),
+      Web3Forms (`api.web3forms.com`), OpenStreetMap-Tiles
+      (`tile.openstreetmap.org`) und – nach Einwilligung – Google Analytics
+      (`googletagmanager.com`, `google-analytics.com`) erlauben.
 
 ## 2. Smoobu
 - [ ] `SMOOBU_API_KEY` als Secret setzen (GitHub → Settings → Secrets → Actions) → ab-Preise laden automatisch

@@ -61,7 +61,7 @@ export const landingPages: Record<string, LandingPage> = {
           'De eerste hond kost € 46 per boeking, een tweede hond € 23. Beddengoed, handdoeken en alle andere opties worden transparant vermeld – je betaalt alleen wat je echt nodig hebt.',
           'Direct voor de deur beginnen de eindeloze dijkpaden: ideaal voor lange wandelingen met je viervoeter, met schapen, wind en weids uitzicht. Het hondenstrand, de promenade en de Waddenzee zijn snel bereikt.',
           'Voor een vakantie met hond zijn de benedenappartementen met terras het handigst: korte afstanden, geen trappenhuis, snel naar buiten. De familielagune Perlebucht ligt op slechts ongeveer 0,4 km.',
-          'Je boekt rechtstreeks bij de gastheer, zonder bemiddelingskosten. Beschikbaarheid en prijzen bekijk je dagactueel in de kalender van het betreffende appartement.',
+          'Je boekt rechtstreeks bij de gastvrouw, zonder bemiddelingskosten. Beschikbaarheid en prijzen bekijk je dagactueel in de kalender van het betreffende appartement.',
         ],
       },
       da: {
@@ -120,7 +120,7 @@ export const landingPages: Record<string, LandingPage> = {
           'Echt zeezicht is er in Haus Aquamarin in het bovenste appartement Topas (2e verdieping, ca. 76 m², balkon). Meerdere andere appartementen scoren met dijkzicht – zoals Türkis (1e verdieping) en Opal met maar liefst twee balkons, waarvan één met weids dijkzicht.',
           'Het verschil: zeezicht richt de blik direct op de Noordzee, dijkzicht op de groene dijkrand met zijn typische Noordzee-panorama. Beide betekenen licht, ruimte en het gevoel midden in het landschap te zijn.',
           'Alle appartementen liggen direct achter de familielagune Perlebucht, op een paar passen van strand en promenade. ’s Ochtends koffie op het balkon, ’s avonds het kleurenspel van de ondergaande zon.',
-          'Beschikbaarheid en prijzen bekijk je direct in de kalender van het betreffende appartement – zonder boekingskosten, rechtstreeks bij de gastheer.',
+          'Beschikbaarheid en prijzen bekijk je direct in de kalender van het betreffende appartement – zonder boekingskosten, rechtstreeks bij de gastvrouw.',
         ],
       },
       da: {
@@ -179,7 +179,7 @@ export const landingPages: Record<string, LandingPage> = {
           'De appartementen in Haus Aquamarin zijn bijzonder geschikt voor langere verblijven in herfst en winter. Alle appartementen zijn verwarmd, hebben gratis wifi en een volledig uitgeruste keuken – ideaal voor een workation en thuiswerken met zeegeruis voor het raam.',
           'Stormachtige wandelingen op de dijk, wadlooptochten en gezellige avonden op de bank: het laagseizoen is de tijd om te vertragen. Wie langer blijft, beleeft Büsum op zijn rustigst.',
           'Honden zijn van harte welkom – juist in de rustige maanden een pluspunt voor lange strandwandelingen. Beddengoed, handdoeken en andere opties worden transparant vermeld.',
-          'Reserveer je gewenste periode direct in de boekingskalender, zonder boekingskosten. Voor langere verblijven loont een directe aanvraag bij de gastheer.',
+          'Reserveer je gewenste periode direct in de boekingskalender, zonder boekingskosten. Voor langere verblijven loont een directe aanvraag bij de gastvrouw.',
         ],
       },
       da: {

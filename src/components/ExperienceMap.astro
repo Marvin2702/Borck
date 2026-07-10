@@ -33,6 +33,12 @@ const hint: Record<Lang, string> = {
   da: 'Tryk på en markør for info, afstand og booking.',
 };
 const clusterLabel: Record<Lang, string> = { de: 'Ziele hier', en: 'places here', nl: 'plekken hier', da: 'steder her' };
+const mapAria: Record<Lang, string> = {
+  de: `Karte mit Zielen rund um ${home.name}`,
+  en: `Map with destinations around ${home.name}`,
+  nl: `Kaart met bestemmingen rond ${home.name}`,
+  da: `Kort med mål omkring ${home.name}`,
+};
 
 const enriched = points.map((p) => ({
   ...p,
@@ -49,7 +55,7 @@ const payload = {
 ---
 
 <p class="exp-hint text-center">{hint[lang]}</p>
-<div id={mapId} class="exp-map" role="application" aria-label={`Karte mit Zielen rund um ${home.name}`}></div>
+<div id={mapId} class="exp-map" role="application" aria-label={mapAria[lang]}></div>
 <script type="application/json" data-map-data={mapId} set:html={JSON.stringify(payload)} />
 
 {showCards && (

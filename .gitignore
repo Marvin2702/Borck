@@ -9,6 +9,11 @@ dist/
 lh*.json
 lhd.json
 
+# Playwright
+test-results/
+playwright-report/
+.playwright/
+
 # Logs & env
 *.log
 .env

@@ -16,6 +16,9 @@ const hasId = effectiveId.length > 0;
 // Smoobu-Sprachsegment der Booking-Tool-URL (Fallback DE bei unbekannt).
 const smoobuLang = ({ de: 'de', en: 'en', nl: 'nl', da: 'da' } as Record<string, string>)[lang] ?? 'de';
 const waText = encodeURIComponent(t('contact.whatsapp.msg'));
+// Direktlink zur Smoobu-Buchungsseite: Fallback ohne JS bzw. wenn das
+// eingebettete Booking-Tool nicht lädt (Adblocker/Netz).
+const directBookUrl = smoobuId ? `${site.smoobuBookingPage}?apartmentId=${smoobuId}` : site.smoobuBookingPage;
 ---
 
 <section class="booking" id="buchung">
@@ -35,8 +38,17 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
         data-phone={site.phone.replace(/\s/g, '')}
         data-phonelabel={site.phoneDisplay}
         data-wa={`https://wa.me/${site.whatsapp}?text=${waText}`}
+        data-frametitle={t('booking.iframeTitle')}
+        data-bookurl={directBookUrl}
+        data-booklabel={t('cta.bookNow')}
       >
         <p class="booking-hint">{t('booking.placeholder')}</p>
+        {/* Nutzer-Trigger als Fallback, falls der IntersectionObserver (noch)
+            nicht gefeuert hat — lädt das Widget sofort per Klick. */}
+        <button type="button" class="btn btn--ghost" data-booking-activate>{t('booking.fallback')}</button>
+        <noscript>
+          <a class="btn btn--gold" href={directBookUrl} target="_blank" rel="noopener">{t('cta.bookNow')} ↗</a>
+        </noscript>
       </div>
     ) : (
       <div class="booking-placeholder">
@@ -77,15 +89,22 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
 <script>
   // Lazy-Load des Smoobu Booking-Tools (schützt CWV/INP). Exaktes Format aus
   // der Originalseite: BookingToolIframe.js + /<lang>/booking-tool/iframe/<user>/<id>.
+  // Ladeauslöser (bewusst KEIN pauschaler Zeit-Trigger — Third-Party-Code lädt
+  // nur, wenn der Gast den Buchungsbereich tatsächlich ansteuert):
+  //   1. Bereich nähert sich dem Viewport (IntersectionObserver).
+  //   2. Klick auf "Buchungskalender aktivieren" (Fallback, falls 1. nie feuert).
   function showFallback(el: HTMLElement) {
     if (el.dataset.fallback || el.querySelector('iframe')) return;
     el.dataset.fallback = '1';
     const phone = el.dataset.phone || '';
     const phoneLabel = el.dataset.phonelabel || phone;
     const wa = el.dataset.wa || '#';
+    const book = el.dataset.bookurl || '';
+    const bookLabel = el.dataset.booklabel || 'Smoobu';
     el.innerHTML =
       '<div style="text-align:center;display:grid;gap:0.8rem;justify-items:center">' +
-      `<a class="btn btn--gold" href="tel:${phone}">☎ ${phoneLabel}</a>` +
+      (book ? `<a class="btn btn--gold" href="${book}" target="_blank" rel="noopener">${bookLabel} ↗</a>` : '') +
+      `<a class="btn btn--ghost" href="tel:${phone}">☎ ${phoneLabel}</a>` +
       `<a class="btn btn--ghost" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>` +
       '</div>';
   }
@@ -111,11 +130,11 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
           baseUrl: base,
           target: `#${targetId}`,
         });
-        // Smoobu-iFrame nachträglich mit Titel versehen (A11y: frame-title).
+        // Smoobu-iFrame nachträglich mit lokalisiertem Titel versehen (A11y).
         let tries = 0;
         const ti = setInterval(() => {
           const f = el.querySelector('iframe') as HTMLIFrameElement | null;
-          if (f) { if (!f.title) f.title = 'Buchungskalender'; clearInterval(ti); }
+          if (f) { if (!f.title) f.title = el.dataset.frametitle || 'Buchungskalender'; clearInterval(ti); }
           else if (++tries > 40) clearInterval(ti);
         }, 250);
       } else {
@@ -128,23 +147,16 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
     setTimeout(() => showFallback(el), 8000);
   }
 
-  // Automatisch laden, sobald der Kalender in Sichtnähe kommt (kein Klick nötig).
-  // Lazy via IntersectionObserver schützt weiterhin CWV/INP beim Initial-Load.
   document.querySelectorAll<HTMLElement>('.booking-embed').forEach((el) => {
+    // Automatisch laden, sobald der Kalender in Sichtnähe kommt (kein Klick
+    // nötig). 200px Vorlauf: genug zum Vorladen beim Scrollen, ohne dass
+    // Third-Party-Code schon beim Seitenaufbau lädt, wenn der Bereich noch
+    // deutlich unterhalb des Folds liegt.
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting) { initSmoobu(el); io.disconnect(); } });
-    }, { rootMargin: '500px' });
+    }, { rootMargin: '200px' });
     io.observe(el);
+    // Nutzer-Trigger: sofort laden, ohne auf den Observer zu warten.
+    el.querySelector('[data-booking-activate]')?.addEventListener('click', () => initSmoobu(el));
   });
-
-  // Sicherheitsnetz: Feuert der Observer nie (gedrosselte/versteckte Tabs,
-  // exotische Browser), bliebe sonst dauerhaft "Kalender wird geladen …" stehen —
-  // auch der 8-s-Kontakt-Fallback startet erst in initSmoobu. Deshalb spätestens
-  // 6 s nach Load initialisieren (LCP/CWV sind dann längst gemessen; Doppel-Init
-  // verhindert das dataset.loaded-Guard).
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.querySelectorAll<HTMLElement>('.booking-embed').forEach((el) => initSmoobu(el));
-    }, 6000);
-  }, { once: true });
 </script>

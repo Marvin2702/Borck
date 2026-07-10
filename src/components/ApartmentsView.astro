@@ -44,7 +44,8 @@ const description = t('meta.apartmentsDesc');
       <div class="apt-grid" data-apt-grid>
         {apartments.map((a) => <ApartmentCard apartment={a} lang={lang} />)}
       </div>
-      <p class="filter-none" data-filter-none hidden>{t('filter.none')}</p>
+      {/* Button statt klickbarem Absatz: per Tastatur bedienbar. */}
+      <button type="button" class="filter-none" data-filter-none hidden>{t('filter.none')}</button>
     </div>
   </section>
 
@@ -93,7 +94,10 @@ const description = t('meta.apartmentsDesc');
   }
   .filter-pill:hover { border-color: var(--c-aqua-300); }
   .filter-pill.is-active { background: var(--brand); color: #fff; border-color: var(--brand); }
-  .filter-none { text-align: center; color: var(--text-muted); cursor: pointer; text-decoration: underline; margin-top: 1.5rem; }
+  .filter-none {
+    display: block; margin: 1.5rem auto 0; background: none; border: 0; font: inherit;
+    text-align: center; color: var(--text-muted); cursor: pointer; text-decoration: underline;
+  }
   .theme-section { padding-block: clamp(2rem, 1.5rem + 2vw, 3rem); }
   .theme-links { display: flex; flex-wrap: wrap; gap: 0.7rem; justify-content: center; margin-top: 1rem; }
   .theme-links a {

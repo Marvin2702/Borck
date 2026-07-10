@@ -9,6 +9,10 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 const waText = encodeURIComponent(t('contact.whatsapp.msg'));
 const title = `${t('contact.title')} · ${site.name} Büsum`;
+// Ohne Web3Forms-Key wird KEIN Formular gerendert (kein stiller mailto-Fallback,
+// der wie ein echter Versand aussieht) — stattdessen ein klarer Hinweis mit
+// Direktkontakt. Key eintragen in src/data/site.ts (formAccessKey).
+const hasFormKey = Boolean(site.formAccessKey);
 ---
 <BaseLayout title={title} description={t('contact.subtitle')} pageKey="kontakt">
   <section class="section">
@@ -40,38 +44,50 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
         </div>
       </div>
 
-      <form
-        class="contact-form"
-        data-contact-form
-        action="https://api.web3forms.com/submit"
-        method="POST"
-        data-haskey={site.formAccessKey ? '1' : '0'}
-        data-email={site.email}
-        data-success={t('form.success')}
-        data-error={t('form.error')}
-        data-mailtohint={`${t('form.mailtoHint')} ${site.email} · ${site.phoneDisplay}`}
-      >
-        <input type="hidden" name="access_key" value={site.formAccessKey} />
-        <input type="hidden" name="subject" value={`Anfrage über ${site.name} Website`} />
-        <input type="hidden" name="from_name" value={site.name} />
-        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" />
-        <h2>{t('form.title')}</h2>
-        <div class="form-row">
-          <label>{t('form.name')}<input type="text" name="name" required autocomplete="name" /></label>
-          <label>{t('contact.email')}<input type="email" name="email" required autocomplete="email" /></label>
+      {hasFormKey ? (
+        <form
+          class="contact-form"
+          data-contact-form
+          action="https://api.web3forms.com/submit"
+          method="POST"
+          data-success={t('form.success')}
+          data-error={t('form.error')}
+          data-sending={t('form.sending')}
+          data-dateorder={t('form.dateOrder')}
+        >
+          <input type="hidden" name="access_key" value={site.formAccessKey} />
+          {/* Sprachkennung im Betreff: Die Gastgeberin sieht sofort, in welcher Sprache der Gast schreibt. */}
+          <input type="hidden" name="subject" value={`Anfrage über ${site.name} Website (${lang.toUpperCase()})`} />
+          <input type="hidden" name="from_name" value={site.name} />
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" />
+          <h2>{t('form.title')}</h2>
+          <div class="form-row">
+            <label>{t('form.name')}<input type="text" name="name" required autocomplete="name" /></label>
+            <label>{t('contact.email')}<input type="email" name="email" required autocomplete="email" /></label>
+          </div>
+          <div class="form-row">
+            <label>{t('form.arrival')}<input type="date" name="anreise" data-arrival /></label>
+            <label>{t('form.departure')}<input type="date" name="abreise" data-departure /></label>
+          </div>
+          <label>{t('apartments.persons')}<input type="number" name="personen" min="1" max="6" inputmode="numeric" /></label>
+          <label>{t('form.message')}<textarea name="message" rows="4" required></textarea></label>
+          <button type="submit" class="btn btn--gold">{t('form.send')}</button>
+          <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+        </form>
+      ) : (
+        <div class="contact-form contact-unavailable">
+          <h2>{t('form.title')}</h2>
+          <p class="form-status is-err" role="status">{t('form.unavailable')}</p>
+          <div class="unavailable-actions">
+            <a class="btn btn--gold" href={`mailto:${site.email}`}>✉ {site.email}</a>
+            <a class="btn btn--ghost" href={`tel:${site.phone.replace(/\s/g, '')}`}>☎ {site.phoneDisplay}</a>
+          </div>
         </div>
-        <div class="form-row">
-          <label>{t('form.dates')}<input type="text" name="dates" autocomplete="off" /></label>
-          <label>{t('apartments.persons')}<input type="number" name="guests" min="1" max="6" /></label>
-        </div>
-        <label>{t('form.message')}<textarea name="message" rows="4" required></textarea></label>
-        <button type="submit" class="btn btn--gold">{t('form.send')}</button>
-        <p class="form-status" data-form-status role="status" aria-live="polite"></p>
-      </form>
+      )}
 
       <figure class="contact-image">
         <Img src="/images/kontakt-maritim.jpg" alt="Haus Aquamarin in Büsum"
-             width={1200} height={600} loading="lazy" sizes="100vw" />
+             width={1200} height={600} loading="lazy" sizes="(min-width: 800px) 760px, 100vw" />
       </figure>
       <p class="addr-line">{site.name} · {site.address.street} · {site.address.postalCode} {site.address.city}</p>
     </div>
@@ -112,6 +128,8 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
   .form-status { margin: 0; font-weight: 600; }
   .form-status.is-ok { color: var(--c-deich-700); }
   .form-status.is-err { color: #a52a3a; }
+  .unavailable-actions { display: flex; gap: 0.7rem; flex-wrap: wrap; }
+  .contact-form button[disabled] { opacity: 0.6; cursor: progress; transform: none; }
   @media (max-width: 600px) { .contact-grid, .form-row { grid-template-columns: 1fr; } }
 </style>
 
@@ -119,30 +137,53 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
   const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
   if (form) {
     const status = form.querySelector<HTMLElement>('[data-form-status]');
+    const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const arrival = form.querySelector<HTMLInputElement>('[data-arrival]');
+    const departure = form.querySelector<HTMLInputElement>('[data-departure]');
+
+    // Native Datumsfelder: Anreise frühestens heute, Abreise nach der Anreise.
+    const isoDate = (d: Date) => d.toISOString().slice(0, 10);
+    const dayAfter = (iso: string) => {
+      const d = new Date(`${iso}T12:00:00`);
+      d.setDate(d.getDate() + 1);
+      return isoDate(d);
+    };
+    if (arrival) arrival.min = isoDate(new Date());
+    const syncDepartureMin = () => {
+      if (!arrival || !departure) return;
+      departure.min = arrival.value ? dayAfter(arrival.value) : (arrival.min ? dayAfter(arrival.min) : '');
+      // Abreise vor/gleich Anreise? Native Validierungsmeldung setzen.
+      if (departure.value && arrival.value && departure.value <= arrival.value) {
+        departure.setCustomValidity(form.dataset.dateorder || '');
+      } else {
+        departure.setCustomValidity('');
+      }
+    };
+    arrival?.addEventListener('change', syncDepartureMin);
+    departure?.addEventListener('change', syncDepartureMin);
+    syncDepartureMin();
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = new FormData(form);
-      // Ohne Web3Forms-Key: mailto-Fallback (öffnet das E-Mail-Programm).
-      if (form.dataset.haskey !== '1') {
-        const subject = encodeURIComponent('Anfrage Ferienwohnung Büsum');
-        const body = encodeURIComponent(
-          `Name: ${data.get('name')}\nE-Mail: ${data.get('email')}\n` +
-          `Reisezeitraum: ${data.get('dates')}\nPersonen: ${data.get('guests')}\n\n${data.get('message')}`
-        );
-        window.location.href = `mailto:${form.dataset.email}?subject=${subject}&body=${body}`;
-        // Ehrliches Feedback: ohne eingerichtetes Mail-Programm passiert sonst
-        // scheinbar nichts — Hinweis mit direkter Kontaktmöglichkeit anzeigen.
-        if (status) { status.textContent = form.dataset.mailtohint || ''; status.className = 'form-status is-ok'; }
-        return;
-      }
-      if (status) { status.textContent = '…'; status.className = 'form-status'; }
+      if (form.dataset.busy === '1') return; // Doppel-Submit verhindern
+      syncDepartureMin();
+      if (!form.reportValidity()) return;
+      form.dataset.busy = '1';
+      if (submitBtn) submitBtn.disabled = true;
+      if (status) { status.textContent = form.dataset.sending || '…'; status.className = 'form-status'; }
       try {
+        const data = new FormData(form);
         const res = await fetch(form.action, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
-        if (!res.ok) throw new Error('bad');
+        // Erfolg NUR melden, wenn der Server ihn bestätigt (Web3Forms: JSON success).
+        const json = await res.json().catch(() => null);
+        if (!res.ok || !json || json.success !== true) throw new Error('bad');
         form.reset();
         if (status) { status.textContent = form.dataset.success || ''; status.className = 'form-status is-ok'; }
       } catch {
         if (status) { status.textContent = form.dataset.error || ''; status.className = 'form-status is-err'; }
+      } finally {
+        delete form.dataset.busy;
+        if (submitBtn) submitBtn.disabled = false;
       }
     });
   }
