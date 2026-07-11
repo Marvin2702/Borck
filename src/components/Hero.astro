@@ -1,5 +1,5 @@
 ---
-import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
 interface Props { lang: Lang }
@@ -9,56 +9,94 @@ const bookHref = localizedPath('apartments', lang);
 const apartmentsHref = '#apartments-preview';
 // Bewertungswert mit lokalisiertem Dezimaltrennzeichen (4,6 vs. 4.6).
 const ratingStr = site.rating.value.toFixed(1).replace('.', lang === 'en' ? '.' : ',');
+const facts: Record<Lang, { distance: string; direct: string; host: string }> = {
+  de: { distance: '400 m zur Familienlagune', direct: 'Ohne Portalgebühr', host: 'Direkt bei Iris' },
+  en: { distance: '400 m to the family lagoon', direct: 'No platform fee', host: 'Direct with Iris' },
+  nl: { distance: '400 m van de familielagune', direct: 'Geen platformkosten', host: 'Direct bij Iris' },
+  da: { distance: '400 m til familielagunen', direct: 'Intet portalgebyr', host: 'Direkte hos Iris' },
+};
+const f = facts[lang];
 ---
 
 <section class="hero">
   <div class="hero-bg" aria-hidden="true">
-    <div class="hero-sky"></div>
-    <svg class="hero-waves" viewBox="0 0 1440 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,96 C240,160 480,40 720,80 C960,120 1200,200 1440,128 L1440,220 L0,220 Z" fill="#7bc0cd" opacity="0.45"/>
-      <path d="M0,128 C240,180 480,90 720,120 C960,150 1200,210 1440,160 L1440,220 L0,220 Z" fill="#2a8ca0" opacity="0.5"/>
-      <path d="M0,160 C240,200 480,150 720,168 C960,186 1200,220 1440,192 L1440,220 L0,220 Z" fill="#155e6e"/>
-    </svg>
+    <picture>
+      <source media="(max-width: 720px)" srcset={withBase('images/hero-buesum-v2-768.webp')} />
+      <source media="(max-width: 1360px)" srcset={withBase('images/hero-buesum-v2-1280.webp')} />
+      <img src={withBase('images/hero-buesum-v2.webp')} alt="" width="1862" height="845" fetchpriority="high" />
+    </picture>
   </div>
 
   <div class="container hero-inner">
-    <p class="eyebrow hero-eyebrow">{t('hero.eyebrow')}</p>
-    <h1 class="hero-title">{t('hero.title')}</h1>
-    <p class="lead hero-sub">{t('hero.subtitle')}</p>
-    <div class="hero-cta">
-      <a href={bookHref} class="btn btn--gold btn--lg">{t('hero.cta.book')}</a>
-      <a href={apartmentsHref} class="btn btn--ghost btn--lg">{t('hero.cta.apartments')}</a>
+    <div class="hero-copy">
+      <p class="eyebrow hero-eyebrow">{t('hero.eyebrow')}</p>
+      <h1 class="hero-title">{t('hero.title')}</h1>
+      <p class="lead hero-sub">{t('hero.subtitle')}</p>
+      <div class="hero-cta">
+        <a href={bookHref} class="btn btn--gold btn--lg">{t('hero.cta.book')}</a>
+        <a href={apartmentsHref} class="btn btn--glass btn--lg">{t('hero.cta.apartments')}</a>
+      </div>
+      <a class="hero-trust" href="#bewertungen" aria-label={`${ratingStr} von 5 – ${site.rating.count} ${t('reviews.count')}`}>
+        <span class="stars" aria-hidden="true">★</span>
+        <strong>{ratingStr}</strong>
+        <span>· {site.rating.count} {t('reviews.count')}</span>
+      </a>
     </div>
-    <a class="hero-trust" href="#bewertungen">
-      <span class="stars" aria-hidden="true">★</span>
-      <span>{ratingStr} · {site.rating.count} {t('reviews.count')}</span>
-    </a>
+    <ul class="hero-facts" aria-label="Vorteile">
+      <li><span aria-hidden="true">⌖</span>{f.distance}</li>
+      <li><span aria-hidden="true">✓</span>{f.direct}</li>
+      <li><span aria-hidden="true">♡</span>{f.host}</li>
+    </ul>
   </div>
 </section>
 
+<div class="mobile-booking" aria-label={t('hero.cta.book')}>
+  <div><strong>{ratingStr} ★</strong><span>{f.direct}</span></div>
+  <a href={bookHref} class="btn btn--gold">{t('hero.cta.book')}</a>
+</div>
+
 <style>
-  .hero { position: relative; overflow: hidden; isolation: isolate; }
+  .hero { position: relative; overflow: hidden; isolation: isolate; min-height: min(760px, calc(100svh - 68px)); display: grid; }
   .hero-bg { position: absolute; inset: 0; z-index: -1; }
-  .hero-sky {
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(1200px 500px at 80% -10%, rgba(201, 162, 75, 0.18), transparent 60%),
-      linear-gradient(165deg, #eaf5f7 0%, #d6ecf0 45%, #bfe1e7 100%);
-  }
-  .hero-waves { position: absolute; bottom: -1px; left: 0; width: 100%; height: 38%; min-height: 120px; }
+  .hero-bg picture, .hero-bg img { width: 100%; height: 100%; display: block; }
+  .hero-bg img { object-fit: cover; object-position: center; }
+  .hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6, 35, 43, .88) 0%, rgba(8, 48, 58, .72) 37%, rgba(8, 48, 58, .18) 68%, rgba(8, 48, 58, .08) 100%); }
   .hero-inner {
-    padding-block: clamp(2.2rem, 1.2rem + 6vw, 5rem) clamp(3.5rem, 2.2rem + 6vw, 6.5rem);
-    max-width: 56ch;
+    width: 100%; align-self: end;
+    padding-block: clamp(3rem, 9vw, 7.5rem) clamp(2.2rem, 5vw, 4rem);
   }
-  .hero-eyebrow { color: var(--c-aqua-700); }
-  .hero-title { color: var(--c-aqua-900); max-width: 24ch; }
-  .hero-sub { color: var(--c-ink-700); margin-bottom: 2rem; }
+  .hero-copy { max-width: 650px; }
+  .hero-eyebrow { color: #f5d887; }
+  .hero-title { color: #fff; max-width: 18ch; font-size: clamp(2.65rem, 6vw, 5.25rem); line-height: .98; text-wrap: balance; text-shadow: 0 2px 24px rgba(0,0,0,.24); }
+  .hero-sub { color: rgba(255,255,255,.88); margin-bottom: 2rem; max-width: 56ch; }
   .hero-cta { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+  .btn--glass { color: #fff; border: 1px solid rgba(255,255,255,.64); background: rgba(255,255,255,.1); backdrop-filter: blur(8px); }
+  .btn--glass:hover { background: #fff; color: var(--brand-strong); }
   .hero-trust {
     margin-top: 2rem; display: inline-flex; align-items: center; gap: 0.6rem;
-    color: var(--c-ink-700); font-weight: 600; font-size: 0.95rem;
+    color: #fff; font-weight: 600; font-size: 0.95rem;
     text-decoration: none;
   }
-  .hero-trust:hover { color: var(--brand); }
+  .hero-trust:hover { color: #f5d887; }
   .stars { color: var(--c-gold); letter-spacing: 2px; }
+  .hero-facts { display: flex; flex-wrap: wrap; gap: .65rem; padding: 0; margin: 2.2rem 0 0; list-style: none; }
+  .hero-facts li { display: inline-flex; gap: .45rem; align-items: center; padding: .48rem .75rem; border-radius: 999px; color: #fff; background: rgba(4,29,35,.52); border: 1px solid rgba(255,255,255,.24); backdrop-filter: blur(8px); font-size: .88rem; font-weight: 650; }
+  .hero-facts li span { color: #f5d887; }
+  .mobile-booking { display: none; }
+
+  @media (max-width: 720px) {
+    .hero { min-height: 690px; }
+    .hero-bg img { object-position: 61% center; }
+    .hero-bg::after { background: linear-gradient(180deg, rgba(4,28,34,.22) 0%, rgba(4,28,34,.42) 34%, rgba(4,28,34,.94) 82%, rgba(4,28,34,.98) 100%); }
+    .hero-inner { padding-block: 7rem 2.1rem; align-self: end; }
+    .hero-title { font-size: clamp(2.55rem, 12vw, 3.7rem); }
+    .hero-sub { font-size: 1.04rem; }
+    .hero-cta .btn { flex: 1 1 100%; }
+    .hero-facts { gap: .45rem; }
+    .hero-facts li { font-size: .78rem; padding: .42rem .6rem; }
+    .mobile-booking { position: fixed; z-index: 180; left: .65rem; right: .65rem; bottom: .65rem; display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .65rem .7rem .65rem 1rem; border-radius: 16px; color: #fff; background: rgba(6,42,51,.94); box-shadow: 0 10px 34px rgba(0,0,0,.28); backdrop-filter: blur(14px); }
+    .mobile-booking div { display: grid; line-height: 1.15; }
+    .mobile-booking span { font-size: .72rem; color: rgba(255,255,255,.72); }
+    .mobile-booking .btn { padding: .7rem .9rem; font-size: .8rem; white-space: nowrap; }
+  }
 </style>
