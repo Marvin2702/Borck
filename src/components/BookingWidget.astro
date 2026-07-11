@@ -8,7 +8,7 @@ interface Props {
   smoobuId?: string;
   apartmentName?: string;
 }
-const { lang, smoobuId, apartmentName } = Astro.props;
+const { lang, smoobuId, apartmentName } = Astro.props as Props;
 const t = useTranslations(lang);
 
 const effectiveId = smoobuId || site.smoobuGroupId || '';

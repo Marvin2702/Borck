@@ -6,6 +6,8 @@ kostengünstig zu hosten, vollständig über Claude Code / Git pflegbar.
 
 ## Schnellstart
 
+Voraussetzung: **Node.js 22.12 oder neuer** (siehe `.nvmrc`).
+
 ```bash
 npm install        # einmalig
 npm run dev        # lokale Vorschau:  http://localhost:4321
@@ -57,7 +59,7 @@ Beschreibungstext des Apartments …
 
 ## Offene TODOs vor Go-Live (vom Auftraggeber)
 
-Stand 02.07.2026 — erledigt sind bereits: Smoobu-IDs, Rechtstexte, ab-Preise
+Stand 11.07.2026 — erledigt sind bereits: Smoobu-IDs, Rechtstexte, ab-Preise
 (Nebensaison-Minimum in `src/data/prices.json`), Kurtaxe/Zuschläge, hreflang/SEO.
 
 - [ ] **Fotos**: 6–8 Bilder je Apartment (aktuell 2–3) nach `public/images/`, in `gallery` verlinken.

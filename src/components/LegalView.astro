@@ -5,7 +5,7 @@ import { site } from '../data/site';
 import { legal } from '../data/legal';
 
 interface Props { lang: Lang; kind: 'impressum' | 'datenschutz' | 'agb' }
-const { lang, kind } = Astro.props;
+const { kind } = Astro.props as Props;
 
 const titles = {
   impressum: 'Impressum',

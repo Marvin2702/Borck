@@ -50,7 +50,7 @@ const payload = {
 
 <p class="exp-hint text-center">{hint[lang]}</p>
 <div id={mapId} class="exp-map" role="application" aria-label={`Karte mit Zielen rund um ${home.name}`}></div>
-<script type="application/json" data-map-data={mapId} set:html={JSON.stringify(payload)} />
+<script is:inline type="application/json" data-map-data={mapId} set:html={JSON.stringify(payload)} />
 
 {showCards && (
   <div class="exp-grid" data-exp-cards={mapId}>
@@ -154,7 +154,6 @@ const payload = {
 
     let inited = false;
     let mapRef: L.Map | null = null;
-    let clusterRef: any = null;
     const markerByIdx: L.Marker[] = [];
     const init = () => {
       if (inited) return;
@@ -182,7 +181,6 @@ const payload = {
           })
         : null;
 
-      clusterRef = cluster;
       data.points.forEach((p: any, idx: number) => {
         bounds.push(p.coords);
         const mk = L.marker(p.coords, { icon: pin(p.icon), title: p.name, riseOnHover: true }).bindPopup(pointPopup(p), { maxWidth: 280 });

@@ -1,6 +1,6 @@
 # Launch-Checkliste — Umzug Staging (GitHub Pages) → www.nordsee-buesum-fewo.de
 
-Stand: 02.07.2026. Reihenfolge einhalten; nichts davon ist auf Staging nötig.
+Stand: 11.07.2026. Reihenfolge einhalten; nichts davon ist auf Staging nötig.
 
 ## 1. Build/Deploy umstellen
 - [ ] Prod-Deploy einrichten (eigener Workflow oder Hosting-Wechsel) mit:
@@ -27,7 +27,7 @@ Stand: 02.07.2026. Reihenfolge einhalten; nichts davon ist auf Staging nötig.
 
 ## 5. Inhalte (vor oder kurz nach Launch)
 - [ ] ab-Preise: falls kein API-Key → `price_from` je Apartment im Frontmatter pflegen (`src/content/apartments/*.md`)
-- [ ] Bewertungen: `date:` (JJJJ-MM-TT) und ggf. `source:` je Review ergänzen (`src/content/reviews/*.md`); `site.ts` rating (5,0 · 8) mit Google abgleichen
+- [ ] Bewertungen: `date:` (JJJJ-MM-TT) und ggf. `source:` je Review ergänzen (`src/content/reviews/*.md`); `site.ts`-Rating vor Launch nochmals mit Google abgleichen
 - [ ] Fotos: 6–8 Bilder je Apartment (aktuell 2–3)
 - [ ] Web3Forms-Key für das Kontaktformular (kostenlos, web3forms.com) → `formAccessKey` in site.ts
 - [ ] Finaler Rechtscheck AGB/Datenschutz durch Iris (Kurabgabe- und Kurzreise-Passus sind am 02.07.2026 ergänzt worden)

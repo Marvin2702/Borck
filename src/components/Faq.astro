@@ -1,9 +1,8 @@
 ---
-import { useTranslations, type Lang } from '../i18n/utils';
+import { type Lang } from '../i18n/utils';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const t = useTranslations(lang);
 
 const titles: Record<Lang, string> = {
   de: 'Häufige Fragen',
@@ -70,7 +69,7 @@ const faqLd = {
       ))}
     </div>
   </div>
-  <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(faqLd)} />
 </section>
 
 <style>

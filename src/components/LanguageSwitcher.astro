@@ -8,7 +8,9 @@ const { lang, noAlternates = false } = Astro.props;
 const pageKey = pageKeyFromUrl(Astro.url);
 // Auf einsprachigen Seiten (noAlternates) existieren keine Übersetzungen dieser
 // URL -> Sprachlinks auf die jeweilige Sprach-Startseite zeigen (statt 404).
-const targetFor = (l: Lang) => (noAlternates && l !== lang ? '' : pageKey);
+// Die statische 404-Datei liegt als /404.html vor; /404/ wäre daher selbst
+// kein gültiges Ziel. Auf der Fehlerseite führen alle Sprachoptionen nach Hause.
+const targetFor = (l: Lang) => (pageKey === '404' || (noAlternates && l !== lang) ? '' : pageKey);
 ---
 
 <div class="lang" data-lang>

@@ -1,11 +1,12 @@
 // =========================================================================
-// Content Collections (Astro 5 Content Layer)
+// Content Collections (Astro Content Layer)
 // Apartments + Reviews als Markdown. Ein Apartment ändern = eine .md-Datei.
 // Felder mit TODO (smoobu_id, price_from, size_qm, gallery) vom Auftraggeber
 // nachzutragen — Schema ist tolerant (optional), Build bleibt grün.
 // =========================================================================
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'zod';
 
 const apartments = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/apartments' }),
