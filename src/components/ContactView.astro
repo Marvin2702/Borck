@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Img from './Img.astro';
+import Icon from './Icon.astro';
 import { useTranslations, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
@@ -19,22 +20,22 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
 
       <div class="contact-grid">
         <a class="contact-card" href={`tel:${site.phone.replace(/\s/g, '')}`}>
-          <span class="ci">☎</span>
+          <span class="ci"><Icon name="phone" size={22} /></span>
           <span class="cl">{t('contact.phone')}</span>
           <strong>{site.phoneDisplay}</strong>
         </a>
         <a class="contact-card" href={`https://wa.me/${site.whatsapp}?text=${waText}`} target="_blank" rel="noopener">
-          <span class="ci">💬</span>
+          <span class="ci"><Icon name="chat" size={22} /></span>
           <span class="cl">{t('contact.whatsapp')}</span>
           <strong>{site.phoneDisplay}</strong>
         </a>
         <a class="contact-card" href={`mailto:${site.email}`}>
-          <span class="ci">✉</span>
+          <span class="ci"><Icon name="mail" size={22} /></span>
           <span class="cl">{t('contact.email')}</span>
           <strong>{site.email}</strong>
         </a>
         <div class="contact-card">
-          <span class="ci">📍</span>
+          <span class="ci"><Icon name="pin" size={22} /></span>
           <span class="cl">{site.name}</span>
           <strong>{site.address.postalCode} {site.address.city}</strong>
         </div>
@@ -87,7 +88,7 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
     text-decoration: none; color: var(--text); box-shadow: var(--shadow-sm);
   }
   a.contact-card:hover { border-color: var(--c-aqua-300); transform: translateY(-2px); }
-  .ci { font-size: 1.4rem; }
+  .ci { color: var(--brand); }
   .cl { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; }
   .contact-card strong { color: var(--brand-strong); font-size: 1.1rem; }
   .contact-image { margin: 1.5rem 0 0.6rem; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }

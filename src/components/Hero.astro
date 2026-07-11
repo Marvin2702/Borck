@@ -1,6 +1,7 @@
 ---
 import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
+import Icon from './Icon.astro';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -43,9 +44,9 @@ const f = facts[lang];
       </a>
     </div>
     <ul class="hero-facts" aria-label="Vorteile">
-      <li><span aria-hidden="true">⌖</span>{f.distance}</li>
-      <li><span aria-hidden="true">✓</span>{f.direct}</li>
-      <li><span aria-hidden="true">♡</span>{f.host}</li>
+      <li><Icon name="pin" size={15} />{f.distance}</li>
+      <li><Icon name="check" size={15} />{f.direct}</li>
+      <li><Icon name="heart" size={15} />{f.host}</li>
     </ul>
   </div>
 </section>
@@ -83,7 +84,7 @@ const f = facts[lang];
   .stars { color: var(--c-gold-300); letter-spacing: 2px; }
   .hero-facts { display: flex; flex-wrap: wrap; gap: .65rem; padding: 0; margin: 2.2rem 0 0; list-style: none; }
   .hero-facts li { display: inline-flex; gap: .45rem; align-items: center; padding: .48rem .75rem; border-radius: 999px; color: #fff; background: rgba(4,29,35,.52); border: 1px solid rgba(255,255,255,.24); backdrop-filter: blur(8px); font-size: .88rem; font-weight: 650; }
-  .hero-facts li span { color: var(--c-gold-300); }
+  .hero-facts li :global(svg) { color: var(--c-gold-300); flex: none; }
   .mobile-booking { display: none; }
 
   /* Dezenter Auftritt: gestaffeltes Aufsteigen der Copy, langsames Zoom-Settle

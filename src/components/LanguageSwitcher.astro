@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import { languages, locales, localizedPath, pageKeyFromUrl, type Lang } from '../i18n/utils';
 
 interface Props { lang: Lang; noAlternates?: boolean }
@@ -15,7 +16,7 @@ const targetFor = (l: Lang) => (pageKey === '404' || (noAlternates && l !== lang
 
 <div class="lang" data-lang>
   <button type="button" class="lang-btn" aria-haspopup="true" aria-expanded="false">
-    <span aria-hidden="true">🌐</span> {lang.toUpperCase()}
+    <Icon name="globe" size={15} /> {lang.toUpperCase()}
   </button>
   <ul class="lang-menu" role="menu">
     {locales.map((l) => (

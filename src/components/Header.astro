@@ -1,5 +1,5 @@
 ---
-import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
+import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { site } from '../data/site';
 
@@ -22,10 +22,14 @@ const bookHref = localizedPath('apartments', lang);
 <header class="site-header">
   <div class="container header-inner">
     <a href={home} class="brand" aria-label={site.name}>
-      <picture>
-        <source srcset={withBase('/images/logo.webp')} type="image/webp" />
-        <img src={withBase('/images/logo.png')} alt="" class="brand-logo" width="44" height="44" />
-      </picture>
+      {/* Signet: facettierter Aquamarin (konsistent mit Favicon & ◈-Markenzeichen) */}
+      <svg class="brand-logo" width="34" height="34" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 3.5 26.5 12.5 16 28.5 5.5 12.5 Z" fill="#155e6e" />
+        <path d="M16 3.5 5.5 12.5 16 12.5 Z" fill="#2a8ca0" />
+        <path d="M16 3.5 26.5 12.5 16 12.5 Z" fill="#7bc0cd" />
+        <path d="M16 12.5 26.5 12.5 16 28.5 Z" fill="#0d3b44" />
+        <path d="M16 3.5 26.5 12.5" stroke="#f5d887" stroke-width="1.1" stroke-linecap="round" />
+      </svg>
       <span class="brand-name">{site.name}</span>
     </a>
 

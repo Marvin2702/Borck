@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import { useTranslations, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
@@ -43,7 +44,7 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
         <div class="ph-cta">
           <p class="ph-note">{t('booking.subtitle')}</p>
           <div class="ph-buttons">
-            <a class="btn btn--gold" href={`tel:${site.phone.replace(/\s/g, '')}`}>☎ {site.phoneDisplay}</a>
+            <a class="btn btn--gold" href={`tel:${site.phone.replace(/\s/g, '')}`}><Icon name="phone" size={17} /> {site.phoneDisplay}</a>
             <a class="btn btn--ghost" href={`https://wa.me/${site.whatsapp}?text=${waText}`} rel="noopener" target="_blank">WhatsApp</a>
           </div>
         </div>

@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ApartmentCard from './ApartmentCard.astro';
 import Faq from './Faq.astro';
 import ThemeLinks from './ThemeLinks.astro';
+import Icon from './Icon.astro';
 import { useTranslations, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 import { trExtra, trUnit } from '../data/extras-i18n';
@@ -36,8 +37,8 @@ const description = t('meta.apartmentsDesc');
           <button type="button" class="filter-pill" data-value="5">5</button>
         </div>
         <div class="filter-toggles">
-          <button type="button" class="filter-pill" data-toggle="dog" aria-pressed="false">🐾 {t('filter.dog')}</button>
-          <button type="button" class="filter-pill" data-toggle="seaview" aria-pressed="false">🌊 {t('filter.seaview')}</button>
+          <button type="button" class="filter-pill" data-toggle="dog" aria-pressed="false"><Icon name="paw" size={15} /> {t('filter.dog')}</button>
+          <button type="button" class="filter-pill" data-toggle="seaview" aria-pressed="false"><Icon name="wave" size={15} /> {t('filter.seaview')}</button>
         </div>
       </div>
 
@@ -87,10 +88,12 @@ const description = t('meta.apartmentsDesc');
   .filter-group, .filter-toggles { display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
   .filter-legend { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 0.2rem; }
   .filter-pill {
+    display: inline-flex; align-items: center; gap: 0.4rem;
     background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
     padding: 0.45rem 0.95rem; font: inherit; font-size: 0.9rem; font-weight: 600;
     color: var(--text); cursor: pointer; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
+  .filter-pill :global(svg) { flex: none; }
   .filter-pill:hover { border-color: var(--c-aqua-300); }
   .filter-pill.is-active { background: var(--brand); color: #fff; border-color: var(--brand); }
   .filter-none { text-align: center; color: var(--text-muted); cursor: pointer; text-decoration: underline; margin-top: 1.5rem; }

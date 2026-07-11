@@ -3,6 +3,7 @@ import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 import { priceFrom } from '../data/prices';
 import { trApt } from '../data/apartments-i18n';
 import Img from './Img.astro';
+import Icon from './Icon.astro';
 import { site } from '../data/site';
 import type { CollectionEntry } from 'astro:content';
 import { galleryImageAlt } from '../data/gallery-alt';
@@ -34,7 +35,7 @@ const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_
       </span>
     )}
     <span class="apt-badge" style={`--a:${accent}`}>{view}</span>
-    {d.dogFriendly && <span class="apt-dog" title="Hundefreundlich" aria-hidden="true">🐾</span>}
+    {d.dogFriendly && <span class="apt-dog" title="Hundefreundlich" aria-hidden="true"><Icon name="paw" size={15} /></span>}
   </a>
 
   <div class="apt-body">
@@ -79,7 +80,7 @@ const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_
     font-weight: 700; font-size: 0.78rem;
     padding: 0.3rem 0.7rem; border-radius: 999px;
   }
-  .apt-dog { position: absolute; right: 12px; top: 12px; background: rgba(255,255,255,0.9); border-radius: 999px; padding: 0.2rem 0.4rem; font-size: 0.9rem; }
+  .apt-dog { position: absolute; right: 12px; top: 12px; display: grid; place-items: center; background: rgba(255,255,255,0.9); border-radius: 999px; padding: 0.35rem; color: var(--c-ink-700); }
   .apt-body { padding: 1.2rem 1.3rem 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
   .apt-name { margin: 0; font-size: 1.4rem; }
   .apt-name a { color: inherit; text-decoration: none; }

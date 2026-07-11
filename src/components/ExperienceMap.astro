@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 // Wiederverwendbare interaktive Leaflet/OpenStreetMap-Karte (kein API-Key).
 // Reiseführer: Erlebnis-Ziele mit Buchungslinks. Lage: Orientierungspunkte.
 import { haversineKm, formatKm } from '../data/experiences';
@@ -58,7 +59,7 @@ const payload = {
       <article class="exp-card card" data-exp-idx={i} role="button" tabindex="0" aria-label={`${p.name} – ${mapLabel[lang]}`}>
         <span class="exp-top">
           <span class="exp-icon" aria-hidden="true">{p.icon}</span>
-          <span class="exp-dist">📍 {p.dist}</span>
+          <span class="exp-dist"><Icon name="pin" size={13} /> {p.dist}</span>
         </span>
         <h3 class="exp-name">{p.name}</h3>
         {p.area && <span class="exp-area">{p.area}</span>}

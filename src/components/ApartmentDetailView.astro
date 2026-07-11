@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import BookingWidget from './BookingWidget.astro';
 import GoodToKnow from './GoodToKnow.astro';
 import Img from './Img.astro';
+import Icon from './Icon.astro';
 import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { priceFrom } from '../data/prices';
 import { trApt, trFeature } from '../data/apartments-i18n';
@@ -139,9 +140,9 @@ const others = (await getCollection('apartments'))
         <aside class="detail-aside">
           <h2 class="aside-title">{t('apartments.features')}</h2>
           <ul class="feature-list">
-            {d.features.map((f) => <li>✓ {trFeature(f, lang)}</li>)}
+            {d.features.map((f) => <li><Icon name="check" size={16} class="feat-ic" /> {trFeature(f, lang)}</li>)}
           </ul>
-          {d.dogFriendly && <p class="dog-badge">🐾 {t('usp.pets.title')}</p>}
+          {d.dogFriendly && <p class="dog-badge"><Icon name="paw" size={16} /> {t('usp.pets.title')}</p>}
           <a href={bookUrl} target="_blank" rel="noopener" class="btn btn--gold" style="margin-top:1rem;width:100%;justify-content:center">
             {t('cta.bookNow')}
           </a>
@@ -195,8 +196,9 @@ const others = (await getCollection('apartments'))
   /* Unterhalb ~1.4rem wirkt die Serif stumpf — kleine Titel in der Grotesk. */
   .aside-title { font-family: var(--font-body); font-weight: 650; font-size: 1.05rem; margin-top: 0; }
   .feature-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.55rem; }
-  .feature-list li { color: var(--text); }
-  .dog-badge { margin-top: 1rem; color: var(--brand); font-weight: 600; }
+  .feature-list li { color: var(--text); display: flex; gap: 0.5rem; align-items: baseline; }
+  .feature-list li :global(.feat-ic) { flex: none; color: var(--c-deich-700); transform: translateY(2px); }
+  .dog-badge { margin-top: 1rem; color: var(--brand); font-weight: 600; display: inline-flex; align-items: center; gap: 0.45rem; }
   @media (max-width: 820px) { .detail-grid { grid-template-columns: 1fr; } .detail-aside { position: static; } }
 
   .apt-gallery-sec { padding-top: clamp(1.5rem, 1rem + 2vw, 2.5rem); }

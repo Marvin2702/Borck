@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBanner from './CtaBanner.astro';
 import ExperienceMap from './ExperienceMap.astro';
@@ -50,7 +51,7 @@ const orientPoints = orient.map((o) => ({ name: o.name[lang], icon: o.icon, coor
         <div class="lage-info">
           <h2>{L.anreise[lang]}</h2>
           <p class="anreise-text">{anreise.text[lang]}</p>
-          {parkNote && <p class="park-note">✓ {parkNote}</p>}
+          {parkNote && <p class="park-note"><Icon name="check" size={15} /> {parkNote}</p>}
           <div class="lage-actions">
             {routeLink && <a class="btn btn--gold" href={routeLink} target="_blank" rel="noopener">{L.route[lang]}</a>}
             <a class="btn btn--ghost" href={localizedPath('apartments', lang)}>{t('apartments.all')}</a>

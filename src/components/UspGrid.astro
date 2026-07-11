@@ -1,22 +1,23 @@
 ---
 import { useTranslations, type Lang } from '../i18n/utils';
+import Icon from './Icon.astro';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const items = [
-  { icon: '✓', title: t('usp.direct.title'), text: t('usp.direct.text') },
-  { icon: '◈', title: t('usp.host.title'), text: t('usp.host.text') },
-  { icon: '≈', title: t('usp.location.title'), text: t('usp.location.text') },
-  { icon: '🐾', title: t('usp.pets.title'), text: t('usp.pets.text') },
-];
+  { icon: 'check', title: t('usp.direct.title'), text: t('usp.direct.text') },
+  { icon: 'gem', title: t('usp.host.title'), text: t('usp.host.text') },
+  { icon: 'wave', title: t('usp.location.title'), text: t('usp.location.text') },
+  { icon: 'paw', title: t('usp.pets.title'), text: t('usp.pets.text') },
+] as const;
 ---
 <section class="section usp-section">
   <div class="container">
     <div class="usp-grid">
       {items.map((i) => (
         <div class="usp">
-          <span class="usp-icon" aria-hidden="true">{i.icon}</span>
+          <span class="usp-icon" aria-hidden="true"><Icon name={i.icon} size={22} /></span>
           <h2 class="usp-title">{i.title}</h2>
           <p class="usp-text">{i.text}</p>
         </div>
