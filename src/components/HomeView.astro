@@ -7,6 +7,8 @@ import ApartmentCard from './ApartmentCard.astro';
 import Reviews from './Reviews.astro';
 import CtaBanner from './CtaBanner.astro';
 import ThemeLinks from './ThemeLinks.astro';
+import HomeEmotion from './HomeEmotion.astro';
+import Faq from './Faq.astro';
 import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 import { getDisplayReviews } from '../data/reviews';
@@ -30,6 +32,7 @@ const description = t('meta.homeDesc');
 <BaseLayout title={title} description={description} pageKey="" reviews={reviews}>
   <Hero lang={lang} />
   <UspGrid lang={lang} />
+  <HomeEmotion lang={lang} />
 
   <section class="section" id="apartments-preview">
     <div class="container">
@@ -48,6 +51,7 @@ const description = t('meta.homeDesc');
 
   <ThemeLinks lang={lang} />
   <Reviews lang={lang} />
+  <Faq lang={lang} />
   <CtaBanner lang={lang} />
 </BaseLayout>
 

@@ -1,0 +1,222 @@
+---
+import Img from './Img.astro';
+import { localizedPath, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props as Props;
+
+type Copy = {
+  matchEyebrow: string; matchTitle: string; matchIntro: string; discover: string;
+  matches: { icon: string; label: string; title: string; text: string; slug: string }[];
+  hostEyebrow: string; hostTitle: string; hostText: string; hostQuote: string;
+  hostCta: string; call: string;
+  bookEyebrow: string; bookTitle: string; bookIntro: string;
+  steps: { title: string; text: string }[];
+  promise: string[];
+};
+
+const copies: Record<Lang, Copy> = {
+  de: {
+    matchEyebrow: 'Sieben Wohnungen · ein Lieblingsplatz',
+    matchTitle: 'Welche Auszeit passt zu dir?',
+    matchIntro: 'Nicht jede Reise braucht dasselbe Zuhause. Drei schnelle Empfehlungen für den Moment, auf den du dich gerade freust.',
+    discover: 'Entdecken',
+    matches: [
+      { icon: '☀', label: 'Für Familien', title: 'Türkis', text: 'Design, Deichblick und Platz für vier – mit Balkon und Etagenbett-Abenteuer.', slug: 'tuerkis' },
+      { icon: '≈', label: 'Für Weitblick', title: 'Topas', text: 'Ganz oben wohnen, das Meer zuerst sehen und bis zu fünf Menschen glücklich machen.', slug: 'topas' },
+      { icon: '♡', label: 'Für zwei', title: 'Bernstein', text: 'Eigene Terrasse, separater Eingang und morgens barfuß den ersten Kaffee trinken.', slug: 'bernstein' },
+    ],
+    hostEyebrow: 'Kein Callcenter. Einfach Iris.',
+    hostTitle: 'Gastgeberin mit Sand unter den Füßen und Herz am rechten Fleck.',
+    hostText: 'Moin, ich bin Iris. Mir gehört kein anonymer Ferienwohnungspark, sondern ein Haus mit sieben ganz unterschiedlichen Lieblingsplätzen. Wenn du Fragen hast, erreichst du mich persönlich – vor der Buchung genauso wie während deines Urlaubs.',
+    hostQuote: 'Du sollst nicht nur ankommen. Du sollst dich vom ersten Moment an willkommen fühlen.',
+    hostCta: 'Iris kennenlernen', call: 'Iris anrufen',
+    bookEyebrow: 'Direkt und unkompliziert', bookTitle: 'Von der Vorfreude zur Buchung in vier Schritten.',
+    bookIntro: 'Du siehst Preise und Extras transparent, buchst ohne Portalprovision und bekommst deine Bestätigung persönlich von uns.',
+    steps: [
+      { title: 'Lieblingswohnung wählen', text: 'Vergleiche Größe, Lage, Ausblick und Ausstattung.' },
+      { title: 'Termin & Preis prüfen', text: 'Der Kalender zeigt dir verfügbare Reisedaten und den aktuellen Preis.' },
+      { title: 'Sicher direkt buchen', text: 'Extras auswählen und ohne Vermittlungsgebühr abschließen.' },
+      { title: 'Persönlich bestätigt', text: 'Du erhältst alle Unterlagen und Anreiseinformationen direkt von Iris.' },
+    ],
+    promise: ['24/7 selbst anreisen', 'Eigener Parkplatz', '400 m zur Familienlagune'],
+  },
+  en: {
+    matchEyebrow: 'Seven apartments · one favourite place', matchTitle: 'Which escape feels like yours?',
+    matchIntro: 'Every journey needs a different kind of home. Three quick recommendations for the moment you are looking forward to.', discover: 'Discover',
+    matches: [
+      { icon: '☀', label: 'For families', title: 'Türkis', text: 'Design, dyke views and room for four – with a balcony and bunk-bed adventures.', slug: 'tuerkis' },
+      { icon: '≈', label: 'For the view', title: 'Topas', text: 'Stay at the top, see the sea first and make up to five people happy.', slug: 'topas' },
+      { icon: '♡', label: 'For two', title: 'Bernstein', text: 'Your own terrace, private entrance and the first coffee of the day barefoot.', slug: 'bernstein' },
+    ],
+    hostEyebrow: 'No call centre. Simply Iris.', hostTitle: 'A host with sand under her feet and her heart in the right place.',
+    hostText: 'Moin, I am Iris. This is not an anonymous holiday complex, but one house with seven very different favourite places. If you have a question, you reach me personally – before your booking and throughout your stay.',
+    hostQuote: 'I want you to do more than arrive. I want you to feel welcome from the very first moment.', hostCta: 'Meet Iris', call: 'Call Iris',
+    bookEyebrow: 'Direct and uncomplicated', bookTitle: 'From anticipation to booking in four steps.',
+    bookIntro: 'See prices and extras clearly, book without platform commission and receive a personal confirmation from us.',
+    steps: [
+      { title: 'Choose your favourite', text: 'Compare size, location, view and amenities.' },
+      { title: 'Check dates & price', text: 'The calendar shows available dates and the current price.' },
+      { title: 'Book direct securely', text: 'Select extras and complete your booking with no platform fee.' },
+      { title: 'Personally confirmed', text: 'Iris sends your documents and all arrival information directly.' },
+    ], promise: ['24/7 self check-in', 'Private parking', '400 m to the family lagoon'],
+  },
+  nl: {
+    matchEyebrow: 'Zeven appartementen · één lievelingsplek', matchTitle: 'Welke vakantie past bij jou?',
+    matchIntro: 'Niet elke reis vraagt om hetzelfde thuis. Drie snelle aanbevelingen voor het moment waar je naar uitkijkt.', discover: 'Ontdekken',
+    matches: [
+      { icon: '☀', label: 'Voor gezinnen', title: 'Türkis', text: 'Design, uitzicht op de dijk en plek voor vier – met balkon en stapelbedavonturen.', slug: 'tuerkis' },
+      { icon: '≈', label: 'Voor het uitzicht', title: 'Topas', text: 'Helemaal boven wonen, als eerste de zee zien en tot vijf mensen blij maken.', slug: 'topas' },
+      { icon: '♡', label: 'Voor twee', title: 'Bernstein', text: 'Eigen terras, aparte ingang en de eerste koffie van de dag op blote voeten.', slug: 'bernstein' },
+    ],
+    hostEyebrow: 'Geen callcenter. Gewoon Iris.', hostTitle: 'Een gastvrouw met zand onder haar voeten en haar hart op de juiste plek.',
+    hostText: 'Moin, ik ben Iris. Geen anoniem vakantiepark, maar één huis met zeven heel verschillende lievelingsplekken. Heb je een vraag, dan bereik je mij persoonlijk – voor je boeking en tijdens je vakantie.',
+    hostQuote: 'Je moet niet alleen aankomen. Je moet je vanaf het eerste moment welkom voelen.', hostCta: 'Maak kennis met Iris', call: 'Bel Iris',
+    bookEyebrow: 'Direct en eenvoudig', bookTitle: 'Van voorpret naar boeking in vier stappen.',
+    bookIntro: 'Bekijk prijzen en extra’s transparant, boek zonder platformcommissie en ontvang een persoonlijke bevestiging.',
+    steps: [
+      { title: 'Kies je favoriet', text: 'Vergelijk grootte, ligging, uitzicht en voorzieningen.' },
+      { title: 'Bekijk datum & prijs', text: 'De kalender toont vrije data en de actuele prijs.' },
+      { title: 'Veilig direct boeken', text: 'Kies extra’s en rond af zonder platformkosten.' },
+      { title: 'Persoonlijk bevestigd', text: 'Iris stuurt alle documenten en aankomstinformatie rechtstreeks.' },
+    ], promise: ['24/7 zelf inchecken', 'Eigen parkeerplaats', '400 m van de familielagune'],
+  },
+  da: {
+    matchEyebrow: 'Syv lejligheder · ét yndlingssted', matchTitle: 'Hvilken ferie passer til dig?',
+    matchIntro: 'Ikke alle rejser har brug for det samme hjem. Tre hurtige anbefalinger til det øjeblik, du glæder dig til.', discover: 'Oplev',
+    matches: [
+      { icon: '☀', label: 'Til familier', title: 'Türkis', text: 'Design, udsigt over diget og plads til fire – med balkon og køjesengseventyr.', slug: 'tuerkis' },
+      { icon: '≈', label: 'Til udsigten', title: 'Topas', text: 'Bo øverst, se havet først og gør op til fem mennesker glade.', slug: 'topas' },
+      { icon: '♡', label: 'Til to', title: 'Bernstein', text: 'Egen terrasse, privat indgang og dagens første kaffe med bare fødder.', slug: 'bernstein' },
+    ],
+    hostEyebrow: 'Intet callcenter. Bare Iris.', hostTitle: 'En vært med sand under fødderne og hjertet på rette sted.',
+    hostText: 'Moin, jeg hedder Iris. Det er ikke et anonymt feriekompleks, men ét hus med syv helt forskellige yndlingssteder. Har du spørgsmål, får du fat i mig personligt – både før bookingen og under ferien.',
+    hostQuote: 'Du skal ikke bare ankomme. Du skal føle dig velkommen fra første øjeblik.', hostCta: 'Mød Iris', call: 'Ring til Iris',
+    bookEyebrow: 'Direkte og enkelt', bookTitle: 'Fra forventning til booking i fire trin.',
+    bookIntro: 'Se priser og tilvalg tydeligt, book uden portalkommission og få en personlig bekræftelse.',
+    steps: [
+      { title: 'Vælg din favorit', text: 'Sammenlign størrelse, beliggenhed, udsigt og faciliteter.' },
+      { title: 'Tjek dato & pris', text: 'Kalenderen viser ledige datoer og den aktuelle pris.' },
+      { title: 'Book sikkert direkte', text: 'Vælg tilvalg og gennemfør uden portalgebyr.' },
+      { title: 'Personligt bekræftet', text: 'Iris sender dokumenter og ankomstinformation direkte.' },
+    ], promise: ['24/7 selv-check-in', 'Egen parkering', '400 m til familielagunen'],
+  },
+};
+
+const c = copies[lang];
+---
+
+<section class="section match-section" aria-labelledby="match-title">
+  <div class="container">
+    <header class="section-intro">
+      <p class="eyebrow">{c.matchEyebrow}</p>
+      <h2 id="match-title">{c.matchTitle}</h2>
+      <p>{c.matchIntro}</p>
+    </header>
+    <div class="match-grid">
+      {c.matches.map((m) => (
+        <a class="match-card" href={localizedPath(`apartments/${m.slug}`, lang)}>
+          <span class="match-icon" aria-hidden="true">{m.icon}</span>
+          <span class="match-label">{m.label}</span>
+          <h3>{m.title}</h3>
+          <p>{m.text}</p>
+          <span class="match-link">{c.discover} <span aria-hidden="true">→</span></span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section host-section" aria-labelledby="host-title">
+  <div class="container host-grid">
+    <figure class="host-photo">
+      <Img src="/images/iris-mia.jpg" alt="Iris mit Hund Mia" width={900} height={900} sizes="(max-width: 760px) 100vw, 44vw" />
+      <figcaption><span aria-hidden="true">♥</span> Iris & Mia · Haus Aquamarin</figcaption>
+    </figure>
+    <div class="host-copy">
+      <p class="eyebrow">{c.hostEyebrow}</p>
+      <h2 id="host-title">{c.hostTitle}</h2>
+      <p class="host-lead">{c.hostText}</p>
+      <blockquote>„{c.hostQuote}“</blockquote>
+      <div class="host-actions">
+        <a class="btn btn--gold" href={localizedPath('ueber-uns', lang)}>{c.hostCta}</a>
+        <a class="text-link" href={`tel:${site.phone.replace(/\s/g, '')}`}>{c.call} <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section booking-story" aria-labelledby="booking-title">
+  <div class="container">
+    <header class="section-intro section-intro--light">
+      <p class="eyebrow">{c.bookEyebrow}</p>
+      <h2 id="booking-title">{c.bookTitle}</h2>
+      <p>{c.bookIntro}</p>
+    </header>
+    <ol class="booking-steps">
+      {c.steps.map((step, i) => (
+        <li>
+          <span class="step-number">{String(i + 1).padStart(2, '0')}</span>
+          <h3>{step.title}</h3>
+          <p>{step.text}</p>
+        </li>
+      ))}
+    </ol>
+    <div class="promise-row">
+      {c.promise.map((item) => <span><b aria-hidden="true">✓</b>{item}</span>)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-intro { max-width: 720px; margin: 0 auto 2.4rem; text-align: center; }
+  .section-intro h2 { font-size: clamp(2rem, 4.5vw, 3.4rem); max-width: 18ch; margin-inline: auto; text-wrap: balance; }
+  .section-intro > p:last-child { color: var(--text-muted); font-size: 1.05rem; max-width: 62ch; margin-inline: auto; }
+  .match-section { background: linear-gradient(180deg, var(--surface) 0%, var(--c-aqua-100) 100%); }
+  .match-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  .match-card { position: relative; min-height: 310px; display: flex; flex-direction: column; padding: 1.7rem; overflow: hidden; color: var(--text); background: rgba(255,255,255,.88); border: 1px solid rgba(21,94,110,.13); border-radius: var(--radius-lg); text-decoration: none; box-shadow: var(--shadow-sm); transition: transform .22s ease, box-shadow .22s ease; }
+  .match-card::after { content: ''; position: absolute; right: -55px; top: -55px; width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, rgba(42,140,160,.16), transparent 68%); }
+  .match-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+  .match-icon { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 1.4rem; color: var(--brand); background: var(--c-aqua-100); border-radius: 50%; font-size: 1.35rem; }
+  .match-label { color: var(--brand); text-transform: uppercase; letter-spacing: .11em; font-weight: 750; font-size: .72rem; }
+  .match-card h3 { margin: .35rem 0 .5rem; font-size: 1.8rem; }
+  .match-card p { color: var(--text-muted); }
+  .match-link { margin-top: auto; color: var(--brand-strong); font-weight: 750; }
+  .host-section { background: var(--surface); }
+  .host-grid { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: clamp(2rem, 6vw, 5.5rem); align-items: center; }
+  .host-photo { position: relative; margin: 0; }
+  .host-photo :global(img) { width: 100%; aspect-ratio: 1 / 1.05; object-fit: cover; border-radius: 46% 46% 18px 18px; box-shadow: var(--shadow-md); }
+  .host-photo figcaption { position: absolute; right: -1rem; bottom: 1.3rem; padding: .7rem 1rem; color: #fff; background: var(--brand-strong); border-radius: 999px; font-weight: 700; box-shadow: var(--shadow-md); }
+  .host-photo figcaption span { color: #f5d887; }
+  .host-copy h2 { font-size: clamp(2.1rem, 4.5vw, 3.75rem); line-height: 1.04; text-wrap: balance; }
+  .host-lead { color: var(--text-muted); font-size: 1.08rem; line-height: 1.75; }
+  blockquote { margin: 1.7rem 0; padding: .2rem 0 .2rem 1.3rem; border-left: 3px solid var(--c-gold); color: var(--brand-strong); font-family: var(--font-head); font-size: 1.35rem; line-height: 1.4; }
+  .host-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1.2rem; }
+  .text-link { color: var(--brand-strong); font-weight: 750; text-decoration-thickness: 1px; text-underline-offset: .25rem; }
+  .booking-story { color: #fff; background: radial-gradient(circle at 86% 12%, rgba(201,162,75,.19), transparent 28%), linear-gradient(145deg, #0d4a58, #082f39); }
+  .section-intro--light .eyebrow { color: #f5d887; }
+  .section-intro--light h2 { color: #fff; }
+  .section-intro--light > p:last-child { color: rgba(255,255,255,.72); }
+  .booking-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin: 0; padding: 0; list-style: none; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.15); border-radius: var(--radius-lg); overflow: hidden; }
+  .booking-steps li { min-height: 245px; padding: 1.6rem; background: rgba(6,39,47,.82); }
+  .step-number { display: block; margin-bottom: 2.5rem; color: #f5d887; font-family: var(--font-head); font-size: 1.15rem; }
+  .booking-steps h3 { margin: 0 0 .65rem; color: #fff; font-size: 1.2rem; }
+  .booking-steps p { margin: 0; color: rgba(255,255,255,.68); font-size: .93rem; }
+  .promise-row { display: flex; justify-content: center; flex-wrap: wrap; gap: .8rem 1.8rem; margin-top: 1.8rem; color: rgba(255,255,255,.82); font-size: .92rem; }
+  .promise-row span { display: inline-flex; align-items: center; gap: .45rem; }
+  .promise-row b { color: #f5d887; }
+  @media (max-width: 860px) {
+    .match-grid { grid-template-columns: 1fr; }
+    .match-card { min-height: 245px; }
+    .host-grid { grid-template-columns: 1fr; }
+    .host-photo { max-width: 560px; margin-inline: auto; }
+    .booking-steps { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .host-photo figcaption { right: .6rem; font-size: .82rem; }
+    .booking-steps { grid-template-columns: 1fr; }
+    .booking-steps li { min-height: 0; }
+    .step-number { margin-bottom: 1rem; }
+  }
+</style>
