@@ -27,20 +27,22 @@ const items = [
 </section>
 
 <style>
+  /* Entkartet: ruhige typografische Zeile mit feiner Oberkante statt 4 Boxen */
   .usp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
-  .usp {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 1.6rem 1.4rem;
-    box-shadow: var(--shadow-sm);
-  }
+  .usp { padding-top: 1.2rem; border-top: 2px solid var(--c-sand-200); }
   .usp-icon {
     display: inline-grid; place-items: center;
-    width: 48px; height: 48px; border-radius: 12px;
-    background: var(--c-aqua-100); color: var(--brand);
-    font-size: 1.3rem; margin-bottom: 0.9rem;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--c-aqua-100); color: var(--c-aqua-700);
+    margin-bottom: 0.9rem;
   }
-  .usp-title { font-size: 1.18rem; margin: 0 0 0.4rem; }
-  .usp-text { color: var(--text-muted); margin: 0; font-size: 0.95rem; }
+  .usp-title { font-family: var(--font-body); font-weight: 650; font-size: 1.05rem; margin: 0 0 0.4rem; }
+  .usp-text { color: var(--text-muted); margin: 0; font-size: 0.95rem; hyphens: auto; }
   @media (max-width: 900px) { .usp-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 520px) { .usp-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) {
+    .usp-grid { grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+    .usp { padding-top: 0.9rem; }
+    .usp-icon { width: 36px; height: 36px; border-radius: 10px; margin-bottom: 0.6rem; }
+    .usp-text { font-size: 0.82rem; }
+  }
 </style>

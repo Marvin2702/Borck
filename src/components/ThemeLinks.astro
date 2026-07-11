@@ -10,7 +10,7 @@ const items = [
   { key: 'ferienwohnung-buesum-nebensaison', label: t('landing.offSeason') },
 ];
 ---
-<section class="section section--alt theme-section">
+<section class="theme-section">
   <div class="container-narrow text-center">
     <p class="eyebrow">{t('landing.popularThemes')}</p>
     <div class="theme-links">
@@ -20,6 +20,11 @@ const items = [
 </section>
 
 <style>
+  /* Kurzes Aqua-Intermezzo statt voller Sektionsbühne — hält den Flächenrhythmus */
+  .theme-section {
+    padding-block: clamp(1.6rem, 1rem + 2vw, 2.75rem);
+    background: color-mix(in srgb, var(--c-aqua-100) 45%, var(--c-white));
+  }
   .theme-links { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin-top: 1rem; }
   .theme-links a {
     display: inline-block; padding: 0.6rem 1.1rem; border: 1px solid var(--line);

@@ -158,8 +158,15 @@ const others = (await getCollection('apartments'))
         <div class="more-grid">
           {others.map((o) => (
             <a class="more-card" href={localizedPath(`apartments/${o.id}`, lang)}>
-              <strong>{o.data.name}</strong>
-              <span>{trApt(o.id, lang)?.view ?? o.data.view}</span>
+              {o.data.heroImage && (
+                <span class="more-thumb">
+                  <Img src={o.data.heroImage} alt="" width={128} height={96} loading="lazy" sizes="64px" />
+                </span>
+              )}
+              <span class="more-txt">
+                <strong>{o.data.name}</strong>
+                <span>{trApt(o.id, lang)?.view ?? o.data.view}</span>
+              </span>
             </a>
           ))}
         </div>
@@ -236,8 +243,11 @@ const others = (await getCollection('apartments'))
 
   .more-sec h2 { margin-top: 0; }
   .more-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0 1.2rem; }
-  .more-card { display: flex; flex-direction: column; gap: 0.2rem; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none; box-shadow: var(--shadow-sm); transition: transform 0.15s ease, border-color 0.2s ease; }
+  .more-card { display: flex; align-items: center; gap: 0.85rem; padding: 0.8rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none; box-shadow: var(--shadow-sm); transition: transform 0.15s ease, border-color 0.2s ease; }
   .more-card:hover { transform: translateY(-3px); border-color: var(--c-aqua-300); }
+  .more-thumb { flex: none; width: 64px; height: 48px; border-radius: 8px; overflow: hidden; }
+  .more-thumb :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .more-txt { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
   .more-card strong { color: var(--brand-strong); font-weight: 650; font-size: 1.05rem; }
   .more-card span { color: var(--text-muted); font-size: 0.9rem; }
   .more-lage a { color: var(--brand); font-weight: 600; text-decoration: none; }

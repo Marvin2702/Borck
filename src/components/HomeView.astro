@@ -34,14 +34,22 @@ const description = t('meta.homeDesc');
   <UspGrid lang={lang} />
   <HomeEmotion lang={lang} />
 
-  <section class="section" id="apartments-preview">
+  <section class="section section--alt" id="apartments-preview">
     <div class="container">
       <div class="sec-head">
         <p class="eyebrow">{t('apartments.title')}</p>
         <h2>{t('apartments.subtitle')}</h2>
       </div>
       <div class="apt-grid">
-        {apartments.map((a) => <ApartmentCard apartment={a} lang={lang} />)}
+        {apartments.map((a, i) => (
+          <ApartmentCard
+            apartment={a}
+            lang={lang}
+            sizes={i === 0 || i === apartments.length - 1
+              ? '(max-width: 600px) 85vw, (max-width: 960px) 100vw, 66vw'
+              : undefined}
+          />
+        ))}
       </div>
       <div class="text-center" style="margin-top:2rem">
         <a href={localizedPath('apartments', lang)} class="btn btn--ghost btn--lg">{t('apartments.all')}</a>
@@ -57,7 +65,37 @@ const description = t('meta.homeDesc');
 
 <style>
   .sec-head { text-align: center; margin-bottom: 2.4rem; }
+  /* Editorial-Komposition für exakt 7 Karten: erste und letzte spannen 2 Spalten
+     → 2+3+2-Reihen ohne Waisenkind, mit Blickanker. (:global nötig: die Karten-
+     Artikel stammen aus ApartmentCard und tragen die HomeView-Scope-Klasse nicht.) */
   .apt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
-  @media (max-width: 960px) { .apt-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 600px) { .apt-grid { grid-template-columns: 1fr; } }
+  .apt-grid > :global(:first-child),
+  .apt-grid > :global(:last-child) { grid-column: span 2; }
+  /* Featured-Bilder cineastisch beschneiden, damit die Reihenhöhen ruhig bleiben */
+  .apt-grid > :global(:first-child .apt-media),
+  .apt-grid > :global(:last-child .apt-media) { aspect-ratio: 21 / 9; }
+  @media (max-width: 960px) {
+    .apt-grid { grid-template-columns: 1fr 1fr; }
+    .apt-grid > :global(:first-child) { grid-column: 1 / -1; }
+    .apt-grid > :global(:last-child) { grid-column: auto; }
+  }
+  /* Mobil: Scroll-Snap-Carousel statt 3.800px Kartenstapel (full-bleed
+     gegen das .container-Padding von 1.2rem je Seite) */
+  @media (max-width: 600px) {
+    .apt-grid {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: min(85%, 340px);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      margin-inline: -1.2rem;
+      padding-inline: 1.2rem;
+      scroll-padding-inline: 1.2rem;
+      padding-bottom: 0.6rem;
+    }
+    .apt-grid > :global(*) { scroll-snap-align: start; }
+    .apt-grid > :global(:first-child),
+    .apt-grid > :global(:last-child) { grid-column: auto; }
+  }
 </style>

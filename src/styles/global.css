@@ -187,6 +187,10 @@ main > article:first-child > .section:first-child {
 
 ::selection { background: var(--c-aqua-300); color: var(--c-ink-900); }
 
+/* Schließt ein CTA-Banner die Seite ab, folgt der Footer ohne Doppelabstand —
+   dunkles Band an dunklem Band, getrennt nur durch die Gold-Haarlinie des Footers. */
+main:has(> .cta-banner:last-child) + .site-footer { margin-top: 0; }
+
 /* Sanfter Cross-Fade zwischen Seiten (Cross-Document View Transitions, MPA).
    Progressive Enhancement: unbekannte At-Regel wird sonst schlicht ignoriert. */
 @media (prefers-reduced-motion: no-preference) {

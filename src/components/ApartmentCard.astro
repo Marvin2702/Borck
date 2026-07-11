@@ -8,8 +8,13 @@ import { site } from '../data/site';
 import type { CollectionEntry } from 'astro:content';
 import { galleryImageAlt } from '../data/gallery-alt';
 
-interface Props { apartment: CollectionEntry<'apartments'>; lang: Lang }
-const { apartment, lang } = Astro.props;
+interface Props {
+  apartment: CollectionEntry<'apartments'>;
+  lang: Lang;
+  /** Responsive sizes-Angabe fürs Kartenbild (z. B. breiter bei Featured-Karten). */
+  sizes?: string;
+}
+const { apartment, lang, sizes } = Astro.props;
 const t = useTranslations(lang);
 const d = apartment.data;
 const href = localizedPath(`apartments/${apartment.id}`, lang);
@@ -28,7 +33,7 @@ const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_
   data-seaview={d.view.toLowerCase().includes('meerblick') ? '1' : '0'}>
   <a href={href} class="apt-media">
     {d.heroImage ? (
-      <Img src={d.heroImage} alt={galleryImageAlt(d.heroImage, d.name, lang, view)} width={640} height={400} loading="lazy" sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw" />
+      <Img src={d.heroImage} alt={galleryImageAlt(d.heroImage, d.name, lang, view)} width={640} height={400} loading="lazy" sizes={sizes ?? '(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw'} />
     ) : (
       <span class="apt-placeholder" style={`--a:${accent}`}>
         <span class="apt-gem" aria-hidden="true">◈</span>
@@ -52,7 +57,8 @@ const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_
         : <span class="apt-price apt-price--tbd">{t('apartments.priceDynamic')}</span>}
       <div class="apt-actions">
         <a href={href} class="btn btn--ghost apt-details">{t('apartments.details')}</a>
-        <a href={bookUrl} class="btn btn--gold apt-book" target="_blank" rel="noopener">{t('cta.bookNow')}</a>
+        {/* Karten-CTA in Aqua — Gold bleibt den Seiten-Primär-CTAs vorbehalten */}
+        <a href={bookUrl} class="btn apt-book" target="_blank" rel="noopener">{t('cta.bookNow')}</a>
       </div>
     </div>
   </div>
@@ -89,10 +95,15 @@ const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_
   .apt-meta { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin: 0.4rem 0; padding: 0; font-size: 0.9rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
   .apt-meta strong { color: var(--text); }
   .apt-foot { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.5rem; }
-  .apt-price { font-size: 0.95rem; color: var(--text-muted); }
-  .apt-price strong { color: var(--brand-strong); font-size: 1.05rem; }
-  .apt-price--tbd strong { color: var(--text-muted); }
+  .apt-price { font-size: 0.95rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  /* Der Preis ist buchungsentscheidend — typografisch führen lassen */
+  .apt-price strong { color: var(--brand-strong); font-size: 1.3rem; font-weight: 700; }
+  .apt-price--tbd strong { color: var(--text-muted); font-size: 0.95rem; }
   .apt-actions { display: flex; gap: 0.5rem; }
   .apt-details { padding: 0.6rem 0.9rem; font-size: 0.9rem; }
-  .apt-book { flex: 1; justify-content: center; }
+  .apt-book { flex: 1; justify-content: center; white-space: nowrap; }
+  @media (max-width: 420px) {
+    .apt-actions { flex-direction: column-reverse; }
+    .apt-actions .btn { width: 100%; justify-content: center; }
+  }
 </style>
