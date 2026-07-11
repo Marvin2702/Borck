@@ -88,7 +88,8 @@ const title = `${t('about.title')} · ${site.name} Büsum`;
 <style>
   .host { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 2.2rem; align-items: start; margin-top: 1.5rem; }
   .host-photo { margin: 0; }
-  .host-photo img {
+  /* :global nötig: <img> kommt aus Img.astro und trägt die Scope-Klasse nicht. */
+  .host-photo :global(img) {
     width: 100%; height: auto; border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md); object-fit: cover; aspect-ratio: 1 / 1;
   }

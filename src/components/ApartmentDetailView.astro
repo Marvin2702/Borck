@@ -200,18 +200,22 @@ const others = (await getCollection('apartments'))
 
   .apt-gallery-sec { padding-top: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
   .apt-gallery { display: grid; gap: 0.8rem; }
-  .apt-gallery figure { margin: 0; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
-  .apt-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; aspect-ratio: 3 / 2; }
-  .apt-gallery.count-2 { grid-template-columns: 1fr 1fr; }
-  .apt-gallery.count-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
+  .apt-gallery figure { margin: 0; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); height: clamp(300px, 34vw, 460px); }
+  /* :global nötig: die <img> stammen aus der Kind-Komponente Img.astro und tragen
+     die Scope-Klasse dieser Komponente nicht — gescopte img-Selektoren greifen nie. */
+  .apt-gallery figure :global(img) { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .apt-gallery.count-2 { grid-template-columns: 1.618fr 1fr; }
+  .apt-gallery.count-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; height: clamp(360px, 44vw, 560px); }
+  .apt-gallery.count-3 figure { height: 100%; min-height: 0; }
   .apt-gallery.count-3 .g-main { grid-row: 1 / 3; }
-  .apt-gallery.count-3 .g-main img { aspect-ratio: auto; min-height: 100%; }
-  .apt-gallery.count-many { grid-template-columns: repeat(3, 1fr); }
+  /* Mehr als 3 Bilder: Hauptbild 2×2, Rest im 3er-Raster */
+  .apt-gallery.count-many { grid-template-columns: repeat(3, 1fr); grid-auto-rows: clamp(150px, 15vw, 220px); }
+  .apt-gallery.count-many figure { height: 100%; min-height: 0; }
   .apt-gallery.count-many .g-main { grid-column: span 2; grid-row: span 2; }
-  .apt-gallery.count-many .g-main img { aspect-ratio: auto; min-height: 100%; }
   @media (max-width: 640px) {
-    .apt-gallery, .apt-gallery.count-2, .apt-gallery.count-3, .apt-gallery.count-many { grid-template-columns: 1fr; grid-template-rows: none; }
+    .apt-gallery, .apt-gallery.count-2, .apt-gallery.count-3, .apt-gallery.count-many { grid-template-columns: 1fr; grid-template-rows: none; grid-auto-rows: auto; height: auto; }
     .apt-gallery.count-3 .g-main, .apt-gallery.count-many .g-main { grid-column: auto; grid-row: auto; }
+    .apt-gallery figure, .apt-gallery.count-3 figure, .apt-gallery.count-many figure { height: clamp(200px, 55vw, 300px); }
   }
 
   /* Galerie-Lightbox */
