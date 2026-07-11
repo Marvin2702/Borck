@@ -18,10 +18,15 @@ features:
 dogFriendly: true
 smoobu_id: "133656"
 accent: "#2a8ca0"
-heroImage: /images/tuerkis-1.jpg
+heroImage: /images/tuerkis-dining.jpg
 gallery:
-  - /images/tuerkis-1.jpg
-  - /images/tuerkis-2.jpg
+  - /images/tuerkis-dining.jpg
+  - /images/tuerkis-living-kitchen.jpg
+  - /images/tuerkis-living-tv.jpg
+  - /images/tuerkis-dining-living.jpg
+  - /images/tuerkis-kitchen.jpg
+  - /images/tuerkis-bedroom.jpg
+  - /images/tuerkis-bunk-room.jpg
 summary: Küstengold für 4 Personen. Urlaub mit Deichblick.
 ---
 

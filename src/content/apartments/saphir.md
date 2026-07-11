@@ -18,10 +18,16 @@ features:
 dogFriendly: true
 smoobu_id: "133655"
 accent: "#2f5fa6"
-heroImage: /images/saphir-1.jpg
+heroImage: /images/saphir-living.jpg
 gallery:
-  - /images/saphir-1.jpg
-  - /images/saphir-2.jpg
+  - /images/saphir-living.jpg
+  - /images/saphir-open-living.jpg
+  - /images/saphir-garden-view.jpg
+  - /images/saphir-dining.jpg
+  - /images/saphir-kitchen.jpg
+  - /images/saphir-bedroom.jpg
+  - /images/saphir-bunk-room.jpg
+  - /images/saphir-bathroom.jpg
 summary: Sonniger Wohlfühlort für 4 Personen. Deine Auszeit mit eigener Terrasse.
 ---
 

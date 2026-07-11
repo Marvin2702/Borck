@@ -18,11 +18,15 @@ features:
 dogFriendly: true
 smoobu_id: "133659"
 accent: "#2e8b57"
-heroImage: /images/smaragd-1.jpg
+heroImage: /images/smaragd-living.jpg
 gallery:
-  - /images/smaragd-1.jpg
-  - /images/smaragd-2.jpg
-  - /images/smaragd-3.jpg
+  - /images/smaragd-living.jpg
+  - /images/smaragd-open-studio.jpg
+  - /images/smaragd-sleeping-area.jpg
+  - /images/smaragd-kitchen.jpg
+  - /images/smaragd-balcony-view.jpg
+  - /images/smaragd-balcony.jpg
+  - /images/smaragd-bathroom.jpg
 summary: Dein Loft unter dem Küstenhimmel. Kompaktes Urlaubsglück für 2 mit seitlichem Deichblick.
 ---
 

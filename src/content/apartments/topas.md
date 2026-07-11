@@ -18,10 +18,15 @@ features:
 dogFriendly: true
 smoobu_id: "133657"
 accent: "#d0a02a"
-heroImage: /images/topas-2.jpg
+heroImage: /images/topas-living-view.jpg
 gallery:
-  - /images/topas-2.jpg
-  - /images/topas-1.jpg
+  - /images/topas-living-view.jpg
+  - /images/topas-sea-view.jpg
+  - /images/topas-dining-kids.jpg
+  - /images/topas-bedroom.jpg
+  - /images/topas-kids-room.jpg
+  - /images/topas-bathroom.jpg
+  - /images/topas-kitchen.jpg
 summary: Dein Logenplatz über der Brandung. Nordsee-Feeling für 5 Personen mit Meerblick.
 ---
 

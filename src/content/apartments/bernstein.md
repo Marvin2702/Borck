@@ -18,10 +18,15 @@ features:
 dogFriendly: true
 smoobu_id: "133660"
 accent: "#c9821f"
-heroImage: /images/bernstein-1.jpg
+heroImage: /images/bernstein-living-terrace.jpg
 gallery:
-  - /images/bernstein-1.jpg
-  - /images/bernstein-2.jpg
+  - /images/bernstein-living-terrace.jpg
+  - /images/bernstein-sofa.jpg
+  - /images/bernstein-dining.jpg
+  - /images/bernstein-kitchen.jpg
+  - /images/bernstein-bedroom.jpg
+  - /images/bernstein-bathroom.jpg
+  - /images/bernstein-entrance.jpg
 summary: Ankerplatz für Barfuß-Freunde. Auszeit im Erdgeschoss mit eigener Terrasse.
 ---
 

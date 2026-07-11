@@ -18,10 +18,14 @@ features:
 dogFriendly: true
 smoobu_id: "133658"
 accent: "#3aa6a0"
-heroImage: /images/opal-1.jpg
+heroImage: /images/opal-living.jpg
 gallery:
-  - /images/opal-1.jpg
-  - /images/opal-2.jpg
+  - /images/opal-living.jpg
+  - /images/opal-dyke-view.jpg
+  - /images/opal-balcony-view.jpg
+  - /images/opal-bedroom.jpg
+  - /images/opal-bedroom-wardrobe.jpg
+  - /images/opal-bunk-room.jpg
 summary: Deich-Kino für 4 Personen. Doppeltes Balkon-Glück mit Weitblick.
 ---
 

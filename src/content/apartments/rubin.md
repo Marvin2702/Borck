@@ -17,9 +17,15 @@ features:
 dogFriendly: true
 smoobu_id: "133683"
 accent: "#a52a3a"
-heroImage: /images/rubin-1.jpg
+heroImage: /images/rubin-living.jpg
 gallery:
-  - /images/rubin-1.jpg
+  - /images/rubin-living.jpg
+  - /images/rubin-dining-kitchen.jpg
+  - /images/rubin-lounge.jpg
+  - /images/rubin-bedroom.jpg
+  - /images/rubin-bunk-room.jpg
+  - /images/rubin-bathroom.jpg
+  - /images/rubin-rain-shower.jpg
 summary: Familien-Glück am Deich. Dein gemütlicher Ankerplatz für 4 Personen.
 ---
 
