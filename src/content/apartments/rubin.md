@@ -3,6 +3,7 @@ name: Rubin
 order: 5
 persons: 4
 bedrooms: 2
+size_qm: 60
 view: Terrasse · am Deich
 floor: Erdgeschoss
 features:
