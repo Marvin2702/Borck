@@ -1,0 +1,21 @@
+{
+  "name": "Haus Aquamarin Büsum",
+  "short_name": "Aquamarin",
+  "description": "Sieben persönliche Ferienapartments direkt hinter der Familienlagune in Büsum.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#faf7f1",
+  "theme_color": "#155e6e",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

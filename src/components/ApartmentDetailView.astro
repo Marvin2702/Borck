@@ -8,6 +8,7 @@ import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/uti
 import { priceFrom } from '../data/prices';
 import { trApt, trFeature } from '../data/apartments-i18n';
 import { site } from '../data/site';
+import { galleryImageAlt } from '../data/gallery-alt';
 
 interface Props { lang: Lang; apartment: CollectionEntry<'apartments'> }
 const { lang, apartment } = Astro.props;
@@ -116,7 +117,7 @@ const others = (await getCollection('apartments'))
           <div class={`apt-gallery count-${Math.min(d.gallery.length, 3)}`}>
             {d.gallery.map((src, i) => (
               <figure class={i === 0 ? 'g-main' : ''} data-lightbox-item>
-                <Img src={src} alt={`${apt} ${d.name}, ${view} · Büsum (${i + 1})`}
+                <Img src={src} alt={galleryImageAlt(src, d.name, lang, view)}
                      width={1200} height={800}
                      loading={i === 0 ? 'eager' : 'lazy'}
                      fetchpriority={i === 0 ? 'high' : undefined}

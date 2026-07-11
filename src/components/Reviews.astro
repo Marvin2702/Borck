@@ -34,7 +34,6 @@ const fmtDate = (iso?: string) => {
           <> · <a class="reviews-glink" href={site.googleProfileUrl} target="_blank" rel="noopener">{t('reviews.googleLink')} ↗</a></>
         )}
       </p>
-      {lang !== 'de' && <p class="reviews-orig">{t('reviews.origGerman')}</p>}
     </div>
     <div class="reviews-grid">
       {reviews.map(({ data, Content }) => (
@@ -42,6 +41,7 @@ const fmtDate = (iso?: string) => {
           <div class="review-stars" aria-label={`${data.rating}/5`}>
             {'★'.repeat(data.rating)}<span class="dim">{'★'.repeat(5 - data.rating)}</span>
           </div>
+          {lang !== 'de' && <span class="review-language">{t('reviews.origGerman')}</span>}
           <blockquote class="review-text"><Content /></blockquote>
           <figcaption class="review-cap">
             <strong>{data.author}</strong>
@@ -62,11 +62,11 @@ const fmtDate = (iso?: string) => {
   .reviews-aggregate strong { color: var(--brand-strong); }
   .reviews-glink { color: var(--brand); font-weight: 600; text-decoration: none; }
   .reviews-glink:hover { text-decoration: underline; }
-  .reviews-orig { color: var(--text-muted); font-size: 0.82rem; font-style: italic; margin-top: 0.4rem; }
   .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
   .review { padding: 1.5rem 1.5rem 1.3rem; display: flex; flex-direction: column; gap: 0.8rem; }
   .review-stars { color: var(--c-gold); letter-spacing: 2px; font-size: 1.05rem; }
   .review-stars .dim { color: var(--c-sand-200); }
+  .review-language { align-self: flex-start; padding: .24rem .55rem; border-radius: 999px; color: var(--brand-strong); background: var(--c-aqua-100); font-size: .72rem; font-weight: 700; }
   .review-text { margin: 0; font-style: italic; color: var(--text); }
   .review-text :global(p) { margin: 0; }
   .review-cap { display: flex; flex-direction: column; gap: 0.1rem; font-size: 0.9rem; }

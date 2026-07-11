@@ -1,0 +1,18 @@
+# Alte Smoobu-URLs -> neue Astro-Seiten (Cloudflare Pages)
+/saphir                 /apartments/saphir/       301
+/bernstein              /apartments/bernstein/    301
+/rubin                  /apartments/rubin/        301
+/smaragd                /apartments/smaragd/      301
+/opal                   /apartments/opal/          301
+/tuerkis                /apartments/tuerkis/       301
+/topas                  /apartments/topas/         301
+/ueber-mich             /ueber-uns/                301
+
+# Alte direkte Buchungsseiten landen beim Kalender des Apartments.
+/buchen-saphir          /apartments/saphir/#buchung       301
+/buchen-bernstein       /apartments/bernstein/#buchung    301
+/buchen-rubin           /apartments/rubin/#buchung        301
+/buchen-smaragd         /apartments/smaragd/#buchung      301
+/buchen-opal            /apartments/opal/#buchung         301
+/buchen-tuerkis         /apartments/tuerkis/#buchung      301
+/buchen-topas           /apartments/topas/#buchung        301

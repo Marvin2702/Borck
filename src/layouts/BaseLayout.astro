@@ -142,6 +142,9 @@ const allJsonLd = [lodging, ...jsonLd];
     <meta name="theme-color" content="#155e6e" />
     {site.googleSiteVerification && <meta name="google-site-verification" content={site.googleSiteVerification} />}
     <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={withBase('favicon-32.png')} type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href={withBase('apple-touch-icon.png')} sizes="180x180" />
+    <link rel="manifest" href={withBase('site.webmanifest')} />
     <link rel="sitemap" href={withBase('sitemap-index.xml')} />
 
     {/* Schriften: Fraunces self-hosted via @fontsource-variable (DSGVO + LCP). */}
