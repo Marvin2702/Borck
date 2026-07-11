@@ -62,7 +62,9 @@ const f = facts[lang];
   .hero-bg img { object-fit: cover; object-position: center; }
   .hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6, 35, 43, .88) 0%, rgba(8, 48, 58, .72) 37%, rgba(8, 48, 58, .18) 68%, rgba(8, 48, 58, .08) 100%); }
   .hero-inner {
-    width: 100%; align-self: end;
+    /* KEIN width:100% — sonst verliert .container seine Randabstände und der
+       Text klebt an der Viewport-Kante (Grid-Child: margin-inline auto zentriert). */
+    align-self: end;
     padding-block: clamp(3rem, 9vw, 7.5rem) clamp(2.2rem, 5vw, 4rem);
   }
   .hero-copy { max-width: 650px; }
