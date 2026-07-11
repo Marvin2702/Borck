@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Img from './Img.astro';
 import Icon from './Icon.astro';
@@ -10,6 +11,8 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 const waText = encodeURIComponent(t('contact.whatsapp.msg'));
 const title = `${t('contact.title')} · ${site.name} Büsum`;
+// Apartment-Auswahl fürs Formular (buildtime aus der Collection).
+const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
 ---
 <BaseLayout title={title} description={t('contact.subtitle')} pageKey="kontakt">
   <section class="section">
@@ -56,14 +59,31 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
         <input type="hidden" name="subject" value={`Anfrage über ${site.name} Website`} />
         <input type="hidden" name="from_name" value={site.name} />
         <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" />
-        <h2>{t('form.title')}</h2>
+        <div class="form-head">
+          <span class="form-portrait" aria-hidden="true">
+            <Img src="/images/iris-mia.jpg" alt="" width={112} height={112} loading="lazy" sizes="56px" />
+          </span>
+          <div>
+            <h2>{t('form.title')}</h2>
+            <p class="form-greeting">{t('form.greeting')}</p>
+          </div>
+        </div>
         <div class="form-row">
           <label>{t('form.name')}<input type="text" name="name" required autocomplete="name" /></label>
           <label>{t('contact.email')}<input type="email" name="email" required autocomplete="email" /></label>
         </div>
         <div class="form-row">
-          <label>{t('form.dates')}<input type="text" name="dates" autocomplete="off" /></label>
-          <label>{t('apartments.persons')}<input type="number" name="guests" min="1" max="6" /></label>
+          <label>{t('form.arrival')}<input type="date" name="arrival" autocomplete="off" /></label>
+          <label>{t('form.departure')}<input type="date" name="departure" autocomplete="off" /></label>
+        </div>
+        <div class="form-row">
+          <label>{t('form.apartment')}
+            <select name="apartment">
+              <option value="">{t('form.apartmentAny')}</option>
+              {apartments.map((a) => <option value={a.data.name}>{a.data.name}</option>)}
+            </select>
+          </label>
+          <label>{t('apartments.persons')}<input type="number" name="guests" min="1" max="6" inputmode="numeric" /></label>
         </div>
         <label>{t('form.message')}<textarea name="message" rows="4" required></textarea></label>
         <button type="submit" class="btn btn--gold">{t('form.send')}</button>
@@ -102,19 +122,27 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
     box-shadow: var(--shadow-sm); display: grid; gap: 1rem;
   }
   .contact-form h2 { margin: 0; font-size: 1.5rem; }
+  .form-head { display: flex; align-items: center; gap: 0.9rem; }
+  .form-portrait { flex: none; width: 56px; height: 56px; border-radius: 999px; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .form-portrait :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .form-greeting { margin: 0.15rem 0 0; color: var(--text-muted); font-family: var(--font-head); font-style: italic; font-size: 1.02rem; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .contact-form label { display: grid; gap: 0.35rem; font-size: 0.9rem; font-weight: 600; color: var(--text); }
-  .contact-form input, .contact-form textarea {
+  .contact-form input, .contact-form textarea, .contact-form select {
     font: inherit; font-weight: 400; padding: 0.7rem 0.85rem;
     border: 1px solid var(--line); border-radius: 10px; background: var(--c-sand-50); color: var(--text);
+    min-height: 44px;
   }
-  .contact-form input:focus, .contact-form textarea:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: transparent; }
+  .contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: transparent; }
   .contact-form button { justify-self: start; }
   .hp { position: absolute; left: -9999px; }
   .form-status { margin: 0; font-weight: 600; }
   .form-status.is-ok { color: var(--c-deich-700); }
   .form-status.is-err { color: #a52a3a; }
-  @media (max-width: 600px) { .contact-grid, .form-row { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) {
+    .contact-grid, .form-row { grid-template-columns: 1fr; }
+    .contact-form button { justify-self: stretch; width: 100%; }
+  }
 </style>
 
 <script>
@@ -129,7 +157,8 @@ const title = `${t('contact.title')} · ${site.name} Büsum`;
         const subject = encodeURIComponent('Anfrage Ferienwohnung Büsum');
         const body = encodeURIComponent(
           `Name: ${data.get('name')}\nE-Mail: ${data.get('email')}\n` +
-          `Reisezeitraum: ${data.get('dates')}\nPersonen: ${data.get('guests')}\n\n${data.get('message')}`
+          `Anreise: ${data.get('arrival')}\nAbreise: ${data.get('departure')}\n` +
+          `Apartment: ${data.get('apartment') || '-'}\nPersonen: ${data.get('guests')}\n\n${data.get('message')}`
         );
         window.location.href = `mailto:${form.dataset.email}?subject=${subject}&body=${body}`;
         // Ehrliches Feedback: ohne eingerichtetes Mail-Programm passiert sonst

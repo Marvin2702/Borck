@@ -113,9 +113,26 @@ const f = facts[lang];
     .hero-cta .btn { flex: 1 1 100%; }
     .hero-facts { gap: .45rem; }
     .hero-facts li { font-size: .78rem; padding: .42rem .6rem; }
-    .mobile-booking { position: fixed; z-index: 180; left: .65rem; right: .65rem; bottom: .65rem; display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .65rem .7rem .65rem 1rem; border-radius: 16px; color: #fff; background: rgba(6,42,51,.94); box-shadow: 0 10px 34px rgba(0,0,0,.28); backdrop-filter: blur(14px); }
+    .mobile-booking { position: fixed; z-index: 180; left: .65rem; right: .65rem; bottom: calc(.65rem + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .65rem .7rem .65rem 1rem; border-radius: 16px; color: #fff; background: rgba(6,42,51,.94); box-shadow: 0 10px 34px rgba(0,0,0,.28); backdrop-filter: blur(14px); transition: transform .3s ease, opacity .3s ease; }
     .mobile-booking div { display: grid; line-height: 1.15; }
     .mobile-booking span { font-size: .72rem; color: rgba(255,255,255,.72); }
-    .mobile-booking .btn { padding: .7rem .9rem; font-size: .8rem; white-space: nowrap; }
+    .mobile-booking .btn { padding: .7rem .9rem; font-size: .8rem; white-space: nowrap; min-height: 44px; }
+    /* Solange der Hero (mit identischem CTA) im Bild ist, bleibt die Leiste
+       geparkt — Klasse wird NUR per JS gesetzt; ohne JS heutiges Verhalten. */
+    .mobile-booking.is-parked { transform: translateY(140%); opacity: 0; pointer-events: none; }
   }
 </style>
+
+<script>
+  // Mobile Buchungsleiste erst zeigen, wenn der Hero (mit identischem CTA)
+  // aus dem Viewport gescrollt ist — sonst doppelter Gold-CTA im ersten Fold.
+  const bar = document.querySelector<HTMLElement>('.mobile-booking');
+  const hero = document.querySelector<HTMLElement>('.hero');
+  if (bar && hero && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => bar.classList.toggle('is-parked', e.isIntersecting)),
+      { threshold: 0.25 }
+    );
+    io.observe(hero);
+  }
+</script>

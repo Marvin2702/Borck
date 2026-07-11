@@ -36,7 +36,15 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
         data-phone={site.phone.replace(/\s/g, '')}
         data-phonelabel={site.phoneDisplay}
         data-wa={`https://wa.me/${site.whatsapp}?text=${waText}`}
+        data-fbtitle={t('booking.fallbackTitle')}
+        data-fbtext={t('booking.fallbackText')}
       >
+        {/* Kalender-Skeleton als Ladezustand (statt nacktem Textsatz) */}
+        <div class="booking-skel" aria-hidden="true">
+          <span class="sk sk-head"></span>
+          <span class="sk sk-row"></span>
+          <span class="sk sk-cal"></span>
+        </div>
         <p class="booking-hint">{t('booking.placeholder')}</p>
       </div>
     ) : (
@@ -68,6 +76,26 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
   .booking-embed { display: grid; place-items: center; gap: 1rem; align-content: center; min-height: 320px; text-align: center; }
   .booking-embed[data-loaded] { display: block; place-items: stretch; }
   .booking-hint { color: var(--text-muted); font-size: 0.9rem; }
+  /* Skeleton in Sand-Tönen: Kopfzeile, Wochentagszeile, Monatsraster */
+  .booking-skel { display: grid; gap: 0.7rem; justify-items: center; width: min(100%, 420px); }
+  .sk { display: block; border-radius: 8px; background: var(--c-sand-100); }
+  .sk-head { width: 55%; height: 1.1rem; }
+  .sk-row { width: 90%; height: 0.75rem; }
+  .sk-cal {
+    width: 90%; height: 150px; border-radius: 12px;
+    background:
+      repeating-linear-gradient(90deg, var(--c-sand-100) 0 calc(100% / 7 - 6px), transparent calc(100% / 7 - 6px) calc(100% / 7)),
+      repeating-linear-gradient(0deg, transparent 0 24px, var(--c-sand-50) 24px 30px);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sk, .sk-cal { animation: sk-pulse 1.6s ease-in-out infinite; }
+  }
+  @keyframes sk-pulse { 50% { opacity: 0.55; } }
+  /* Gestalteter Fallback (per JS gerendert): Karte mit Titel + Kontaktwegen */
+  .booking-embed :global(.booking-fb) { display: grid; gap: 0.5rem; justify-items: center; max-width: 46ch; }
+  .booking-embed :global(.booking-fb strong) { font-family: var(--font-head); font-size: 1.35rem; color: var(--brand-strong); }
+  .booking-embed :global(.booking-fb p) { color: var(--text-muted); margin: 0 0 0.5rem; }
+  .booking-embed :global(.booking-fb .fb-btns) { display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: center; }
   .booking-placeholder { display: grid; place-items: center; min-height: 280px; text-align: center; }
   .ph-note { color: var(--text-muted); }
   .ph-buttons { display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: center; }
@@ -84,11 +112,17 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
     const phone = el.dataset.phone || '';
     const phoneLabel = el.dataset.phonelabel || phone;
     const wa = el.dataset.wa || '#';
+    const esc = (s: string) => s.replace(/</g, '&lt;');
+    const phoneIcon =
+      '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.2 4.2h2.9l1.5 3.9-1.9 1.7a12.4 12.4 0 0 0 6.5 6.5l1.7-1.9 3.9 1.5v2.9a1.9 1.9 0 0 1-2.1 1.9A16.6 16.6 0 0 1 3.3 6.3a1.9 1.9 0 0 1 1.9-2.1z"/></svg>';
     el.innerHTML =
-      '<div style="text-align:center;display:grid;gap:0.8rem;justify-items:center">' +
-      `<a class="btn btn--gold" href="tel:${phone}">☎ ${phoneLabel}</a>` +
+      '<div class="booking-fb">' +
+      `<strong>${esc(el.dataset.fbtitle || '')}</strong>` +
+      `<p>${esc(el.dataset.fbtext || '')}</p>` +
+      '<div class="fb-btns">' +
+      `<a class="btn btn--gold" href="tel:${phone}">${phoneIcon} ${esc(phoneLabel)}</a>` +
       `<a class="btn btn--ghost" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>` +
-      '</div>';
+      '</div></div>';
   }
 
   function initSmoobu(el: HTMLElement) {
