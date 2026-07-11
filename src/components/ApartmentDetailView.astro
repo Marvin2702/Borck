@@ -190,9 +190,10 @@ const others = (await getCollection('apartments'))
   .apt-facts { list-style: none; display: flex; flex-wrap: wrap; gap: 0.6rem 1.6rem; padding: 0; margin: 1.2rem 0 0; color: var(--text-muted); }
   .apt-facts strong { color: var(--text); }
   .detail-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; align-items: start; }
-  .detail-body { font-size: 1.05rem; }
+  .detail-body { font-size: 1.05rem; max-width: 65ch; hyphens: auto; }
   .detail-aside { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); position: sticky; top: 90px; }
-  .aside-title { font-size: 1.2rem; margin-top: 0; }
+  /* Unterhalb ~1.4rem wirkt die Serif stumpf — kleine Titel in der Grotesk. */
+  .aside-title { font-family: var(--font-body); font-weight: 650; font-size: 1.05rem; margin-top: 0; }
   .feature-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.55rem; }
   .feature-list li { color: var(--text); }
   .dog-badge { margin-top: 1rem; color: var(--brand); font-weight: 600; }
@@ -218,17 +219,24 @@ const others = (await getCollection('apartments'))
     .apt-gallery figure, .apt-gallery.count-3 figure, .apt-gallery.count-many figure { height: clamp(200px, 55vw, 300px); }
   }
 
-  /* Galerie-Lightbox */
+  /* Galerie-Lightbox (Fade via @starting-style + transition-behavior, progressive) */
+  .apt-gallery figure :global(img) { cursor: zoom-in; }
   .lightbox { position: fixed; inset: 0; z-index: 300; background: rgba(13, 59, 68, 0.92); display: grid; place-items: center; padding: 1.5rem; }
   .lightbox[hidden] { display: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .lightbox { opacity: 1; transition: opacity 0.22s ease, display 0.22s ease allow-discrete; }
+    .lightbox[hidden] { opacity: 0; }
+    @starting-style { .lightbox { opacity: 0; } }
+  }
   .lightbox-img { max-width: 95vw; max-height: 90vh; border-radius: 8px; box-shadow: var(--shadow-lg); }
-  .lightbox-close { position: absolute; top: 0.8rem; right: 1.2rem; background: none; border: 0; color: #fff; font-size: 2.6rem; line-height: 1; cursor: pointer; }
+  .lightbox-close { position: absolute; top: 0.8rem; right: 1.2rem; background: none; border: 0; color: #fff; font-size: 2.6rem; line-height: 1; cursor: pointer; opacity: 0.85; }
+  .lightbox-close:hover { opacity: 1; transform: scale(1.08); }
 
   .more-sec h2 { margin-top: 0; }
   .more-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0 1.2rem; }
   .more-card { display: flex; flex-direction: column; gap: 0.2rem; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none; box-shadow: var(--shadow-sm); transition: transform 0.15s ease, border-color 0.2s ease; }
   .more-card:hover { transform: translateY(-3px); border-color: var(--c-aqua-300); }
-  .more-card strong { color: var(--brand-strong); font-family: var(--font-head); font-size: 1.15rem; }
+  .more-card strong { color: var(--brand-strong); font-weight: 650; font-size: 1.05rem; }
   .more-card span { color: var(--text-muted); font-size: 0.9rem; }
   .more-lage a { color: var(--brand); font-weight: 600; text-decoration: none; }
   @media (max-width: 700px) { .more-grid { grid-template-columns: 1fr; } }
@@ -265,7 +273,6 @@ const others = (await getCollection('apartments'))
   const lbImg = lb?.querySelector('.lightbox-img') as HTMLImageElement | null;
   const closeLb = () => { if (lb) { lb.hidden = true; document.body.style.overflow = ''; } };
   document.querySelectorAll<HTMLImageElement>('[data-lightbox-item] img').forEach((img) => {
-    img.style.cursor = 'zoom-in';
     img.addEventListener('click', () => {
       if (!lb || !lbImg) return;
       lbImg.src = img.currentSrc || img.src;

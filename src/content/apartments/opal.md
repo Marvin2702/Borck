@@ -17,7 +17,7 @@ features:
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 smoobu_id: "133658"
-accent: "#3aa6a0"
+accent: "#258b86"
 heroImage: /images/opal-living.jpg
 gallery:
   - /images/opal-living.jpg

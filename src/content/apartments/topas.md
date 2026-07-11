@@ -17,7 +17,7 @@ features:
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 smoobu_id: "133657"
-accent: "#d0a02a"
+accent: "#9e7a23"
 heroImage: /images/topas-living-view.jpg
 gallery:
   - /images/topas-living-view.jpg

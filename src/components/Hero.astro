@@ -68,8 +68,8 @@ const f = facts[lang];
     padding-block: clamp(3rem, 9vw, 7.5rem) clamp(2.2rem, 5vw, 4rem);
   }
   .hero-copy { max-width: 650px; }
-  .hero-eyebrow { color: #f5d887; }
-  .hero-title { color: #fff; max-width: 18ch; font-size: clamp(2.65rem, 6vw, 5.25rem); line-height: .98; text-wrap: balance; text-shadow: 0 2px 24px rgba(0,0,0,.24); }
+  .hero-eyebrow { color: var(--c-gold-300); }
+  .hero-title { color: #fff; max-width: 18ch; font-size: clamp(2.65rem, 6vw, 5.25rem); text-shadow: 0 2px 24px rgba(0,0,0,.24); }
   .hero-sub { color: rgba(255,255,255,.88); margin-bottom: 2rem; max-width: 56ch; }
   .hero-cta { display: flex; flex-wrap: wrap; gap: 0.9rem; }
   .btn--glass { color: #fff; border: 1px solid rgba(255,255,255,.64); background: rgba(255,255,255,.1); backdrop-filter: blur(8px); }
@@ -79,12 +79,28 @@ const f = facts[lang];
     color: #fff; font-weight: 600; font-size: 0.95rem;
     text-decoration: none;
   }
-  .hero-trust:hover { color: #f5d887; }
-  .stars { color: var(--c-gold); letter-spacing: 2px; }
+  .hero-trust:hover { color: var(--c-gold-300); }
+  .stars { color: var(--c-gold-300); letter-spacing: 2px; }
   .hero-facts { display: flex; flex-wrap: wrap; gap: .65rem; padding: 0; margin: 2.2rem 0 0; list-style: none; }
   .hero-facts li { display: inline-flex; gap: .45rem; align-items: center; padding: .48rem .75rem; border-radius: 999px; color: #fff; background: rgba(4,29,35,.52); border: 1px solid rgba(255,255,255,.24); backdrop-filter: blur(8px); font-size: .88rem; font-weight: 650; }
-  .hero-facts li span { color: #f5d887; }
+  .hero-facts li span { color: var(--c-gold-300); }
   .mobile-booking { display: none; }
+
+  /* Dezenter Auftritt: gestaffeltes Aufsteigen der Copy, langsames Zoom-Settle
+     des Bildes. Nur bei erlaubter Motion; ohne Guard keine versteckten Zustände. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-copy > * { animation: hero-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+    .hero-copy > :nth-child(2) { animation-delay: 0.08s; }
+    .hero-copy > :nth-child(3) { animation-delay: 0.16s; }
+    .hero-copy > :nth-child(4) { animation-delay: 0.24s; }
+    .hero-copy > :nth-child(5) { animation-delay: 0.3s; }
+    .hero-facts { animation: hero-rise 0.7s 0.38s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+    @media (min-width: 721px) {
+      .hero-bg img { animation: hero-zoom 22s ease-out both; }
+    }
+  }
+  @keyframes hero-rise { from { opacity: 0; transform: translateY(14px); } }
+  @keyframes hero-zoom { from { transform: scale(1.05); } to { transform: scale(1); } }
 
   @media (max-width: 720px) {
     .hero { min-height: 690px; }

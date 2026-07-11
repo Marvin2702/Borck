@@ -17,7 +17,7 @@ features:
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 smoobu_id: "133655"
-accent: "#2f5fa6"
+accent: "#426cab"
 heroImage: /images/saphir-living.jpg
 gallery:
   - /images/saphir-living.jpg

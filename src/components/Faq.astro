@@ -80,7 +80,25 @@ const faqLd = {
     list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
   }
   .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: '+'; color: var(--accent); font-size: 1.4rem; line-height: 1; }
-  .faq-item[open] summary::after { content: '–'; }
+  /* Rotierendes Chevron statt Zeichen-Swap — eine ruhige, durchgängige Mechanik */
+  .faq-item summary::after {
+    content: '';
+    width: 9px; height: 9px; flex: none;
+    border-right: 2px solid var(--c-aqua-700);
+    border-bottom: 2px solid var(--c-aqua-700);
+    transform: rotate(45deg);
+    transition: transform 0.25s ease;
+    margin-right: 2px;
+  }
+  .faq-item[open] summary::after { transform: rotate(225deg); }
   .faq-item p { margin: 0; padding: 0 1.2rem 1.1rem; color: var(--text-muted); }
+  /* Sanftes Aufklappen, wo ::details-content + interpolate-size unterstützt sind */
+  @media (prefers-reduced-motion: no-preference) {
+    .faq-item { interpolate-size: allow-keywords; }
+    .faq-item::details-content {
+      block-size: 0; overflow: hidden;
+      transition: block-size 0.28s ease, content-visibility 0.28s ease allow-discrete;
+    }
+    .faq-item[open]::details-content { block-size: auto; }
+  }
 </style>

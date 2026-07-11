@@ -34,9 +34,11 @@ const bookHref = localizedPath('apartments', lang);
     </button>
 
     <nav class="site-nav" id="site-nav" aria-label={t('nav.menu')}>
-      {nav.map((item) => (
-        <a href={localizedPath(item.key, lang)} class="nav-link">{item.label}</a>
-      ))}
+      {nav.map((item) => {
+        const href = localizedPath(item.key, lang);
+        const current = Astro.url.pathname.startsWith(href);
+        return <a href={href} class="nav-link" aria-current={current ? 'page' : undefined}>{item.label}</a>;
+      })}
       <LanguageSwitcher lang={lang} noAlternates={noAlternates} />
       <a href={bookHref} class="btn btn--gold nav-cta">{t('nav.book')}</a>
     </nav>
@@ -70,18 +72,39 @@ const bookHref = localizedPath('apartments', lang);
   }
   .site-nav { display: flex; align-items: center; gap: 1.4rem; }
   .nav-link {
+    position: relative;
     text-decoration: none;
     color: var(--text);
     font-weight: 500;
     font-size: 0.98rem;
     transition: color 0.15s ease;
   }
+  .nav-link::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: -6px; height: 2px;
+    border-radius: 2px; background: var(--brand);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.22s ease;
+  }
+  .nav-link:hover::after,
+  .nav-link[aria-current='page']::after { transform: scaleX(1); }
   .nav-link:hover { color: var(--brand); }
+  .nav-link[aria-current='page'] { color: var(--brand); }
   .nav-cta { font-size: 0.92rem; padding: 0.6rem 1.1rem; }
+
+  /* Beim Scrollen leicht anheben (scroll-driven, nur wo unterstützt). */
+  @supports (animation-timeline: scroll()) {
+    .site-header { animation: header-elevate linear both; animation-timeline: scroll(); animation-range: 0 120px; }
+  }
 
   .burger { display: none; background: none; border: 0; }
 
+  @keyframes header-elevate {
+    to { box-shadow: 0 6px 24px rgba(13, 59, 68, 0.09); background: rgba(250, 247, 241, 0.94); }
+  }
+
   @media (max-width: 860px) {
+    .nav-link::after { content: none; } /* mobil trägt border-bottom die Trennung */
     .burger {
       display: inline-flex;
       flex-direction: column;
@@ -93,6 +116,10 @@ const bookHref = localizedPath('apartments', lang);
       width: 26px; height: 2px; background: var(--brand-strong);
       transition: transform 0.2s ease, opacity 0.2s ease;
     }
+    /* Burger → X, rein über den bestehenden aria-expanded-Toggle */
+    .burger[aria-expanded='true'] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
+    .burger[aria-expanded='true'] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
     .site-nav {
       position: absolute;
       top: 100%;

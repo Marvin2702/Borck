@@ -17,7 +17,7 @@ features:
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 smoobu_id: "133659"
-accent: "#2e8b57"
+accent: "#3a8357"
 heroImage: /images/smaragd-living.jpg
 gallery:
   - /images/smaragd-living.jpg

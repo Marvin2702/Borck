@@ -17,7 +17,7 @@ features:
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 smoobu_id: "133660"
-accent: "#c9821f"
+accent: "#a46d25"
 heroImage: /images/bernstein-living-terrace.jpg
 gallery:
   - /images/bernstein-living-terrace.jpg

@@ -17,7 +17,7 @@ features:
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 smoobu_id: "133656"
-accent: "#2a8ca0"
+accent: "#208295"
 heroImage: /images/tuerkis-dining.jpg
 gallery:
   - /images/tuerkis-dining.jpg

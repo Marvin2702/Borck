@@ -16,7 +16,7 @@ features:
   - PKW-Stellplatz & abschließbare Fahrradgarage
 dogFriendly: true
 smoobu_id: "133683"
-accent: "#a52a3a"
+accent: "#a64b50"
 heroImage: /images/rubin-living.jpg
 gallery:
   - /images/rubin-living.jpg
