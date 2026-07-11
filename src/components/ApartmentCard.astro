@@ -25,23 +25,57 @@ const view = tr?.view ?? d.view;
 const summary = tr?.summary ?? d.summary;
 // 1-Klick-Buchung: direkt zur Smoobu-Buchungsseite dieses Apartments.
 const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_id}` : href;
+// Karten-Galerie: alle Fotos direkt auf der Karte durchblätterbar,
+// damit niemand die Seite verlassen muss, um sich zu entscheiden.
+const gallery: string[] = d.gallery?.length ? d.gallery : d.heroImage ? [d.heroImage] : [];
 ---
 
 <article class="card apt" data-apt
   data-persons={d.persons}
   data-dog={d.dogFriendly ? '1' : '0'}
   data-seaview={d.view.toLowerCase().includes('meerblick') ? '1' : '0'}>
-  <a href={href} class="apt-media">
-    {d.heroImage ? (
-      <Img src={d.heroImage} alt={galleryImageAlt(d.heroImage, d.name, lang, view)} width={640} height={400} loading="lazy" sizes={sizes ?? '(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw'} />
-    ) : (
+  {gallery.length > 0 ? (
+    <div class="apt-media" data-carousel>
+      <div class="apt-track" data-track>
+        {gallery.map((src, i) => (
+          <a class="apt-slide" href={href} tabindex={i === 0 ? undefined : -1}>
+            <Img
+              src={src}
+              alt={galleryImageAlt(src, d.name, lang, view)}
+              width={640}
+              height={400}
+              loading="lazy"
+              sizes={sizes ?? '(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw'}
+            />
+          </a>
+        ))}
+      </div>
+      {gallery.length > 1 && (
+        <>
+          {/* hidden bis JS initialisiert — ohne JS bleibt natives Swipen */}
+          <button type="button" class="apt-nav apt-nav--prev" data-prev aria-label={t('gallery.prev')} hidden>
+            <Icon name="chevron-left" size={18} />
+          </button>
+          <button type="button" class="apt-nav apt-nav--next" data-next aria-label={t('gallery.next')} hidden>
+            <Icon name="chevron-right" size={18} />
+          </button>
+          <span class="apt-dots" aria-hidden="true">
+            {gallery.map((_, i) => <span class={i === 0 ? 'apt-dot is-on' : 'apt-dot'}></span>)}
+          </span>
+        </>
+      )}
+      <span class="apt-badge" style={`--a:${accent}`}>{view}</span>
+      {d.dogFriendly && <span class="apt-dog" title="Hundefreundlich" aria-hidden="true"><Icon name="paw" size={15} /></span>}
+    </div>
+  ) : (
+    <a href={href} class="apt-media">
       <span class="apt-placeholder" style={`--a:${accent}`}>
         <span class="apt-gem" aria-hidden="true">◈</span>
       </span>
-    )}
-    <span class="apt-badge" style={`--a:${accent}`}>{view}</span>
-    {d.dogFriendly && <span class="apt-dog" title="Hundefreundlich" aria-hidden="true"><Icon name="paw" size={15} /></span>}
-  </a>
+      <span class="apt-badge" style={`--a:${accent}`}>{view}</span>
+      {d.dogFriendly && <span class="apt-dog" title="Hundefreundlich" aria-hidden="true"><Icon name="paw" size={15} /></span>}
+    </a>
+  )}
 
   <div class="apt-body">
     <h3 class="apt-name"><a href={href}>{d.name}</a></h3>
@@ -72,6 +106,36 @@ const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_
      Scope-Klasse dieser Karte nicht — sonst greifen object-fit & Hover-Zoom nie. */
   .apt-media :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
   .apt:hover .apt-media :global(img) { transform: scale(1.05); }
+
+  /* Karten-Galerie: native Scroll-Snap-Spur (Swipe mobil), Pfeile per JS */
+  .apt-track {
+    position: absolute; inset: 0;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .apt-track::-webkit-scrollbar { display: none; }
+  .apt-slide { flex: 0 0 100%; display: block; height: 100%; overflow: hidden; scroll-snap-align: start; scroll-snap-stop: always; }
+  .apt-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    display: grid; place-items: center;
+    width: 36px; height: 36px; border-radius: 999px; border: 0;
+    background: rgba(255, 255, 255, 0.92); color: var(--c-ink-900);
+    cursor: pointer; box-shadow: var(--shadow-sm);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .apt-nav:hover { background: #fff; transform: translateY(-50%) scale(1.06); }
+  .apt-nav:active { transform: translateY(-50%) scale(0.94); }
+  .apt-nav--prev { left: 10px; }
+  .apt-nav--next { right: 10px; }
+  .apt-dots {
+    position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%);
+    display: flex; gap: 5px; pointer-events: none;
+  }
+  .apt-dot { width: 6px; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.55); box-shadow: 0 0 4px rgba(0, 0, 0, 0.25); transition: background 0.2s ease; }
+  .apt-dot.is-on { background: #fff; }
   .apt-placeholder {
     position: absolute; inset: 0;
     display: grid; place-items: center;
@@ -107,3 +171,38 @@ const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_
     .apt-actions .btn { width: 100%; justify-content: center; }
   }
 </style>
+
+<script>
+  // Karten-Galerie: Pfeile blättern die Scroll-Snap-Spur, Punkte zeigen die
+  // Position. Ohne JS bleiben die Pfeile hidden — natives Swipen geht trotzdem.
+  const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((media) => {
+    const track = media.querySelector<HTMLElement>('[data-track]');
+    if (!track || track.children.length < 2) return;
+    media.querySelectorAll<HTMLButtonElement>('.apt-nav').forEach((b) => (b.hidden = false));
+    const dots = Array.from(media.querySelectorAll<HTMLElement>('.apt-dot'));
+
+    const go = (dir: number) => {
+      const max = track.scrollWidth - track.clientWidth;
+      let left = Math.round(track.scrollLeft + dir * track.clientWidth);
+      if (left > max + 4) left = 0; // am Ende wieder von vorn …
+      if (left < -4) left = max; // … und am Anfang ans Ende
+      track.scrollTo({ left, behavior: smooth ? 'smooth' : 'auto' });
+    };
+    media.querySelector('[data-prev]')?.addEventListener('click', () => go(-1));
+    media.querySelector('[data-next]')?.addEventListener('click', () => go(1));
+
+    let raf = 0;
+    track.addEventListener(
+      'scroll',
+      () => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          const i = Math.round(track.scrollLeft / track.clientWidth);
+          dots.forEach((d, k) => d.classList.toggle('is-on', k === i));
+        });
+      },
+      { passive: true }
+    );
+  });
+</script>
