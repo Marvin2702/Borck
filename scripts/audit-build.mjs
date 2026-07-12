@@ -16,7 +16,9 @@ function walk(dir) {
 
 function resolveLocal(raw, htmlFile) {
   const value = raw.split('#')[0].split('?')[0];
-  if (!value || /^(?:https?:|mailto:|tel:|data:|javascript:)/.test(value)) return null;
+  // Jede URL mit Schema ist kein lokales Ziel (http/mailto/tel, aber auch
+  // Custom-App-Schemes wie hausaquamarin:// der Gäste-App-Brücke).
+  if (!value || /^[a-z][a-z0-9+.-]*:/i.test(value)) return null;
   let pathname = value;
   if (pathname.startsWith('/')) {
     if (base && pathname.startsWith(`${base}/`)) pathname = pathname.slice(base.length);
