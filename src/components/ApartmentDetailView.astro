@@ -29,6 +29,13 @@ const summary = tr?.summary ?? d.summary;
 const apt = t('apartments.holidayApt');
 // Ortspräposition lokalisiert (DA: "i Büsum", sonst "in Büsum").
 const inTown = lang === 'da' ? 'i Büsum' : 'in Büsum';
+const lightboxUi: Record<Lang, { enlarge: string; gallery: string; close: string; prev: string; next: string }> = {
+  de: { enlarge: 'vergrößern', gallery: 'Bildergalerie', close: 'Schließen', prev: 'Vorheriges Bild', next: 'Nächstes Bild' },
+  en: { enlarge: 'enlarge', gallery: 'Image gallery', close: 'Close', prev: 'Previous image', next: 'Next image' },
+  nl: { enlarge: 'vergroten', gallery: 'Fotogalerij', close: 'Sluiten', prev: 'Vorige afbeelding', next: 'Volgende afbeelding' },
+  da: { enlarge: 'forstør', gallery: 'Billedgalleri', close: 'Luk', prev: 'Forrige billede', next: 'Næste billede' },
+};
+const lbu = lightboxUi[lang];
 
 const title = `${apt} ${d.name} · ${site.name} Büsum`;
 const description = `${apt} ${d.name} ${inTown}: ${summary} ${d.persons} ${t('apartments.persons')}, ${view}.`;
@@ -117,7 +124,7 @@ const others = (await getCollection('apartments'))
         <div class="container">
           <div class={`apt-gallery ${d.gallery.length > 3 ? 'count-many' : `count-${d.gallery.length}`}`}>
             {d.gallery.map((src, i) => (
-              <figure class={i === 0 ? 'g-main' : ''} data-lightbox-item>
+              <figure class={i === 0 ? 'g-main' : ''} data-lightbox-item role="button" tabindex="0" aria-label={`${galleryImageAlt(src, d.name, lang, view)} – ${lbu.enlarge}`}>
                 <Img src={src} alt={galleryImageAlt(src, d.name, lang, view)}
                      width={1200} height={800}
                      loading={i === 0 ? 'eager' : 'lazy'}
@@ -183,9 +190,17 @@ const others = (await getCollection('apartments'))
       <a href="#buchung" class="btn btn--gold">{t('nav.book')}</a>
     </div>
 
-    <div class="lightbox" data-lightbox hidden>
-      <button class="lightbox-close" type="button" aria-label="Schließen" data-lightbox-close>×</button>
-      <img class="lightbox-img" alt="" />
+    <div class="lightbox" data-lightbox role="dialog" aria-modal="true" aria-label={lbu.gallery} hidden>
+      <button class="lightbox-close" type="button" aria-label={lbu.close} data-lightbox-close>×</button>
+      <button class="lightbox-nav lightbox-prev" type="button" aria-label={lbu.prev} data-lightbox-prev>‹</button>
+      <figure class="lightbox-figure">
+        <img class="lightbox-img" alt="" />
+        <figcaption class="lightbox-caption">
+          <span data-lightbox-text></span>
+          <span class="lightbox-count" aria-live="polite" data-lightbox-count></span>
+        </figcaption>
+      </figure>
+      <button class="lightbox-nav lightbox-next" type="button" aria-label={lbu.next} data-lightbox-next>›</button>
     </div>
   </article>
 </BaseLayout>
@@ -212,7 +227,8 @@ const others = (await getCollection('apartments'))
 
   .apt-gallery-sec { padding-top: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
   .apt-gallery { display: grid; gap: 0.8rem; }
-  .apt-gallery figure { margin: 0; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); height: clamp(300px, 34vw, 460px); }
+  .apt-gallery figure { margin: 0; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); height: clamp(300px, 34vw, 460px); outline: 0; cursor: zoom-in; }
+  .apt-gallery figure:focus-visible { box-shadow: 0 0 0 4px var(--c-aqua-300), var(--shadow-md); }
   /* :global nötig: die <img> stammen aus der Kind-Komponente Img.astro und tragen
      die Scope-Klasse dieser Komponente nicht — gescopte img-Selektoren greifen nie. */
   .apt-gallery figure :global(img) { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -230,18 +246,28 @@ const others = (await getCollection('apartments'))
     .apt-gallery figure, .apt-gallery.count-3 figure, .apt-gallery.count-many figure { height: clamp(200px, 55vw, 300px); }
   }
 
-  /* Galerie-Lightbox (Fade via @starting-style + transition-behavior, progressive) */
-  .apt-gallery figure :global(img) { cursor: zoom-in; }
-  .lightbox { position: fixed; inset: 0; z-index: 300; background: rgba(13, 59, 68, 0.92); display: grid; place-items: center; padding: 1.5rem; }
+  /* Galerie-Lightbox */
+  .lightbox { position: fixed; inset: 0; z-index: 300; background: rgba(5, 28, 34, 0.96); display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1rem; padding: 1.5rem; }
   .lightbox[hidden] { display: none; }
+  .lightbox-figure { min-width: 0; margin: 0; display: grid; justify-items: center; gap: .8rem; }
+  .lightbox-img { max-width: 100%; max-height: 82vh; object-fit: contain; border-radius: 8px; box-shadow: var(--shadow-lg); touch-action: pan-y; }
+  .lightbox-caption { width: min(100%, 900px); display: flex; justify-content: space-between; gap: 1rem; color: rgba(255,255,255,.82); font-size: .9rem; }
+  .lightbox-count { white-space: nowrap; color: #f5d887; font-weight: 700; }
+  .lightbox-close { position: absolute; top: 0.8rem; right: 1.2rem; background: none; border: 0; color: #fff; font-size: 2.6rem; line-height: 1; cursor: pointer; }
+  .lightbox-nav { width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,255,255,.34); color: #fff; background: rgba(255,255,255,.08); font-size: 2rem; cursor: pointer; }
+  .lightbox-nav:hover, .lightbox-nav:focus-visible, .lightbox-close:focus-visible { color: #082f39; background: #fff; outline: 0; }
   @media (prefers-reduced-motion: no-preference) {
     .lightbox { opacity: 1; transition: opacity 0.22s ease, display 0.22s ease allow-discrete; }
     .lightbox[hidden] { opacity: 0; }
     @starting-style { .lightbox { opacity: 0; } }
   }
-  .lightbox-img { max-width: 95vw; max-height: 90vh; border-radius: 8px; box-shadow: var(--shadow-lg); }
-  .lightbox-close { position: absolute; top: 0.8rem; right: 1.2rem; background: none; border: 0; color: #fff; font-size: 2.6rem; line-height: 1; cursor: pointer; opacity: 0.85; }
-  .lightbox-close:hover { opacity: 1; transform: scale(1.08); }
+  @media (max-width: 640px) {
+    .lightbox { grid-template-columns: 1fr; padding: 3.5rem .7rem 1rem; }
+    .lightbox-nav { position: absolute; top: 50%; z-index: 1; width: 42px; height: 42px; background: rgba(5,28,34,.72); }
+    .lightbox-prev { left: .7rem; }
+    .lightbox-next { right: .7rem; }
+    .lightbox-caption { padding-inline: .4rem; font-size: .78rem; }
+  }
 
   .more-sec h2 { margin-top: 0; }
   .more-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0 1.2rem; }
@@ -289,21 +315,66 @@ const others = (await getCollection('apartments'))
   // Galerie-Lightbox
   const lb = document.querySelector<HTMLElement>('[data-lightbox]');
   const lbImg = lb?.querySelector('.lightbox-img') as HTMLImageElement | null;
-  const closeLb = () => { if (lb) { lb.hidden = true; document.body.style.overflow = ''; } };
-  document.querySelectorAll<HTMLImageElement>('[data-lightbox-item] img').forEach((img) => {
-    img.addEventListener('click', () => {
-      if (!lb || !lbImg) return;
-      lbImg.src = img.currentSrc || img.src;
-      lbImg.alt = img.alt || '';
-      lb.hidden = false;
-      document.body.style.overflow = 'hidden';
+  const lbText = lb?.querySelector<HTMLElement>('[data-lightbox-text]');
+  const lbCount = lb?.querySelector<HTMLElement>('[data-lightbox-count]');
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-lightbox-item]'));
+  let activeIndex = 0;
+  let returnFocus: HTMLElement | null = null;
+  let touchStartX = 0;
+  const showImage = (index: number) => {
+    if (!lbImg || !items.length) return;
+    activeIndex = (index + items.length) % items.length;
+    const img = items[activeIndex].querySelector('img') as HTMLImageElement | null;
+    if (!img) return;
+    lbImg.src = img.currentSrc || img.src;
+    lbImg.alt = img.alt || '';
+    if (lbText) lbText.textContent = img.alt || '';
+    if (lbCount) lbCount.textContent = `${activeIndex + 1} / ${items.length}`;
+  };
+  const closeLb = () => {
+    if (!lb || lb.hidden) return;
+    lb.hidden = true;
+    document.body.style.overflow = '';
+    returnFocus?.focus();
+  };
+  const openLb = (index: number, trigger: HTMLElement) => {
+    if (!lb) return;
+    returnFocus = trigger;
+    showImage(index);
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+    lb.querySelector<HTMLButtonElement>('[data-lightbox-close]')?.focus();
+  };
+  items.forEach((item, index) => {
+    item.addEventListener('click', () => openLb(index, item));
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(index, item); }
     });
   });
+  lb?.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => showImage(activeIndex - 1));
+  lb?.querySelector('[data-lightbox-next]')?.addEventListener('click', () => showImage(activeIndex + 1));
+  lbImg?.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0]?.clientX ?? 0; }, { passive: true });
+  lbImg?.addEventListener('touchend', (e) => {
+    const delta = (e.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
+    if (Math.abs(delta) > 45) showImage(activeIndex + (delta < 0 ? 1 : -1));
+  }, { passive: true });
   lb?.addEventListener('click', (e) => {
     const target = e.target as Element;
     if (target === lb || target.hasAttribute('data-lightbox-close')) closeLb();
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLb(); });
+  document.addEventListener('keydown', (e) => {
+    if (!lb || lb.hidden) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft') showImage(activeIndex - 1);
+    if (e.key === 'ArrowRight') showImage(activeIndex + 1);
+    if (e.key === 'Tab') {
+      const focusable = Array.from(lb.querySelectorAll<HTMLElement>('button:not([disabled])'));
+      if (!focusable.length) return;
+      const first = focusable[0]; const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
 
   // Desktop: Floating-Buchungs-CTA erst nach dem Hero einblenden (mobil ist die
   // Leiste per CSS immer sichtbar; .is-visible wirkt nur ab 821px).

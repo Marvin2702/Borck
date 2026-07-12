@@ -34,6 +34,13 @@ const hint: Record<Lang, string> = {
   da: 'Tryk på en markør for info, afstand og booking.',
 };
 const clusterLabel: Record<Lang, string> = { de: 'Ziele hier', en: 'places here', nl: 'plekken hier', da: 'steder her' };
+const loadLabel: Record<Lang, string> = { de: 'Interaktive Karte laden', en: 'Load interactive map', nl: 'Interactieve kaart laden', da: 'Indlæs interaktivt kort' };
+const privacyLabel: Record<Lang, string> = {
+  de: 'Lädt Kartenkacheln von OpenStreetMap erst nach deinem Klick.',
+  en: 'Loads map tiles from OpenStreetMap only after your click.',
+  nl: 'Laadt kaarttegels van OpenStreetMap pas na je klik.',
+  da: 'Indlæser først kortfelter fra OpenStreetMap efter dit klik.',
+};
 
 const enriched = points.map((p) => ({
   ...p,
@@ -50,7 +57,14 @@ const payload = {
 ---
 
 <p class="exp-hint text-center">{hint[lang]}</p>
-<div id={mapId} class="exp-map" role="application" aria-label={`Karte mit Zielen rund um ${home.name}`}></div>
+<div class="exp-map-shell">
+  <div id={mapId} class="exp-map" role="region" tabindex="-1" aria-label={`Karte mit Zielen rund um ${home.name}`}></div>
+  <button type="button" class="map-loader" data-map-load={mapId}>
+    <span class="map-loader-icon" aria-hidden="true">⌖</span>
+    <strong>{loadLabel[lang]}</strong>
+    <span>{privacyLabel[lang]}</span>
+  </button>
+</div>
 <script is:inline type="application/json" data-map-data={mapId} set:html={JSON.stringify(payload)} />
 
 {showCards && (
@@ -80,6 +94,13 @@ const payload = {
     box-shadow: var(--shadow-sm); border: 1px solid var(--line);
     background: var(--c-aqua-100); z-index: 0;
   }
+  .exp-map-shell { position: relative; }
+  .map-loader { position: absolute; inset: 0; z-index: 2; width: 100%; display: grid; place-content: center; justify-items: center; gap: .45rem; padding: 2rem; border: 1px solid var(--line); border-radius: var(--radius-lg); color: var(--brand-strong); background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.9), rgba(226,242,245,.96)), var(--c-aqua-100); cursor: pointer; text-align: center; }
+  .map-loader:hover { background: var(--c-aqua-100); }
+  .map-loader:focus-visible { outline: 4px solid var(--c-aqua-300); outline-offset: 3px; }
+  .map-loader-icon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; color: #fff; background: var(--brand); font-size: 1.7rem; box-shadow: var(--shadow-sm); }
+  .map-loader strong { font-family: var(--font-head); font-size: 1.25rem; }
+  .map-loader span:last-child { max-width: 46ch; color: var(--text-muted); font-size: .84rem; }
   @media (max-width: 600px) { .exp-map { height: 380px; } }
 
   .exp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.4rem; }
@@ -123,16 +144,24 @@ const payload = {
 </style>
 
 <script>
-  import L from 'leaflet';
-  import 'leaflet/dist/leaflet.css';
-  import 'leaflet.markercluster';
-  import 'leaflet.markercluster/dist/MarkerCluster.css';
-
   document.querySelectorAll<HTMLScriptElement>('[data-map-data]').forEach((dataEl) => {
     const id = dataEl.getAttribute('data-map-data');
     const mapEl = id ? document.getElementById(id) : null;
     if (!mapEl || !dataEl.textContent) return;
     const data = JSON.parse(dataEl.textContent);
+    let L: any = null;
+    let leafletPromise: Promise<any> | null = null;
+    const loadLeaflet = () => {
+      if (!leafletPromise) {
+        leafletPromise = Promise.all([
+          import('leaflet'),
+          import('leaflet/dist/leaflet.css'),
+          import('leaflet.markercluster'),
+          import('leaflet.markercluster/dist/MarkerCluster.css'),
+        ]).then(([leaflet]) => leaflet.default);
+      }
+      return leafletPromise;
+    };
 
     const esc = (s: unknown) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const pin = (emoji: string, extra?: string, size = 34) =>
@@ -154,11 +183,12 @@ const payload = {
       (h.address ? `<p class="mp-text">${esc(h.address)}</p>` : '') + `</div>`;
 
     let inited = false;
-    let mapRef: L.Map | null = null;
-    const markerByIdx: L.Marker[] = [];
-    const init = () => {
+    let mapRef: any = null;
+    const markerByIdx: any[] = [];
+    const init = async () => {
       if (inited) return;
       inited = true;
+      L = await loadLeaflet();
       const map = L.map(mapEl as HTMLElement, { scrollWheelZoom: false }).setView(data.home.coords, 12);
       mapRef = map;
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -226,13 +256,14 @@ const payload = {
       map.fitBounds(bounds, { padding: [40, 40] });
     };
 
-    const start = () => {
-      const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, o?: any) => void);
-      if (ric) ric(() => init(), { timeout: 1500 });
-      else setTimeout(init, 200);
-    };
-    if (document.readyState === 'complete') start();
-    else window.addEventListener('load', start, { once: true });
+    const loadButton = document.querySelector<HTMLButtonElement>(`[data-map-load="${id}"]`);
+    loadButton?.addEventListener('click', async () => {
+      loadButton.disabled = true;
+      await init();
+      loadButton.remove();
+      mapEl.setAttribute('role', 'application');
+      mapEl.focus({ preventScroll: true });
+    });
 
     // Karte auf einen Punkt zoomen und dessen Popup öffnen. Popup eigenständig
     // (nicht über den Marker): funktioniert auch, wenn der Marker im Cluster
@@ -262,8 +293,9 @@ const payload = {
 
     // Kachel-Klick: Karte in Sicht scrollen, aufs Ziel zoomen, Popup öffnen —
     // der Gast muss den Marker nicht selbst suchen.
-    const focusPoint = (idx: number) => {
-      init();
+    const focusPoint = async (idx: number) => {
+      await init();
+      loadButton?.remove();
       const mk = markerByIdx[idx];
       if (!mapRef || !mk) return;
       mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });

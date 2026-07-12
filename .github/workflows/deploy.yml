@@ -53,6 +53,12 @@ jobs:
           BASE: ${{ steps.pages.outputs.base_path }}
           PUBLIC_STAGING: 'true' # Staging => noindex (schützt Prod-SEO)
 
+      - name: Launch audit (links, assets, SEO)
+        run: npm run audit:build
+        env:
+          BASE: ${{ steps.pages.outputs.base_path }}
+          PUBLIC_STAGING: 'true'
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
