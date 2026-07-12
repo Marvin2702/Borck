@@ -57,7 +57,7 @@ jobs:
       - name: Build combined production output
         run: npm run build:with-app
 
-      - name: Lighthouse (mobile, three core pages)
+      - name: Lighthouse (mobile, core pages and maps)
         run: npm run audit:lighthouse
         env:
           # `runner` steht erst auf Step-Ebene zur Verfügung; im Job-env würde

@@ -129,6 +129,44 @@ test.describe('SEO, Staging-Sicherheit und Kernseiten', () => {
   });
 });
 
+test('Karten laden automatisch kurz vor Sichtbarkeit, andere Seiten bleiben kartenfrei', async ({ page }) => {
+  const tileRequests: string[] = [];
+  const mapAssetRequests: string[] = [];
+  await page.addInitScript((key) => {
+    localStorage.setItem(key, JSON.stringify({ version: 2, analytics: false, marketing: false, updatedAt: new Date().toISOString() }));
+  }, CONSENT_KEY);
+  page.on('request', (request) => {
+    if (/\/(?:ExperienceMap|leaflet(?:\.markercluster)?-src)[^/]*\.js/i.test(request.url())) {
+      mapAssetRequests.push(request.url());
+    }
+  });
+  await page.route('https://tile.openstreetmap.org/**', async (route) => {
+    tileRequests.push(route.request().url());
+    await route.fulfill({
+      status: 200,
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#dcebf2"/></svg>',
+    });
+  });
+
+  await page.goto('/');
+  await page.waitForTimeout(300);
+  expect(tileRequests).toEqual([]);
+  expect(mapAssetRequests).toEqual([]);
+
+  await page.goto('/lage/');
+  await expect(page.locator('#lage-map.leaflet-container')).toBeVisible();
+  await expect(page.locator('[data-map-load="lage-map"]')).toHaveCount(0);
+  expect(tileRequests.length).toBeGreaterThan(0);
+  expect(mapAssetRequests.some((url) => /leaflet-src/i.test(url))).toBe(true);
+
+  await page.goto('/reisefuehrer/');
+  await expect(page.locator('#reisefuehrer-map.leaflet-container')).toBeVisible();
+  await expect(page.locator('[data-map-load="reisefuehrer-map"]')).toHaveCount(0);
+  await page.locator('.exp-card').first().click({ position: { x: 12, y: 12 } });
+  await expect(page.locator('.leaflet-popup-content .mp-title')).toContainText('Familienlagune Perlebucht');
+});
+
 test.describe('Consent Mode und Conversion-Events', () => {
   test('vor Einwilligung lädt kein Google-Tag; Ablehnung bleibt widerrufbar', async ({ page }) => {
     const googleRequests: string[] = [];

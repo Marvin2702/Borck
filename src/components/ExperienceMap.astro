@@ -1,5 +1,10 @@
 ---
 import Icon from './Icon.astro';
+// CSS gehört in Astros seitenbezogenen Stylesheet-Chunk. Dynamische CSS-
+// Imports werden vom statischen Preview-Server nicht zuverlässig emittiert;
+// die deutlich größeren JS-Bibliotheken bleiben dagegen lazy geladen.
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
 // Wiederverwendbare interaktive Leaflet/OpenStreetMap-Karte (kein API-Key).
 // Reiseführer: Erlebnis-Ziele mit Buchungslinks. Lage: Orientierungspunkte.
 import { haversineKm, formatKm } from '../data/experiences';
@@ -34,13 +39,14 @@ const hint: Record<Lang, string> = {
   da: 'Tryk på en markør for info, afstand og booking.',
 };
 const clusterLabel: Record<Lang, string> = { de: 'Ziele hier', en: 'places here', nl: 'plekken hier', da: 'steder her' };
-const loadLabel: Record<Lang, string> = { de: 'Interaktive Karte laden', en: 'Load interactive map', nl: 'Interactieve kaart laden', da: 'Indlæs interaktivt kort' };
+const loadLabel: Record<Lang, string> = { de: 'Karte wird vorbereitet …', en: 'Preparing map …', nl: 'Kaart wordt voorbereid …', da: 'Kortet klargøres …' };
 const privacyLabel: Record<Lang, string> = {
-  de: 'Lädt Kartenkacheln von OpenStreetMap erst nach deinem Klick.',
-  en: 'Loads map tiles from OpenStreetMap only after your click.',
-  nl: 'Laadt kaarttegels van OpenStreetMap pas na je klik.',
-  da: 'Indlæser først kortfelter fra OpenStreetMap efter dit klik.',
+  de: 'OpenStreetMap wird nur auf dieser Kartenseite und erst kurz vor der Anzeige verbunden.',
+  en: 'OpenStreetMap connects only on this map page and shortly before the map is shown.',
+  nl: 'OpenStreetMap maakt alleen op deze kaartpagina en kort voor de weergave verbinding.',
+  da: 'OpenStreetMap forbindes kun på denne kortside og kort før visningen.',
 };
+const retryLabel: Record<Lang, string> = { de: 'Karte erneut laden', en: 'Retry map', nl: 'Kaart opnieuw laden', da: 'Indlæs kortet igen' };
 const mapAria: Record<Lang, string> = {
   de: `Karte mit Zielen rund um ${home.name}`,
   en: `Map with destinations around ${home.name}`,
@@ -65,7 +71,7 @@ const payload = {
 <p class="exp-hint text-center">{hint[lang]}</p>
 <div class="exp-map-shell">
   <div id={mapId} class="exp-map" role="region" tabindex="-1" aria-label={mapAria[lang]}></div>
-  <button type="button" class="map-loader" data-map-load={mapId}>
+  <button type="button" class="map-loader" data-map-load={mapId} data-map-retry={retryLabel[lang]}>
     <span class="map-loader-icon" aria-hidden="true">⌖</span>
     <strong>{loadLabel[lang]}</strong>
     <span>{privacyLabel[lang]}</span>
@@ -101,12 +107,18 @@ const payload = {
     background: var(--c-aqua-100); z-index: 0;
   }
   .exp-map-shell { position: relative; }
-  .map-loader { position: absolute; inset: 0; z-index: 2; width: 100%; display: grid; place-content: center; justify-items: center; gap: .45rem; padding: 2rem; border: 1px solid var(--line); border-radius: var(--radius-lg); color: var(--brand-strong); background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.9), rgba(226,242,245,.96)), var(--c-aqua-100); cursor: pointer; text-align: center; }
+  .map-loader { position: absolute; inset: 0; z-index: 2; width: 100%; display: grid; place-content: center; justify-items: center; gap: .45rem; padding: 2rem; border: 1px solid var(--line); border-radius: var(--radius-lg); color: var(--brand-strong); background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.9), rgba(226,242,245,.96)), var(--c-aqua-100); cursor: pointer; text-align: center; transition: opacity .2s ease; }
   .map-loader:hover { background: var(--c-aqua-100); }
   .map-loader:focus-visible { outline: 4px solid var(--c-aqua-300); outline-offset: 3px; }
   .map-loader-icon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; color: #fff; background: var(--brand); font-size: 1.7rem; box-shadow: var(--shadow-sm); }
+  .map-loader.is-loading { cursor: progress; }
+  .map-loader.is-loading .map-loader-icon { animation: map-pulse 1.2s ease-in-out infinite alternate; }
+  .map-loader.is-ready { opacity: 0; pointer-events: none; }
+  .map-loader.is-error { cursor: pointer; }
   .map-loader strong { font-family: var(--font-head); font-size: 1.25rem; }
   .map-loader span:last-child { max-width: 46ch; color: var(--text-muted); font-size: .84rem; }
+  @keyframes map-pulse { to { transform: scale(1.08); opacity: .78; } }
+  @media (prefers-reduced-motion: reduce) { .map-loader.is-loading .map-loader-icon { animation: none; } }
   @media (max-width: 600px) { .exp-map { height: 380px; } }
 
   .exp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.4rem; }
@@ -159,12 +171,23 @@ const payload = {
     let leafletPromise: Promise<any> | null = null;
     const loadLeaflet = () => {
       if (!leafletPromise) {
-        leafletPromise = Promise.all([
-          import('leaflet'),
-          import('leaflet/dist/leaflet.css'),
-          import('leaflet.markercluster'),
-          import('leaflet.markercluster/dist/MarkerCluster.css'),
-        ]).then(([leaflet]) => leaflet.default);
+        leafletPromise = import('leaflet')
+          .then(async (leafletModule) => {
+            const leaflet = leafletModule.default;
+            if (data.cluster) {
+              // markercluster ist ein älteres UMD-Plugin und erwartet Leaflet
+              // als globales `L`. Erst Core bereitstellen, dann den optionalen
+              // Chunk laden — parallel würde die Plugin-Auswertung sporadisch
+              // mit „L is not defined“ abbrechen.
+              (globalThis as any).L = leaflet;
+              await import('leaflet.markercluster');
+            }
+            return leaflet;
+          })
+          .catch((error) => {
+            leafletPromise = null;
+            throw error;
+          });
       }
       return leafletPromise;
     };
@@ -188,20 +211,40 @@ const payload = {
       `<div class="mp"><strong class="mp-title">🏡 ${esc(h.name)}</strong>` +
       (h.address ? `<p class="mp-text">${esc(h.address)}</p>` : '') + `</div>`;
 
-    let inited = false;
+    const loadButton = document.querySelector<HTMLButtonElement>(`[data-map-load="${id}"]`);
+    const loaderTitle = loadButton?.querySelector('strong');
+    let initPromise: Promise<void> | null = null;
     let mapRef: any = null;
     const markerByIdx: any[] = [];
-    const init = async () => {
-      if (inited) return;
-      inited = true;
+    let readyTimer = 0;
+    const markReady = () => {
+      window.clearTimeout(readyTimer);
+      loadButton?.classList.remove('is-loading', 'is-error');
+      loadButton?.classList.add('is-ready');
+      window.setTimeout(() => loadButton?.remove(), 220);
+    };
+    const init = () => {
+      if (initPromise) return initPromise;
+      loadButton?.classList.remove('is-error');
+      loadButton?.classList.add('is-loading');
+      if (loadButton) loadButton.disabled = true;
+
+      initPromise = (async () => {
       L = await loadLeaflet();
       const map = L.map(mapEl as HTMLElement, { scrollWheelZoom: false }).setView(data.home.coords, 12);
       mapRef = map;
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        detectRetina: true,
+        // Keine vierfache HiDPI-Kachellast; Nachladen erst nach beendeter
+        // Bewegung und nur mit kleinem Puffer hält Netz- und CPU-Kosten niedrig.
+        detectRetina: false,
+        updateWhenIdle: true,
+        keepBuffer: 1,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
-      }).addTo(map);
+      });
+      readyTimer = window.setTimeout(markReady, 2500);
+      tiles.once('load', markReady);
+      tiles.addTo(map);
       const bounds: [number, number][] = [data.home.coords];
       L.marker(data.home.coords, { icon: pin('🏡', 'mp-pin--home', 40), title: data.home.name, riseOnHover: true })
         .addTo(map).bindPopup(homePopup(data.home), { maxWidth: 280 });
@@ -260,16 +303,54 @@ const payload = {
       }
 
       map.fitBounds(bounds, { padding: [40, 40] });
+      })().catch((error) => {
+        initPromise = null;
+        window.clearTimeout(readyTimer);
+        loadButton?.classList.remove('is-loading');
+        loadButton?.classList.add('is-error');
+        if (loadButton) loadButton.disabled = false;
+        if (loaderTitle) loaderTitle.textContent = loadButton?.dataset.mapRetry || 'Karte erneut laden';
+        console.error('Interaktive Karte konnte nicht geladen werden.', error);
+        throw error;
+      });
+      return initPromise;
     };
 
-    const loadButton = document.querySelector<HTMLButtonElement>(`[data-map-load="${id}"]`);
     loadButton?.addEventListener('click', async () => {
-      loadButton.disabled = true;
-      await init();
-      loadButton.remove();
-      mapEl.setAttribute('role', 'application');
-      mapEl.focus({ preventScroll: true });
+      try {
+        await init();
+        // Nur eine echte Nutzerinteraktion darf den Tastaturfokus verschieben.
+        mapEl.focus({ preventScroll: true });
+      } catch { /* Der Loader zeigt die Wiederholen-Option. */ }
     });
+
+    const runInit = () => { void init().catch(() => {}); };
+    const scheduleInit = (alreadyVisible: boolean) => {
+      if (alreadyVisible) {
+        // IntersectionObserver läuft erst nach der ersten Render-Gelegenheit:
+        // sichtbare Karten starten sofort, ohne den initialen Paint zu blockieren.
+        runInit();
+        return;
+      }
+      const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, options?: { timeout: number }) => void);
+      if (ric) ric(runInit, { timeout: 700 });
+      else window.setTimeout(runInit, 50);
+    };
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        const entry = entries.find((candidate) => candidate.isIntersecting);
+        if (!entry) return;
+        observer.disconnect();
+        const alreadyVisible = entry.boundingClientRect.top < window.innerHeight && entry.boundingClientRect.bottom > 0;
+        scheduleInit(alreadyVisible);
+      }, { rootMargin: '1000px 0px' });
+      observer.observe(mapEl);
+    } else {
+      // Sehr alte Browser ohne Observer starten weiterhin außerhalb des
+      // kritischen Renderpfads über requestIdleCallback/setTimeout.
+      scheduleInit(false);
+    }
 
     // Karte auf einen Punkt zoomen und dessen Popup öffnen. Popup eigenständig
     // (nicht über den Marker): funktioniert auch, wenn der Marker im Cluster
@@ -301,7 +382,6 @@ const payload = {
     // der Gast muss den Marker nicht selbst suchen.
     const focusPoint = async (idx: number) => {
       await init();
-      loadButton?.remove();
       const mk = markerByIdx[idx];
       if (!mapRef || !mk) return;
       mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });

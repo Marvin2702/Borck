@@ -13,6 +13,8 @@ module.exports = {
         'http://localhost/',
         'http://localhost/apartments/saphir/',
         'http://localhost/kontakt/',
+        'http://localhost/lage/',
+        'http://localhost/reisefuehrer/',
       ],
       numberOfRuns: 3,
       ...(chromePath ? { chromePath } : {}),

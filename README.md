@@ -145,7 +145,7 @@ App-Fahrplan steht in [docs/app-golive.md](docs/app-golive.md).
 | `npm run build:with-app` | Website + noindex-Web-App samt App-Audit, Typecheck, Jest und Integrationsaudit |
 | `npm run audit:build` | Website-Anteil: Produktions-/Staging-SEO, JSON-LD, lokale Ziele, Redirects und Asset-Budgets (überspringt `dist/gast-app/`) |
 | `npm run audit:guest-app` | Web-App-noindex, Basis-Pfade und statisch exportierte App-Routen |
-| `npm run audit:lighthouse` | drei mobile Lighthouse-Läufe je Startseite, Apartmentdetail und Kontakt |
+| `npm run audit:lighthouse` | je drei mobile Lighthouse-Läufe für Startseite, Apartmentdetail, Kontakt und beide Kartenseiten |
 | `npm run test:e2e` | Consent, Events, Formular→Danke, Buchungswege, mobile Navigation und Screenshot-Suite |
 | `npm run audit:links` | externe Links mit Timeout, Retries und begrenzter Parallelität |
 | `quality.yml` | Produktions-Build plus Lighthouse bei Push und Pull Request |
