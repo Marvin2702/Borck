@@ -18,4 +18,5 @@ export const badgeDefs: BadgeDef[] = [
   { id: 'schietwetter-held', icon: '🌧️', title: 'Schietwetter-Held', hint: 'Bei echtem Schietwetter losgezogen' },
   { id: 'landratte', icon: '🗺️', title: 'Entdecker-Landratte', hint: 'Ein Ausflug weiter als 10 km' },
   { id: 'buesum-profi', icon: '⭐', title: 'Büsum-Profi', hint: 'Fünf Erlebnisse abgehakt' },
+  { id: 'iris-best', icon: '💛', title: "Iris' Best", hint: 'Drei Lieblings-Tipps der Gastgeberin erlebt' },
 ];

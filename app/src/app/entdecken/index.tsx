@@ -36,15 +36,24 @@ export default function EntdeckenIntro() {
       </Muted>
 
       {resumable && (
-        <Pressable onPress={() => router.push('/entdecken/swipe')}>
-          <Card style={styles.resume}>
+        <Card style={styles.resume}>
+          <Pressable onPress={() => router.push('/entdecken/swipe')}>
             <Text style={styles.resumeTitle}>▶︎ Angefangene Runde fortsetzen</Text>
             <Muted>
               {resumable.mode === 'duo' ? 'Zu zweit' : 'Solo'} · gestartet{' '}
               {new Date(resumable.startedAt).toLocaleDateString('de-DE')}
             </Muted>
-          </Card>
-        </Pressable>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              saveSession(null);
+              setResumable(null);
+            }}
+            style={styles.discard}
+          >
+            <Text style={styles.discardLabel}>✕ Verwerfen & unten neu starten</Text>
+          </Pressable>
+        </Card>
       )}
 
       <SectionTitle>Wie swipt ihr?</SectionTitle>
@@ -78,6 +87,8 @@ const styles = StyleSheet.create({
   title: { fontFamily: fonts.head, fontSize: 28, color: colors.aqua900 },
   resume: { backgroundColor: colors.aqua100 },
   resumeTitle: { fontWeight: '700', color: colors.aqua900, fontSize: 16 },
+  discard: { paddingTop: spacing.sm, minHeight: 36, justifyContent: 'center' },
+  discardLabel: { color: '#a64b50', fontWeight: '600', fontSize: 13.5 },
   duo: { borderColor: colors.gold, borderWidth: 1.5, borderRadius: radius.lg },
   modeIcon: { fontSize: 30 },
   modeTitle: { fontFamily: fonts.head, fontSize: 20, color: colors.aqua900, marginTop: spacing.xs },

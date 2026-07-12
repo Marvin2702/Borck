@@ -5,15 +5,18 @@
 // =========================================================================
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext } from 'react';
+import type { Stay } from './stays';
 
 const KEYS = {
   apartment: 'gast.apartment',
+  arrival: 'gast.arrival', // ISO YYYY-MM-DD (laufender Aufenthalt)
   departure: 'gast.departure', // ISO YYYY-MM-DD
   reminder: 'gast.reminder', // '1' | ''
   checklist: 'gast.checklist', // JSON: number[] (abgehakte Indizes)
   plan: 'gast.plan', // JSON: PlanItem[]
   checkins: 'gast.checkins', // JSON: Record<activityId, Checkin>
   badges: 'gast.badges', // JSON: Record<badgeId, isoDate>
+  stays: 'gast.stays', // JSON: Stay[] — abgeschlossene Aufenthalte (Nächte-Bilanz)
 } as const;
 
 /** Eintrag im Urlaubsplan. `source: 'match'` = im Duo gemeinsam gewählt.
@@ -30,37 +33,42 @@ export type Checkin = { date: string; weather?: 'sonne' | 'wolken' | 'schietwett
 
 export type GuestState = {
   apartment: string | null;
+  arrival: string | null;
   departure: string | null;
   reminder: boolean;
   checklist: number[];
   plan: PlanItem[];
   checkins: Record<string, Checkin>;
   badges: Record<string, string>;
+  stays: Stay[];
 };
 
 export const emptyState: GuestState = {
   apartment: null,
+  arrival: null,
   departure: null,
   reminder: false,
   checklist: [],
   plan: [],
   checkins: {},
   badges: {},
+  stays: [],
 };
 
 export async function loadState(): Promise<GuestState> {
   try {
-    const [apartment, departure, reminder, checklist, plan, checkins, badges] = await AsyncStorage.multiGet(
-      Object.values(KEYS)
-    ).then((e) => e.map(([, v]) => v));
+    const [apartment, arrival, departure, reminder, checklist, plan, checkins, badges, stays] =
+      await AsyncStorage.multiGet(Object.values(KEYS)).then((e) => e.map(([, v]) => v));
     return {
       apartment: apartment || null,
+      arrival: arrival || null,
       departure: departure || null,
       reminder: reminder === '1',
       checklist: checklist ? (JSON.parse(checklist) as number[]) : [],
       plan: plan ? (JSON.parse(plan) as PlanItem[]) : [],
       checkins: checkins ? (JSON.parse(checkins) as Record<string, Checkin>) : {},
       badges: badges ? (JSON.parse(badges) as Record<string, string>) : {},
+      stays: stays ? (JSON.parse(stays) as Stay[]) : [],
     };
   } catch {
     return emptyState;
@@ -70,6 +78,8 @@ export async function loadState(): Promise<GuestState> {
 export const persist = {
   apartment: (slug: string | null) =>
     slug ? AsyncStorage.setItem(KEYS.apartment, slug) : AsyncStorage.removeItem(KEYS.apartment),
+  arrival: (iso: string | null) =>
+    iso ? AsyncStorage.setItem(KEYS.arrival, iso) : AsyncStorage.removeItem(KEYS.arrival),
   departure: (iso: string | null) =>
     iso ? AsyncStorage.setItem(KEYS.departure, iso) : AsyncStorage.removeItem(KEYS.departure),
   reminder: (on: boolean) => AsyncStorage.setItem(KEYS.reminder, on ? '1' : ''),
@@ -77,10 +87,12 @@ export const persist = {
   plan: (items: PlanItem[]) => AsyncStorage.setItem(KEYS.plan, JSON.stringify(items)),
   checkins: (c: Record<string, Checkin>) => AsyncStorage.setItem(KEYS.checkins, JSON.stringify(c)),
   badges: (b: Record<string, string>) => AsyncStorage.setItem(KEYS.badges, JSON.stringify(b)),
+  stays: (s: Stay[]) => AsyncStorage.setItem(KEYS.stays, JSON.stringify(s)),
 };
 
 export type GuestContextValue = GuestState & {
   setApartment: (slug: string | null) => void;
+  setArrival: (iso: string | null) => void;
   setDeparture: (iso: string | null) => void;
   setReminder: (on: boolean) => void;
   toggleChecklist: (index: number) => void;
@@ -90,12 +102,15 @@ export type GuestContextValue = GuestState & {
   /** „Waren wir!" — Check-in inkl. eingefrorener Wetterklasse; liefert neue Badges. */
   checkin: (id: string, weather?: Checkin['weather']) => void;
   setBadges: (b: Record<string, string>) => void;
+  /** Vergangenen Aufenthalt in die Nächte-Bilanz eintragen. */
+  addStay: (stay: Stay) => void;
   resetVacationData: () => void;
 };
 
 export const GuestContext = createContext<GuestContextValue>({
   ...emptyState,
   setApartment: () => {},
+  setArrival: () => {},
   setDeparture: () => {},
   setReminder: () => {},
   toggleChecklist: () => {},
@@ -103,6 +118,7 @@ export const GuestContext = createContext<GuestContextValue>({
   removeFromPlan: () => {},
   checkin: () => {},
   setBadges: () => {},
+  addStay: () => {},
   resetVacationData: () => {},
 });
 

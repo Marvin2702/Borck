@@ -11,6 +11,7 @@ import { WeatherPill } from '../components/WeatherPill';
 import { Card, Muted, Screen, SectionTitle } from '../components/ui';
 import { activityById } from '../content';
 import { badgeDefs } from '../data/badges';
+import { irisFavoriten } from '../data/guestInfo';
 import { newBadges } from '../lib/badges';
 import { getWeather, todayClass } from '../lib/weather';
 import { useGuest } from '../lib/store';
@@ -135,6 +136,7 @@ function RowContent({
           <Text style={styles.rowMeta}>
             ca. {String(a.km).replace('.', ',')} km · {a.indoor ? 'Indoor' : 'Draußen'}
             {item.source === 'match' ? ' · 💙 Gemeinsam gewählt' : ''}
+            {irisFavoriten.includes(id) ? " · 💛 Iris' Liebling" : ''}
           </Text>
         </View>
       </View>

@@ -83,6 +83,24 @@ export const gaestemappe: { icon: string; title: string; lines: string[] }[] = [
   },
 ];
 
+/**
+ * Iris' Lieblingsaktivitäten fürs Swipe-Deck („Iris' Best").
+ * Die Ids stammen aus dem Erlebnis-Katalog (assets/content.json) — der Test
+ * in __tests__/iris.test.ts prüft, dass jede Id existiert. Iris: einfach
+ * Zeilen austauschen! Diese Erlebnisse rutschen im Stapel nach vorn, tragen
+ * ein 💛-Band, und wer drei davon erlebt, verdient den „Iris' Best"-Badge.
+ */
+export const irisFavoriten: string[] = [
+  'hafen-leuchtturm',
+  'wattwanderung-schutzstation',
+  'fischbroetchen-hafen',
+  'sonnenuntergang-deich',
+  'krabbenfangfahrt',
+];
+
+/** Wie viele Lieblinge für den „Iris' Best"-Badge erlebt sein müssen. */
+export const IRIS_BADGE_TARGET = 3;
+
 /** Iris' persönliche Tipps — bitte durch echte Empfehlungen ersetzen. */
 export const irisTipps: { title: string; text: string }[] = [
   { title: 'TODO: Lieblings-Fischbrötchen', text: 'TODO: Wo gibt es für euch die besten Fischbrötchen am Hafen?' },

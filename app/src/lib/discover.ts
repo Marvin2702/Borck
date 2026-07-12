@@ -81,22 +81,26 @@ function seededShuffle<T>(arr: T[], seed: number): T[] {
 
 /**
  * Deck-Reihenfolge: +2 je gelikter Mood, +1 Wetter-Bonus (Regen→indoor,
- * Sonne→outdoor). Innerhalb gleicher Punktzahl seeded-geshuffelt — alle
- * Karten bleiben im Stapel, genopte Moods rutschen nur nach hinten.
+ * Sonne→outdoor), +2 für Iris' Lieblinge (boostIds) — auf die Gastgeberin
+ * hört man. Innerhalb gleicher Punktzahl seeded-geshuffelt — alle Karten
+ * bleiben im Stapel, genopte Moods rutschen nur nach hinten.
  */
 export function orderDeck(
   activities: Activity[],
   likedMoods: string[],
   weather: WeatherClass | null,
   seed: number,
-  excludeIds: string[] = []
+  excludeIds: string[] = [],
+  boostIds: readonly string[] = []
 ): Activity[] {
   const liked = new Set(likedMoods);
+  const boosted = new Set(boostIds);
   const score = (a: Activity) => {
     let s = 0;
     for (const m of a.mood) if (liked.has(m)) s += 2;
     if (weather === 'schietwetter' && a.indoor) s += 1;
     if (weather === 'sonne' && !a.indoor) s += 1;
+    if (boosted.has(a.id)) s += 2;
     return s;
   };
   const excluded = new Set(excludeIds);

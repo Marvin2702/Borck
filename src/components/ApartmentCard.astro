@@ -1,5 +1,5 @@
 ---
-import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import { priceFrom } from '../data/prices';
 import { trApt } from '../data/apartments-i18n';
 import Img from './Img.astro';
@@ -72,7 +72,7 @@ const gallery: string[] = (d.gallery?.length ? d.gallery : d.heroImage ? [d.hero
   ) : (
     <a href={href} class="apt-media">
       <span class="apt-placeholder" style={`--a:${accent}`}>
-        <span class="apt-gem" aria-hidden="true">◈</span>
+        <img src={withBase('/images/logo.png')} alt="" class="apt-logo" width="72" height="72" loading="lazy" />
       </span>
       <span class="apt-badge" style={`--a:${accent}`}>{view}</span>
       {d.dogFriendly && <span class="apt-dog" title="Hundefreundlich" aria-hidden="true"><Icon name="paw" size={15} /></span>}
@@ -150,7 +150,7 @@ const gallery: string[] = (d.gallery?.length ? d.gallery : d.heroImage ? [d.hero
     background:
       radial-gradient(120% 120% at 20% 10%, color-mix(in srgb, var(--a) 55%, white), var(--a) 70%, color-mix(in srgb, var(--a) 70%, black));
   }
-  .apt-gem { font-size: 2.6rem; color: rgba(255, 255, 255, 0.85); }
+  .apt-logo { width: 72px; height: 72px; border-radius: 999px; background: var(--c-sand-50); padding: 8px; object-fit: contain; }
   .apt-badge {
     position: absolute; left: 12px; bottom: 12px;
     background: rgba(255, 255, 255, 0.92);
@@ -184,13 +184,40 @@ const gallery: string[] = (d.gallery?.length ? d.gallery : d.heroImage ? [d.hero
   // Karten-Galerie: Pfeile blättern die Scroll-Snap-Spur, Punkte zeigen die
   // Position. Ohne JS bleiben die Pfeile hidden — natives Swipen geht trotzdem.
   const smooth = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+
+  // WebKit lädt loading="lazy"-Bilder in horizontalen Scroll-Spuren beim
+  // Blättern oft nie nach ("Karte lädt nicht bei Klick"). Deshalb: sobald die
+  // Karte selbst im Viewport steht, alle ihre Slides nachladen.
+  const eagerLoad = (media: HTMLElement) => {
+    media.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => {
+      img.loading = 'eager';
+      img.decoding = 'async';
+    });
+  };
+  const nearViewport =
+    'IntersectionObserver' in window
+      ? new IntersectionObserver(
+          (entries, obs) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue;
+              eagerLoad(e.target as HTMLElement);
+              obs.unobserve(e.target);
+            }
+          },
+          { rootMargin: '300px' }
+        )
+      : null;
+
   document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((media) => {
     const track = media.querySelector<HTMLElement>('[data-track]');
     if (!track || track.children.length < 2) return;
     media.querySelectorAll<HTMLButtonElement>('.apt-nav').forEach((b) => (b.hidden = false));
     const dots = Array.from(media.querySelectorAll<HTMLElement>('.apt-dot'));
+    if (nearViewport) nearViewport.observe(media);
+    else eagerLoad(media);
 
     const go = (dir: number) => {
+      eagerLoad(media); // Gürtel + Hosenträger: spätestens beim ersten Klick laden
       const max = track.scrollWidth - track.clientWidth;
       let left = Math.round(track.scrollLeft + dir * track.clientWidth);
       if (left > max + 4) left = 0; // am Ende wieder von vorn …

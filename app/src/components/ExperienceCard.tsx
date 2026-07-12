@@ -49,7 +49,15 @@ function CardShell({
   );
 }
 
-export function ActivityCard({ activity, ribbon }: { activity: Activity; ribbon?: string }) {
+export function ActivityCard({
+  activity,
+  ribbon,
+  ribbonTone = 'aqua',
+}: {
+  activity: Activity;
+  ribbon?: string;
+  ribbonTone?: 'aqua' | 'gold';
+}) {
   const art = activityArt[activity.id];
   const onArt = art != null;
   const tint = moodTint[activity.mood[0]] ?? colors.aqua100;
@@ -57,8 +65,8 @@ export function ActivityCard({ activity, ribbon }: { activity: Activity; ribbon?
   return (
     <CardShell tint={tint} icon={activity.icon} art={art}>
       {ribbon ? (
-        <View style={styles.ribbon}>
-          <Text style={styles.ribbonText}>{ribbon}</Text>
+        <View style={[styles.ribbon, ribbonTone === 'gold' && styles.ribbonGold]}>
+          <Text style={[styles.ribbonText, ribbonTone === 'gold' && styles.ribbonTextGold]}>{ribbon}</Text>
         </View>
       ) : null}
       {!onArt && (
@@ -140,6 +148,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: radius.pill,
   },
   ribbonText: { color: colors.white, fontWeight: '700', fontSize: 12 },
+  ribbonGold: { backgroundColor: colors.gold },
+  ribbonTextGold: { color: colors.ink900 },
   iconWrap: {
     width: 108,
     height: 108,

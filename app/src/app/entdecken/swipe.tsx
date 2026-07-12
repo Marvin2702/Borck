@@ -26,6 +26,7 @@ import {
   type Session,
   type SwipeAction,
 } from '../../lib/discover';
+import { irisFavoriten } from '../../data/guestInfo';
 import { getWeather, todayClass } from '../../lib/weather';
 import { useGuest, type PlanItem } from '../../lib/store';
 import { colors, fonts, radius, spacing } from '../../theme';
@@ -35,8 +36,21 @@ export default function SwipeFlow() {
   const [index, setIndex] = useState(0);
   const [weather, setWeather] = useState<ReturnType<typeof todayClass>>(null);
   const [burst, setBurst] = useState(0);
+  const [confirmRestart, setConfirmRestart] = useState(false);
   const undoRef = useRef<Session | null>(null);
   const { addToPlan, plan } = useGuest();
+
+  // Neustart: Session verwerfen, zurück zur Modus-Wahl. Zwei-Tap-Bestätigung
+  // statt Alert (Alert.alert ist auf Web ein No-op).
+  const restart = () => {
+    if (!confirmRestart) {
+      setConfirmRestart(true);
+      setTimeout(() => setConfirmRestart(false), 3500);
+      return;
+    }
+    saveSession(null);
+    router.replace('/entdecken');
+  };
 
   useEffect(() => {
     loadSession().then((s) => setSession(s ?? null));
@@ -48,7 +62,7 @@ export default function SwipeFlow() {
     if (!session) return [];
     const p = session.players[session.active]!;
     const personSeed = session.seed + (session.active === 'B' ? 7919 : 0);
-    return orderDeck(content.activities, p.moods, weather, personSeed);
+    return orderDeck(content.activities, p.moods, weather, personSeed, [], irisFavoriten);
   }, [session, weather]);
 
   const update = (s: Session, newIndex?: number) => {
@@ -183,6 +197,14 @@ export default function SwipeFlow() {
             <PrimaryButton label={`Alle ${likesTotal} Ideen übernehmen`} onPress={takeAll} />
           </>
         )}
+        <Pressable
+          onPress={() => {
+            saveSession(null);
+            router.replace('/entdecken');
+          }}
+        >
+          <Text style={styles.secondary}>🔄 Nochmal spielen</Text>
+        </Pressable>
       </FullScreen>
     );
   }
@@ -212,6 +234,14 @@ export default function SwipeFlow() {
           <>
             <Muted>Euer Büsum-Plan steht — wetterschlau sortiert findet ihr ihn im Urlaubsplan.</Muted>
             <PrimaryButton label="Zum Urlaubsplan" onPress={take} />
+            <Pressable
+              onPress={() => {
+                saveSession(null);
+                router.replace('/entdecken');
+              }}
+            >
+              <Text style={styles.secondary}>🔄 Nochmal spielen (ohne Übernehmen)</Text>
+            </Pressable>
           </>
         ) : (
           <>
@@ -239,7 +269,18 @@ export default function SwipeFlow() {
       <Stack.Screen options={{ title: 'Entdecken', headerBackVisible: session.mode !== 'duo' }} />
       <View style={styles.head}>
         <Text style={styles.headText}>{header}</Text>
-        <Text style={styles.progress}>{progress}</Text>
+        <View style={styles.headRight}>
+          <Pressable
+            accessibilityLabel="Runde neu starten"
+            onPress={restart}
+            style={({ pressed }) => [styles.restart, confirmRestart && styles.restartConfirm, pressed && { opacity: 0.8 }]}
+          >
+            <Text style={[styles.restartLabel, confirmRestart && styles.restartLabelConfirm]}>
+              {confirmRestart ? 'Wirklich neu?' : '↻ Neu'}
+            </Text>
+          </Pressable>
+          <Text style={styles.progress}>{progress}</Text>
+        </View>
       </View>
       {isMood && <Muted>Kurze Aufwärmrunde: Was klingt nach eurem Urlaub? (Nichts wird aussortiert.)</Muted>}
       {!finishedStack && (
@@ -250,20 +291,20 @@ export default function SwipeFlow() {
           superLeft={!isMood ? SUPERLIKE_LIMIT - superlikesUsed(p) : undefined}
           canUndo={index > 0 && undoRef.current !== null}
           onUndo={undo}
-          renderCard={(item) =>
-            isMood ? (
-              <MoodCard mood={item as unknown as Mood} />
-            ) : (
+          renderCard={(item) => {
+            if (isMood) return <MoodCard mood={item as unknown as Mood} />;
+            const a = item as unknown as Activity;
+            // Schietwetter-Tipp hat Vorrang (situativ) — sonst Iris' Liebling.
+            const schiet = weather === 'schietwetter' && a.indoor;
+            const iris = irisFavoriten.includes(a.id);
+            return (
               <ActivityCard
-                activity={item as unknown as Activity}
-                ribbon={
-                  weather === 'schietwetter' && (item as unknown as Activity).indoor
-                    ? 'Schietwetter-Tipp'
-                    : undefined
-                }
+                activity={a}
+                ribbon={schiet ? 'Schietwetter-Tipp' : iris ? "💛 Iris' Liebling" : undefined}
+                ribbonTone={schiet ? 'aqua' : 'gold'}
               />
-            )
-          }
+            );
+          }}
           onSwipe={(item, action) => onSwipe(item, action)}
         />
       )}
@@ -291,8 +332,20 @@ function PrimaryButton({ label, onPress }: { label: string; onPress: () => void 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.sand50, padding: spacing.md, gap: spacing.sm },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  headRight: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   headText: { fontFamily: fonts.head, fontSize: 20, color: colors.aqua900 },
   progress: { fontWeight: '700', color: colors.ink500, fontVariant: ['tabular-nums'] },
+  restart: {
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.line,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    backgroundColor: colors.white,
+  },
+  restartConfirm: { backgroundColor: '#a64b50', borderColor: '#a64b50' },
+  restartLabel: { fontSize: 13, fontWeight: '700', color: colors.ink700 },
+  restartLabelConfirm: { color: colors.white },
   full: {
     flex: 1,
     backgroundColor: colors.sand50,

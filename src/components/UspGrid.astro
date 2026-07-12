@@ -1,13 +1,15 @@
 ---
-import { useTranslations, type Lang } from '../i18n/utils';
+import { useTranslations, withBase, type Lang } from '../i18n/utils';
 import Icon from './Icon.astro';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
+// „Persönlich geführt" trägt das traditionelle Logo (Wiedererkennung),
+// die übrigen USPs bleiben beim ruhigen Strich-Icon-Set.
 const items = [
   { icon: 'check', title: t('usp.direct.title'), text: t('usp.direct.text') },
-  { icon: 'gem', title: t('usp.host.title'), text: t('usp.host.text') },
+  { icon: 'logo', title: t('usp.host.title'), text: t('usp.host.text') },
   { icon: 'wave', title: t('usp.location.title'), text: t('usp.location.text') },
   { icon: 'paw', title: t('usp.pets.title'), text: t('usp.pets.text') },
 ] as const;
@@ -17,7 +19,13 @@ const items = [
     <div class="usp-grid">
       {items.map((i) => (
         <div class="usp">
-          <span class="usp-icon" aria-hidden="true"><Icon name={i.icon} size={22} /></span>
+          <span class="usp-icon" aria-hidden="true">
+            {i.icon === 'logo' ? (
+              <img src={withBase('/images/logo.png')} alt="" class="usp-logo" width="30" height="30" loading="lazy" />
+            ) : (
+              <Icon name={i.icon} size={22} />
+            )}
+          </span>
           <h2 class="usp-title">{i.title}</h2>
           <p class="usp-text">{i.text}</p>
         </div>

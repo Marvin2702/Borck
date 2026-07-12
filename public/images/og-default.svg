@@ -10,7 +10,7 @@
   <rect width="1200" height="630" fill="url(#g)"/>
   <path d="M0,470 C300,540 600,420 900,470 C1050,495 1150,540 1200,510 L1200,630 L0,630 Z" fill="#155e6e"/>
   <path d="M0,510 C300,560 600,470 900,500 C1050,515 1150,560 1200,540 L1200,630 L0,630 Z" fill="#0d3b44"/>
-  <text x="90" y="250" font-family="Georgia, serif" font-size="40" fill="#155e6e" letter-spacing="6">◈ HAUS AQUAMARIN · BÜSUM</text>
+  <text x="90" y="250" font-family="Georgia, serif" font-size="40" fill="#155e6e" letter-spacing="6">HAUS AQUAMARIN · BÜSUM</text>
   <text x="90" y="340" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#0d3b44">Sieben Edelsteine</text>
   <text x="90" y="420" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#0d3b44">an der Nordsee</text>
 </svg>

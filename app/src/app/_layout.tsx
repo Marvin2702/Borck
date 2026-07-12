@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { evaluateBadges } from '../lib/badges';
 import { saveSession } from '../lib/discover';
+import { nights, type Stay } from '../lib/stays';
 import { colors, fonts } from '../theme';
 import {
   emptyState,
@@ -36,6 +37,10 @@ export default function RootLayout() {
   const setApartment = useCallback((slug: string | null) => {
     setState((s) => ({ ...s, apartment: slug }));
     persist.apartment(slug);
+  }, []);
+  const setArrival = useCallback((iso: string | null) => {
+    setState((s) => ({ ...s, arrival: iso }));
+    persist.arrival(iso);
   }, []);
   const setDeparture = useCallback((iso: string | null) => {
     setState((s) => ({ ...s, departure: iso }));
@@ -101,14 +106,35 @@ export default function RootLayout() {
     });
   }, []);
 
+  const addStay = useCallback((stay: Stay) => {
+    setState((s) => {
+      if (nights(stay.from, stay.to) <= 0) return s;
+      // idempotent: gleicher Zeitraum wird nicht doppelt gezählt
+      if (s.stays.some((x) => x.from === stay.from && x.to === stay.to)) return s;
+      const stays = [...s.stays, stay].sort((a, b) => a.from.localeCompare(b.from));
+      persist.stays(stays);
+      return { ...s, stays };
+    });
+  }, []);
+
   const resetVacationData = useCallback(() => {
     setState((s) => {
+      // Laufenden Aufenthalt in die Nächte-Bilanz übernehmen, dann aufräumen.
+      // Badges und Bilanz bleiben — das sind die Meilensteine über Jahre.
+      let stays = s.stays;
+      if (s.arrival && s.departure && nights(s.arrival, s.departure) > 0) {
+        if (!stays.some((x) => x.from === s.arrival && x.to === s.departure)) {
+          stays = [...stays, { from: s.arrival, to: s.departure }].sort((a, b) => a.from.localeCompare(b.from));
+          persist.stays(stays);
+        }
+      }
       persist.plan([]);
       persist.checkins({});
-      persist.badges({});
       persist.checklist([]);
+      persist.arrival(null);
+      persist.departure(null);
       saveSession(null);
-      return { ...s, plan: [], checkins: {}, badges: {}, checklist: [] };
+      return { ...s, stays, plan: [], checkins: {}, checklist: [], arrival: null, departure: null };
     });
   }, []);
 
@@ -116,6 +142,7 @@ export default function RootLayout() {
     () => ({
       ...state,
       setApartment,
+      setArrival,
       setDeparture,
       setReminder,
       toggleChecklist,
@@ -123,9 +150,10 @@ export default function RootLayout() {
       removeFromPlan,
       checkin,
       setBadges,
+      addStay,
       resetVacationData,
     }),
-    [state, setApartment, setDeparture, setReminder, toggleChecklist, addToPlan, removeFromPlan, checkin, setBadges, resetVacationData]
+    [state, setApartment, setArrival, setDeparture, setReminder, toggleChecklist, addToPlan, removeFromPlan, checkin, setBadges, addStay, resetVacationData]
   );
 
   // Splash bleibt, bis Font + Zustand da sind (beides lokal, <100 ms).
@@ -160,6 +188,7 @@ export default function RootLayout() {
         <Stack.Screen name="entdecken/swipe" options={{ title: 'Entdecken' }} />
         <Stack.Screen name="plan" options={{ title: 'Euer Urlaubsplan' }} />
         <Stack.Screen name="album" options={{ title: 'Sammelalbum' }} />
+        <Stack.Screen name="meilensteine" options={{ title: 'Eure Meilensteine' }} />
         <Stack.Screen name="service" options={{ title: 'Service & Wünsche' }} />
       </Stack>
       </GuestContext.Provider>

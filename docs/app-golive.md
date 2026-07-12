@@ -73,7 +73,52 @@ Kein neues `eas init` ausführen und die ID nicht ersetzen, solange das
 vorhandene Projekt korrekt ist. Ein Wechsel würde Builds und Credentials von
 der bestehenden Projekthistorie trennen.
 
-## 4. Datenschutz- und Anbieter-Gate 👤
+## 4. Android-Preview ohne Terminal — Klick für Klick 👤
+
+Für die erste installierbare Android-Test-APK reicht der Browser (Dauer:
+~15 Minuten plus ~20 Minuten Build-Wartezeit). Der Android-Keystore wird beim
+allerersten Build automatisch in der Expo-Cloud erzeugt und dort verwaltet;
+wer Credentials lieber unter persönlicher Kontrolle einrichtet, nimmt den
+lokalen Weg in Abschnitt 6 — beide führen zum selben Ergebnis.
+
+**Teil A — Expo-Token erzeugen (expo.dev):**
+1. https://expo.dev öffnen und einloggen.
+2. Oben rechts auf euren **Avatar → Account settings** klicken.
+3. Links im Menü **Access tokens** wählen.
+4. **Create token** klicken, Name z. B. `github-actions`, **Create** bestätigen.
+5. Den angezeigten Token **sofort kopieren** (er wird nur einmal angezeigt) und
+   nirgendwo committen; bei Verdacht auf Leck sofort widerrufen.
+
+**Teil B — Token bei GitHub hinterlegen (github.com):**
+1. https://github.com/Marvin2702/Borck öffnen.
+2. **Settings** (Reiter oben im Repo) klicken.
+3. Links: **Secrets and variables → Actions**.
+4. **New repository secret** klicken.
+5. Name: `EXPO_TOKEN` (exakt so) · Secret: den kopierten Token einfügen → **Add secret**.
+
+**Teil C — Build starten (github.com):**
+1. Im Repo auf den Reiter **Actions** klicken.
+2. Links in der Workflow-Liste **„App Build (EAS)"** wählen.
+3. Rechts den grauen Knopf **„Run workflow"** klicken.
+4. Im Dropdown: Plattform `android`, Profil `preview` (Voreinstellung passt) → grüner **„Run workflow"**-Knopf.
+5. ~15–25 Minuten warten (Seite neu laden; der Lauf wird grün ✓).
+
+**Teil D — APK aufs Handy:**
+1. Im fertigen (grünen) Lauf den Job **build** öffnen → im Log des Schritts
+   **„EAS Build"** steht am Ende ein Link `https://expo.dev/accounts/…/builds/…`.
+   (Alternativ: auf expo.dev → euer Projekt **haus-aquamarin-gast → Builds**.)
+2. Diesen Build-Link am **Android-Handy** öffnen (z. B. per WhatsApp an euch
+   selbst schicken) → **Install** tippen.
+3. Android fragt nach Erlaubnis für „Apps aus unbekannter Quelle" → einmalig
+   für den Browser erlauben → installieren → fertig: Das Häuschen-Logo liegt
+   auf dem Homescreen. 🎉
+4. Denselben Link könnt ihr an weitere Android-Testgeräte schicken — für den
+   ersten Praxistest völlig ausreichend, ganz ohne Play Store.
+
+iOS-Builds und Production-Releases laufen dagegen über den kontrollierten
+Weg in Abschnitt 6 (Apple-Login und Zertifikate interaktiv).
+
+## 5. Datenschutz- und Anbieter-Gate 👤
 
 Der Abschnitt zur App in `src/data/legal.ts` ist ein prüfpflichtiger technischer
 Entwurf, keine Rechtsberatung oder Vollständigkeitsgarantie. Vor irgendeiner
@@ -81,9 +126,9 @@ Entwurf, keine Rechtsberatung oder Vollständigkeitsgarantie. Vor irgendeiner
 tatsächlichen produktiven Build abnehmen. Der aktuelle technische Stand sieht
 vor:
 
-- lokale Speicherung von Wohnungswahl, Abreisedatum, Erinnerungsentscheidung,
-  Checkliste, Urlaubsplan, Erlebnis-Check-ins/Abzeichen, laufender Auswahlrunde
-  und optionalem Wettercache;
+- lokale Speicherung von Wohnungswahl, An-/Abreisedaten, Aufenthalts-Bilanz,
+  Erinnerungsentscheidung, Checkliste, Urlaubsplan, Erlebnis-Check-ins/
+  Abzeichen, laufender Auswahlrunde und optionalem Wettercache;
 - eine nur nach aktivem Opt-in und Geräteberechtigung lokal geplante einmalige
   Abreise-Benachrichtigung um 08:30 Uhr; kein eigener Push-Server;
 - kein Gastkonto und kein eigenes App-Tracking;
@@ -103,12 +148,12 @@ Store-Datenschutzangaben werden aus diesen tatsächlichen Datenflüssen
 abgeleitet. Nicht pauschal „keine Datenerhebung“ auswählen, nur weil die App
 kein Konto und kein eigenes Tracking besitzt.
 
-## 5. Ersten EAS-Build interaktiv lokal starten
+## 6. Ersten EAS-Build interaktiv lokal starten
 
-Der erste Build jeder Plattform wird aus einem lokalen, interaktiven Terminal
-gestartet. `eas build` baut zwar in der Expo-Cloud, aber Login,
-Projektzuordnung und Signing-Credentials werden dabei unter persönlicher
-Kontrolle eingerichtet — nicht erstmals in GitHub Actions.
+Der erste iOS-Build (und wahlweise auch der Android-Build) wird aus einem
+lokalen, interaktiven Terminal gestartet. `eas build` baut zwar in der
+Expo-Cloud, aber Login, Projektzuordnung und Signing-Credentials werden dabei
+unter persönlicher Kontrolle eingerichtet.
 
 ```bash
 cd app
@@ -134,7 +179,7 @@ manuelle Workflow „App Build (EAS)“ nicht-interaktive Preview-/Production-
 Builds ausführen. Tokens nie in `.env.example`, Logs, Issues oder committed
 Dateien kopieren und bei Verdacht sofort widerrufen.
 
-## 6. Optionale Web-Vorschau integrieren
+## 7. Optionale Web-Vorschau integrieren
 
 Die Produktionswebsite bleibt zunächst beim Standardbefehl:
 
@@ -167,7 +212,7 @@ Diese Maßnahmen reduzieren Suchmaschinenindexierung, machen die URLs aber
 nicht privat. Keine Codes, Secrets oder personenbezogenen Inhalte in die
 Web-Vorschau aufnehmen.
 
-## 7. Store-Release 👤
+## 8. Store-Release 👤
 
 1. `npm run typecheck` und `STRICT_TODOS=1 npm test` in `app/` müssen grün sein.
 2. Native Preview-Builds auf echten Zielgeräten abnehmen.
@@ -181,7 +226,7 @@ Web-Vorschau aufnehmen.
    Ferienwohnungen, ohne Login; Check-in- und Hausinfos, lokale Ausflugsideen,
    Gezeiten-/Notfalllinks und Abreise-Checkliste.
 
-## 8. Produktionsprüfung und QR-Codes 👤
+## 9. Produktionsprüfung und QR-Codes 👤
 
 QR-Codes erst drucken oder in den Wohnungen aushängen, wenn je Wohnung alles
 Folgende geprüft ist:

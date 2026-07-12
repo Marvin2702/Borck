@@ -45,7 +45,11 @@ export default function Einstellungen() {
 
       <SectionTitle>Urlaubsdaten</SectionTitle>
       <Card>
-        <Muted>Löscht Urlaubsplan, Stempel und angefangene Swipe-Runden (z. B. für den nächsten Aufenthalt).</Muted>
+        <Muted>
+          Räumt für den nächsten Aufenthalt auf: Urlaubsplan, Check-ins und angefangene Swipe-Runden werden
+          geleert. Eure Badges und die Nächte-Bilanz (Meilensteine) bleiben erhalten — der aktuelle Aufenthalt
+          wird dabei in die Bilanz übernommen.
+        </Muted>
         <Pressable onPress={resetVacationData} style={({ pressed }) => [styles.btn, styles.btnDanger, pressed && { opacity: 0.85 }]}>
           <Text style={styles.btnLabel}>Urlaubsdaten zurücksetzen</Text>
         </Pressable>

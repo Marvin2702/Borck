@@ -21,6 +21,7 @@ const tiles = [
   { href: '/heute', icon: '📘', label: 'Reisetipps zum Lesen' },
   { href: '/gezeiten', icon: '🌙', label: 'Ebbe & Flut' },
   { href: '/album', icon: '🎖️', label: 'Sammelalbum' },
+  { href: '/meilensteine', icon: '🏆', label: 'Eure Meilensteine' },
   { href: '/notfall', icon: '⛑️', label: 'Notfall & Praktisches' },
   { href: '/abreise', icon: '👋', label: 'Abreise' },
   { href: '/einstellungen', icon: '⚙️', label: 'Einstellungen' },
@@ -68,12 +69,15 @@ export default function ApartmentHome() {
 
       <WeatherPill />
 
-      {/* Das Herzstück: der Aktivitäten-Swiper */}
+      {/* Das Herzstück: der Aktivitäten-Swiper — mit dem traditionellen Logo
+          statt Emoji (🃏 rendert je nach Gerät als „komische" Spielkarte) */}
       <Pressable
         onPress={() => router.push(plan.length > 0 ? '/plan' : '/entdecken')}
         style={({ pressed }) => [styles.discover, pressed && styles.pressed]}
       >
-        <Text style={styles.discoverIcon}>🃏</Text>
+        <View style={styles.discoverLogoWrap}>
+          <Image source={require('../../../assets/images/logo.png')} style={styles.discoverLogo} contentFit="contain" />
+        </View>
         <View style={styles.discoverText}>
           <Text style={styles.discoverTitle}>Was machen wir heute?</Text>
           <Text style={styles.discoverSub}>
@@ -131,7 +135,15 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     minHeight: 84,
   },
-  discoverIcon: { fontSize: 34 },
+  discoverLogoWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 999,
+    backgroundColor: colors.sand50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  discoverLogo: { width: 40, height: 40 },
   discoverText: { flex: 1, gap: 3 },
   discoverTitle: { fontFamily: fonts.head, fontSize: 20, color: colors.white },
   discoverSub: { color: 'rgba(255,255,255,0.85)', fontSize: 13, lineHeight: 18 },
