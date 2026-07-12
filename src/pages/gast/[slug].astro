@@ -1,10 +1,8 @@
 ---
 // =========================================================================
-// Brücke für die QR-Codes in den Wohnungen: /gast/{slug} versucht die
-// Gäste-App zu öffnen (Custom Scheme) und zeigt sonst Hinweise. Die URL ist
-// der dauerhafte Vertrag der gedruckten Codes — später übernimmt ein
-// Universal/App Link dieselbe Adresse direkt in die App. noindex: interne
-// Gäste-Seite, kein Suchtreffer.
+// Dauerhafte Brücke für spätere Wohnungs-QR-Codes. Solange der kombinierte
+// App-Build nicht ausdrücklich aktiviert ist, verspricht sie weder eine App
+// noch eine Web-Vorschau. Die interne Seite bleibt immer noindex.
 // =========================================================================
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -20,10 +18,11 @@ export async function getStaticPaths() {
 const { name, accent } = Astro.props;
 const { slug } = Astro.params;
 const appLink = `hausaquamarin://wohnung/${slug}`;
+const guestAppEnabled = site.guestAppEnabled;
 ---
 <BaseLayout
   title={`Gäste-Info ${name} · ${site.name}`}
-  description={`Gäste-App und Infos für die Ferienwohnung ${name} im ${site.name} Büsum.`}
+  description={`Gäste-Infos für die Ferienwohnung ${name} im ${site.name} Büsum.`}
   pageKey={`gast/${slug}`}
   noindex={true}
   noAlternates={true}
@@ -31,19 +30,29 @@ const appLink = `hausaquamarin://wohnung/${slug}`;
   <section class="section">
     <div class="container-narrow gast" style={`--a:${accent}`}>
       <p class="eyebrow">Moin in {name}!</p>
-      <h1>Deine Gäste-App</h1>
-      <p class="lead">
-        WLAN, Check-in, Gästemappe, Ausflugstipps und Ebbe &amp; Flut — alles für deinen Aufenthalt, auch offline.
-      </p>
+      <h1>{guestAppEnabled ? 'Deine Gäste-App' : 'Infos für deinen Aufenthalt'}</h1>
+      {guestAppEnabled ? (
+        <p class="lead">
+          Check-in, Gästemappe, Ausflugstipps und Ebbe &amp; Flut — praktisch gebündelt für deinen Aufenthalt.
+        </p>
+      ) : (
+        <p class="lead">
+          Die digitale Gästemappe wird noch vorbereitet. Bis zur Freigabe findest du alle wichtigen Hinweise direkt
+          in der Wohnung — bei Fragen sind wir persönlich für dich da.
+        </p>
+      )}
 
       <div class="gast-actions">
-        <a class="btn btn--gold btn--lg" href={appLink} data-app-open>Gäste-App öffnen</a>
-        {/* TODO nach Store-Release: App-Store- & Play-Store-Badges mit echten Links ergänzen. */}
-        <a class="btn btn--ghost" href={withBase('gast-app/')}>App im Browser ansehen</a>
-        <p class="gast-hint">
-          App noch nicht installiert? Bis sie im App Store verfügbar ist, helfen dir die Browser-Variante oben, die
-          ausgedruckten Infos in der Wohnung — oder du fragst direkt:
-        </p>
+        {guestAppEnabled && (
+          <>
+            <a class="btn btn--gold btn--lg" href={appLink}>Gäste-App öffnen</a>
+            <a class="btn btn--ghost" href={withBase('gast-app/')}>App im Browser ansehen</a>
+            <p class="gast-hint">
+              Wenn die App auf diesem Gerät nicht installiert ist, kannst du die Web-Vorschau nutzen. Die Hinweise in
+              der Wohnung und unser direkter Kontakt bleiben ebenfalls verfügbar.
+            </p>
+          </>
+        )}
         <div class="gast-contact">
           <a class="btn btn--ghost" href={`tel:${site.phone.replace(/\s/g, '')}`}><Icon name="phone" size={16} /> {site.phoneDisplay}</a>
           <a class="btn btn--ghost" href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener"><Icon name="chat" size={16} /> WhatsApp</a>
@@ -59,9 +68,3 @@ const appLink = `hausaquamarin://wohnung/${slug}`;
   .gast-hint { color: var(--text-muted); max-width: 48ch; margin: 0; }
   .gast-contact { display: flex; gap: 0.7rem; flex-wrap: wrap; }
 </style>
-
-<script>
-  // Sanfter Auto-Versuch: Wenn die App installiert ist, übernimmt sie direkt.
-  const link = document.querySelector<HTMLAnchorElement>('[data-app-open]');
-  if (link) setTimeout(() => { window.location.href = link.href; }, 350);
-</script>

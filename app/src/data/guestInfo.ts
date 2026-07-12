@@ -1,32 +1,47 @@
 // =========================================================================
 // GAST-INFORMATIONEN — die Pflege-Datei für Iris & Marvin.
 //
-// Alles, was nur ihr wissen könnt, steht hier: WLAN, Schlüsselbox, Hausregeln,
-// eure lokalen Tipps. Einträge mit „TODO:" sind Platzhalter und werden in der
-// App mit einem Hinweis angezeigt — vor dem Store-Release bitte alle füllen
-// (der Test in __tests__/guestInfo.test.ts warnt, solange TODOs übrig sind).
+// WICHTIG: Native App und Webexport sind öffentlich lesbare Clients. Deshalb
+// gehören hier niemals Tür-/Schlüsselbox-Codes, personenbezogene Daten (PII),
+// Zugangsdaten zu privaten/Admin-WLANs oder andere Geheimnisse hinein. Solche
+// Angaben ausschließlich vor Ort oder über einen geschützten Kanal mitteilen.
+//
+// Nicht geheime Hausinfos und lokale Tipps werden hier gepflegt. Einträge mit
+// „TODO:" sind Platzhalter und werden in der App nicht als fertige Inhalte
+// angezeigt. Der Test in __tests__/guestInfo.test.ts findet sie rekursiv.
 // =========================================================================
 
-export type WifiInfo = { ssid: string; password: string };
+/**
+ * Zugangsdaten bleiben standardmäßig vor Ort. `public-guest` darf nur für ein
+ * bewusst öffentliches, vom privaten/Admin-Netz getrenntes Gäste-WLAN genutzt
+ * werden; SSID und Passwort landen dann lesbar im App-Bundle und Webexport.
+ */
+export type WifiInfo =
+  | { mode: 'onsite'; accessHint: string }
+  | { mode: 'public-guest'; ssid: string; password: string };
 
 export type ApartmentGuestInfo = {
   wifi: WifiInfo;
-  /** Schritt-für-Schritt zur Wohnung: Schlüsselbox, Etage, Besonderheiten. */
+  /** Nicht geheime Wegbeschreibung/Schritte; keine Tür-/Schlüsselbox-Codes. */
   checkinSteps: string[];
   /** z. B. „Stellplatz Nr. 3, direkt vor der Fahrradgarage" */
   parking: string;
 };
 
 const TODO = 'TODO: von Iris eintragen';
+const onsiteWifi = (): WifiInfo => ({
+  mode: 'onsite',
+  accessHint: 'Die WLAN-Zugangsdaten stehen auf der WLAN-Karte in der Wohnung.',
+});
 
 export const perApartment: Record<string, ApartmentGuestInfo> = {
-  tuerkis: { wifi: { ssid: TODO, password: TODO }, checkinSteps: [TODO], parking: TODO },
-  saphir: { wifi: { ssid: TODO, password: TODO }, checkinSteps: [TODO], parking: TODO },
-  bernstein: { wifi: { ssid: TODO, password: TODO }, checkinSteps: [TODO], parking: TODO },
-  topas: { wifi: { ssid: TODO, password: TODO }, checkinSteps: [TODO], parking: TODO },
-  rubin: { wifi: { ssid: TODO, password: TODO }, checkinSteps: [TODO], parking: TODO },
-  opal: { wifi: { ssid: TODO, password: TODO }, checkinSteps: [TODO], parking: TODO },
-  smaragd: { wifi: { ssid: TODO, password: TODO }, checkinSteps: [TODO], parking: TODO },
+  tuerkis: { wifi: onsiteWifi(), checkinSteps: [TODO], parking: TODO },
+  saphir: { wifi: onsiteWifi(), checkinSteps: [TODO], parking: TODO },
+  bernstein: { wifi: onsiteWifi(), checkinSteps: [TODO], parking: TODO },
+  topas: { wifi: onsiteWifi(), checkinSteps: [TODO], parking: TODO },
+  rubin: { wifi: onsiteWifi(), checkinSteps: [TODO], parking: TODO },
+  opal: { wifi: onsiteWifi(), checkinSteps: [TODO], parking: TODO },
+  smaragd: { wifi: onsiteWifi(), checkinSteps: [TODO], parking: TODO },
 };
 
 /** Gästemappe: gilt für alle Wohnungen. Sektionen mit Titel + Absätzen. */

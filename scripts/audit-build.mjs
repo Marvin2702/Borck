@@ -73,7 +73,14 @@ function routeFor(rel) {
 }
 
 function isIntentionalNoindex(rel) {
-  return rel === '404.html' || /^(?:(?:en|nl|da)\/)?danke\/index\.html$/.test(rel);
+  return rel === '404.html'
+    || /^(?:(?:en|nl|da)\/)?danke\/index\.html$/.test(rel)
+    || /^gast\/[^/]+\/index\.html$/.test(rel)
+    || /^gast-app(?:\/|$)/.test(rel);
+}
+
+function isForbiddenSitemapPath(pathname) {
+  return pathname.endsWith('/danke/') || /(?:^|\/)gast(?:-app)?(?:\/|$)/.test(pathname);
 }
 
 function expectedRuntimeUrl(route) {
@@ -185,7 +192,8 @@ function auditSitemaps() {
     for (const match of xml.matchAll(/<loc>([^<]+)<\/loc>/g)) {
       if (!runtimeUrlUsesExpectedHost(match[1])) failures.push(`${file}: unerwartete Sitemap-URL ${match[1]}`);
       try {
-        if (new URL(decodeHtml(match[1])).pathname.endsWith('/danke/')) failures.push(`${file}: noindex-Danke-Seite darf nicht in der Sitemap stehen.`);
+        const pathname = new URL(decodeHtml(match[1])).pathname;
+        if (isForbiddenSitemapPath(pathname)) failures.push(`${file}: noindex-Seite darf nicht in der Sitemap stehen: ${pathname}`);
       } catch { /* Der Host-/URL-Check oben meldet ungültige Werte. */ }
     }
   }
@@ -235,7 +243,15 @@ if (!fs.existsSync(root)) {
   }
 
   const files = walk(root);
-  const htmlFiles = files.filter((file) => file.endsWith('.html'));
+  // Der Expo-Export hat einen eigenen Vertrag (noindex, statische Routen,
+  // Bundles und Brückenseiten) und wird von audit-guest-app.mjs geprüft.
+  // Deshalb darf ein nachträgliches `npm run audit:build` auf einem
+  // Kombiartefakt ihn nicht wie Astro-Marketingseiten behandeln.
+  const websiteFiles = files.filter((file) => {
+    const rel = path.relative(root, file);
+    return rel !== 'gast-app' && !rel.startsWith(`gast-app${path.sep}`);
+  });
+  const htmlFiles = websiteFiles.filter((file) => file.endsWith('.html'));
   if (htmlFiles.length < 70) failures.push(`Zu wenige HTML-Seiten: ${htmlFiles.length} (erwartet mindestens 70).`);
 
   for (const file of htmlFiles) {
@@ -313,7 +329,7 @@ if (!fs.existsSync(root)) {
     if (jsBytes > maxInitialJsBytes) failures.push(`${rel}: initiales eigenes JavaScript ${jsBytes} B > Budget ${maxInitialJsBytes} B.`);
   }
 
-  for (const file of files.filter((entry) => /\.(?:avif|gif|jpe?g|png|webp)$/i.test(entry))) {
+  for (const file of websiteFiles.filter((entry) => /\.(?:avif|gif|jpe?g|png|webp)$/i.test(entry))) {
     const bytes = fs.statSync(file).size;
     if (bytes > largestImage.bytes) largestImage = { bytes, file: path.relative(root, file) };
     if (bytes > maxImageBytes) failures.push(`${path.relative(root, file)}: Bild ${bytes} B > Budget ${maxImageBytes} B.`);
@@ -332,11 +348,21 @@ if (!fs.existsSync(root)) {
   for (const required of ['Content-Security-Policy:', 'Strict-Transport-Security:', 'X-Content-Type-Options:']) {
     if (!headers.includes(required)) failures.push(`_headers: ${required.slice(0, -1)} fehlt.`);
   }
+  for (const route of ['/gast/*', '/gast-app/*']) {
+    const block = headers.match(new RegExp(`^${route.replaceAll('*', '\\*')}\\n((?:[ \\t]+[^\\n]+\\n?)*)`, 'm'))?.[1] || '';
+    if (!/^\s+X-Robots-Tag:\s*noindex,\s*nofollow\s*$/im.test(block)) {
+      failures.push(`_headers: X-Robots-Tag für ${route} fehlt.`);
+    }
+  }
 
   const robotsText = fs.readFileSync(path.join(root, 'robots.txt'), 'utf8');
   const wantedSitemap = expectedRuntimeUrl('/sitemap-index.xml');
   if (!robotsText.includes(`Sitemap: ${wantedSitemap}`)) failures.push(`robots.txt: erwartete Sitemap ${wantedSitemap} fehlt.`);
   if (/^Disallow:\s*\/$/im.test(robotsText)) failures.push('robots.txt blockiert die gesamte Website.');
+  for (const route of [`${base}/gast/`, `${base}/gast-app/`]) {
+    const occurrences = robotsText.match(new RegExp(`^Disallow: ${route.replaceAll('/', '\\/')}\\s*$`, 'gm'))?.length || 0;
+    if (occurrences < 2) failures.push(`robots.txt: ${route} muss für allgemeine und spezifische AI-Bots gesperrt sein.`);
+  }
 
   auditSitemaps();
   const redirectCount = auditRedirects() || 0;

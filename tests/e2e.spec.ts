@@ -5,6 +5,7 @@ import { expect, test, type Page } from '@playwright/test';
 const PROD = 'https://www.nordsee-buesum-fewo.de';
 const GA_ID = 'G-CI00000000';
 const CONSENT_KEY = 'ha-consent-v2';
+const GUEST_APP_ENABLED = process.env.PUBLIC_GUEST_APP_ENABLED === 'true';
 
 async function stubGoogle(page: Page) {
   await page.route('https://www.googletagmanager.com/**', (route) => route.fulfill({
@@ -67,6 +68,59 @@ test.describe('SEO, Staging-Sicherheit und Kernseiten', () => {
       const sitemap = await (await request.get(new URL(sitemapUrl).pathname)).text();
       expect(sitemap).not.toContain('/danke/');
     }
+  });
+
+  test('Gäste-Brücke ist noindex, bleibt freiwillig und fehlt in der Sitemap', async ({ page, request }) => {
+    const response = await page.goto('/gast/saphir/');
+    expect(response?.status()).toBe(200);
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+
+    // Auch bei aktivierter App bleibt der Gast auf der Brücke, bis er selbst
+    // einen der beiden Links auswählt.
+    await page.waitForTimeout(600);
+    await expect(page).toHaveURL(/\/gast\/saphir\/$/);
+
+    const nativeAppLinks = page.locator('a[href^="hausaquamarin:"]');
+    const webPreviewLinks = page.locator('a[href*="/gast-app/"]');
+    await expect(nativeAppLinks).toHaveCount(GUEST_APP_ENABLED ? 1 : 0);
+    await expect(webPreviewLinks).toHaveCount(GUEST_APP_ENABLED ? 1 : 0);
+
+    const sitemapIndex = await (await request.get('/sitemap-index.xml')).text();
+    const matches = [...sitemapIndex.matchAll(/<loc>([^<]+)<\/loc>/g)];
+    for (const [, sitemapUrl] of matches) {
+      const sitemap = await (await request.get(new URL(sitemapUrl).pathname)).text();
+      expect(sitemap).not.toMatch(/\/gast(?:-app)?\//);
+    }
+  });
+
+  test('kombinierter Build schützt Web-App und bekannte statische Routen mit noindex', async ({ page }) => {
+    test.skip(!GUEST_APP_ENABLED, 'Die Web-App gehört absichtlich nicht zum Standard-Website-Build.');
+
+    const pageErrors: string[] = [];
+    const consoleErrors: string[] = [];
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') consoleErrors.push(message.text());
+    });
+
+    const rootResponse = await page.goto('/gast-app/');
+    expect(rootResponse?.status()).toBe(200);
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+    await expect(page.getByText('Moin & herzlich willkommen!')).toBeVisible();
+
+    // Echte Client-Hydrierung und Navigation prüfen, nicht nur das statische
+    // HTML-Gerüst. Ohne geladenes Expo-Bundle bliebe die Route hier leer.
+    await page.getByText('Saphir', { exact: true }).click();
+    await expect(page).toHaveURL(/\/gast-app\/wohnung\/saphir\/?$/);
+    await expect(page.getByText('Moin in Saphir!')).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+
+    const guideResponse = await page.goto('/gast-app/heute/wattwandern-buesum/');
+    expect(guideResponse?.status()).toBe(200);
+    await expect(page.getByText('Wattwandern in Büsum: Touren, Tipps und Ausrüstung')).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+    expect(pageErrors).toEqual([]);
+    expect(consoleErrors).toEqual([]);
   });
 });
 

@@ -34,6 +34,9 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            app/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -44,16 +47,22 @@ jobs:
       - name: Check Astro and TypeScript
         run: npm run check
 
+      # Der False-Zweig des App-Feature-Flags ist ein eigener Vertrag: Der
+      # normale Website-Build darf weder App-Link noch /gast-app ausliefern.
+      - name: Playwright (website-only fallback)
+        run: npm run test:e2e
+
       # PUBLIC_STAGING bleibt absichtlich ungesetzt. Der postbuild-Audit muss
       # damit eine vollständig indexierbare Produktionsausgabe bestätigen.
-      - name: Build production output
-        run: npm run build
+      # build:with-app führt zusätzlich App-Audit, Typecheck und Jest aus.
+      - name: Build combined production output
+        run: npm run build:with-app
 
       - name: Lighthouse (mobile, three core pages)
         run: npm run audit:lighthouse
 
-      - name: Playwright (Consent, form, funnel and screenshots)
-        run: npm run test:e2e:run
+      - name: Playwright (website and guest app integration)
+        run: npm run test:e2e:with-app:run
 
       - name: Upload Lighthouse reports
         if: always()

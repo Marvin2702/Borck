@@ -17,12 +17,19 @@ npm run build
 npm run preview
 ```
 
-`npm run build` ist absichtlich die vollständige Build-Pipeline:
+`npm run build` ist absichtlich die vollständige Pipeline für die
+**Website allein**:
 
 1. `prebuild` lädt mit gesetztem Smoobu-Secret die aktuellen Mindestpreise.
 2. Astro erzeugt die statische Website in `dist/`.
 3. `postbuild` prüft Links, Canonicals, `noindex`, JSON-LD, Sitemap,
    Redirects sowie JavaScript- und Bildbudgets.
+
+Die Gäste-App ist kein Blocker für den Website-Launch. Erst nach ihrer eigenen
+fachlichen, technischen und rechtlichen Abnahme erzeugt
+`npm run build:with-app` zusätzlich die statische Web-Vorschau unter
+`/gast-app/` und aktiviert die App-Links der QR-Brückenseiten. Der normale
+Build verspricht bewusst keine noch nicht ausgelieferte App.
 
 Ohne Smoobu-Secret bleibt der datierte Preis-Snapshot unverändert. Werte älter
 als sieben Tage werden auf der Website nicht als aktuelle „ab“-Preise gezeigt.
@@ -38,14 +45,17 @@ als sieben Tage werden auf der Website nicht als aktuelle „ab“-Preise gezeig
 | `PUBLIC_GA4_ID` | GA4-ID, z. B. `G-XXXXXXXXXX` | leer oder eigene Test-Property |
 | `PUBLIC_GOOGLE_SITE_VERIFICATION` | Search-Console-Token | leer |
 | `PUBLIC_WEB3FORMS_ACCESS_KEY` | öffentlicher Web3Forms-Key | eigener Test-Key oder leer |
+| `PUBLIC_GUEST_APP_ENABLED` | nicht manuell setzen; `build:with-app` setzt den Wert nur für seinen Website-Build | wird vom kombinierten Staging-Build intern gesetzt |
 | `SMOOBU_API_KEY` | verschlüsseltes Build-Secret | GitHub-Secret optional |
 | `SMOOBU_API_SECRET` | verschlüsseltes HMAC-Secret | GitHub-Secret optional |
 | `REQUIRE_FRESH_PRICES` | optional `true` für einen harten Frische-Guard | nicht nötig |
 
-Nur Variablen mit `PUBLIC_` werden in den Browser-Build übernommen. Smoobu-API-
-Zugangsdaten dürfen deshalb **niemals** ein `PUBLIC_`-Präfix erhalten. Der
-offizielle objektübergreifende Smoobu-Iframe nutzt direkt die öffentliche
-Account-ID und benötigt keine separate Group-ID.
+Nur Variablen mit `PUBLIC_` werden in den Browser-Build übernommen. Sie sind
+Konfiguration, keine Geheimnisse. Smoobu-/Expo-Zugangsdaten, Schlüsselbox- oder
+WLAN-Codes und personenbezogene Gastdaten dürfen deshalb **niemals** als
+`PUBLIC_*`, im statischen Website-/App-Code oder in committed Content-Dateien
+landen. Der offizielle objektübergreifende Smoobu-Iframe nutzt direkt die
+öffentliche Account-ID und benötigt keine separate Group-ID.
 
 [.env.example](.env.example) enthält alle Variablennamen ohne echte
 Zugangsdaten. Lokale Secrets nur in der von Git ignorierten `.env` oder in der
@@ -70,8 +80,9 @@ Repository verbinden:
 | Node-Version | aus `.nvmrc` (`22`) |
 
 Die Produktionsvariablen und Preview-Variablen getrennt pflegen. Insbesondere
-darf `PUBLIC_STAGING=true` nur in Preview/Staging gelten. Danach
-`www.nordsee-buesum-fewo.de` als Custom Domain anbinden.
+darf `PUBLIC_STAGING=true` nur in Preview/Staging gelten;
+`PUBLIC_GUEST_APP_ENABLED` bleibt für den ersten Website-Launch ungesetzt.
+Danach `www.nordsee-buesum-fewo.de` als Custom Domain anbinden.
 
 Cloudflare Pages liest [public/_headers](public/_headers) und
 [public/_redirects](public/_redirects) beim Deployment ein. GitHub Pages
@@ -95,16 +106,45 @@ Domain-Level-Redirects werden von Pages-`_redirects` nicht unterstützt.
 `noindex, nofollow`. Canonical, hreflang, Open Graph und strukturierte Daten
 zeigen dennoch auf die Produktionsdomain; lokale Links sowie Staging-Sitemap
 und `robots.txt` bleiben unter dem GitHub-Host und `/Borck` funktionsfähig. Diese
-Werte nicht für Produktion wiederverwenden. Die drei optionalen `PUBLIC_*`-
-Aktivierungswerte liest das Staging aus gleichnamigen GitHub Repository
-Variables; für GA4 und Web3Forms möglichst eigene Testkonfigurationen nutzen.
+Werte nicht für Produktion wiederverwenden. Der Workflow baut dort zusätzlich
+die noindex-Web-Vorschau der Gäste-App; das macht GitHub Pages weiterhin nicht
+zum Produktionskanal. Die optionalen Analyse-/Formularwerte liest das Staging
+aus gleichnamigen GitHub Repository Variables; für GA4 und Web3Forms möglichst
+eigene Testkonfigurationen nutzen.
+
+### Gäste-App später freigeben
+
+Die App-Freigabe ist ein eigener Launch nach der Website:
+
+1. Gast-Inhalte ohne Secrets, Schlüssel-/WLAN-Codes oder personenbezogene Daten
+   vervollständigen und `STRICT_TODOS=1 npm test` in `app/` ausführen.
+2. Datenschutzentwurf anhand des produktiven Builds rechtlich prüfen. Für
+   Open-Meteo muss vor Aktivierung insbesondere ein für die kommerzielle
+   Nutzung zulässiger Tarif bzw. eine ausdrückliche Erlaubnis geklärt sein.
+3. Native Builds und Web-Vorschau abnehmen. Der erste EAS-Build wird
+   interaktiv vom lokalen Terminal gestartet; erst nach eingerichteten
+   Credentials darf CI mit einem geschützten `EXPO_TOKEN` übernehmen.
+4. In Cloudflare den Build Command auf
+   `npm ci && npm run build:with-app` umstellen. Dieser explizite Kombi-Befehl
+   aktiviert die App-Links nur für den dazugehörigen Build; das interne Flag
+   nicht unabhängig davon als Cloudflare-Variable setzen.
+5. `/gast-app/` und alle `/gast/{wohnung}/` müssen in Produktion HTTP 200,
+   `noindex` und die erwarteten Links liefern. Erst danach die QR-Codes drucken
+   oder aushängen.
+
+`noindex`, `robots.txt` und `X-Robots-Tag` verhindern keine Kenntnisnahme durch
+Personen mit der URL. Die Web-Vorschau ist öffentlich erreichbar und darf nie
+als Ablage für geheime Vor-Ort-Informationen behandelt werden. Der detaillierte
+App-Fahrplan steht in [docs/app-golive.md](docs/app-golive.md).
 
 ## Qualitätssicherung
 
 | Befehl/Workflow | Zweck |
 |---|---|
 | `npm run check` | Astro-/TypeScript-Diagnostik |
-| `npm run audit:build` | Produktions-/Staging-SEO, JSON-LD, lokale Ziele, Redirects und Asset-Budgets |
+| `npm run build:with-app` | Website + noindex-Web-App samt App-Audit, Typecheck, Jest und Integrationsaudit |
+| `npm run audit:build` | Website-Anteil: Produktions-/Staging-SEO, JSON-LD, lokale Ziele, Redirects und Asset-Budgets (überspringt `dist/gast-app/`) |
+| `npm run audit:guest-app` | Web-App-noindex, Basis-Pfade und statisch exportierte App-Routen |
 | `npm run audit:lighthouse` | drei mobile Lighthouse-Läufe je Startseite, Apartmentdetail und Kontakt |
 | `npm run test:e2e` | Consent, Events, Formular→Danke, Buchungswege, mobile Navigation und Screenshot-Suite |
 | `npm run audit:links` | externe Links mit Timeout, Retries und begrenzter Parallelität |
@@ -146,6 +186,8 @@ Build-Audit stoppt Einzeldateien über dem Budget.
 - Canonical, hreflang, Sitemap, Open Graph sowie `LodgingBusiness`, `Apartment`,
   `Article`, `BreadcrumbList` und sichtbares FAQ-Markup
 - GA4/Consent Mode nur mit Deployment-Konfiguration
+- Gäste-Brücken und optionale Web-App stets `noindex`; App-Verweise nur mit
+  explizitem kombinierten Build
 
 ## Rollback
 

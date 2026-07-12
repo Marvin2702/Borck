@@ -1,7 +1,8 @@
 // =========================================================================
-// Wetter für „Heute passt" & Deck-Gewichtung: Open-Meteo (kostenlos, ohne
-// Key, keine personenbezogenen Daten). Stale-while-revalidate mit 3-h-Cache;
-// offline degradiert alles sanft (nie ein Fehler-Screen).
+// Wetter für „Heute passt" & Deck-Gewichtung. Der Remote-Abruf ist bewusst
+// deaktiviert: Open-Meteos Free API erlaubt keine kommerzielle Nutzung
+// (https://open-meteo.com/en/terms). Erst nach lizenzierter/proxied
+// Integration wieder aktivieren. Ohne Wetter degradiert die App sanft.
 // =========================================================================
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { content } from '../content';
@@ -19,6 +20,7 @@ export type WeatherState = { fetchedAt: string; daily: WeatherDay[]; stale: bool
 
 const KEY = 'gast.weather';
 const TTL_MS = 3 * 60 * 60 * 1000;
+const REMOTE_WEATHER_ENABLED = false;
 
 /** Büsum-Klassifikation: Wind zählt genauso wie Regen. */
 export function classify(day: WeatherDay): WeatherClass {
@@ -66,6 +68,7 @@ async function readCache(): Promise<WeatherState | null> {
 /** Liefert sofort Cache (falls da) und aktualisiert bei Bedarf im Hintergrund.
  *  Rückgabe null = noch nie erfolgreich geladen UND offline. */
 export async function getWeather(): Promise<WeatherState | null> {
+  if (!REMOTE_WEATHER_ENABLED) return null;
   const cached = await readCache();
   const fresh = cached && Date.now() - new Date(cached.fetchedAt).getTime() < TTL_MS;
   if (cached && fresh) return cached;

@@ -45,9 +45,11 @@ jobs:
       - name: Check (astro check)
         run: npm run check
 
-      # npm führt prebuild (Smoobu-Preise) und postbuild (Launch-Audit) mit aus.
-      - name: Build and launch audit
-        run: npm run build
+      # Baut und auditiert Website + statische Gäste-App gemeinsam. Der Befehl
+      # enthält auch App-Dependency-Audit, Typecheck und Jest; ein rotes App-CI
+      # kann deshalb nicht parallel trotzdem als Pages-Artefakt erscheinen.
+      - name: Build and audit website with guest app
+        run: npm run build:with-app
         env:
           SITE: ${{ steps.pages.outputs.origin }}
           BASE: ${{ steps.pages.outputs.base_path }}
@@ -57,17 +59,6 @@ jobs:
           PUBLIC_WEB3FORMS_ACCESS_KEY: ${{ vars.PUBLIC_WEB3FORMS_ACCESS_KEY }}
           SMOOBU_API_KEY: ${{ secrets.SMOOBU_API_KEY }}
           SMOOBU_API_SECRET: ${{ secrets.SMOOBU_API_SECRET }}
-
-      # Klickbare Web-Vorschau der Gäste-App unter {base}/gast-app/ —
-      # bewusst NACH dem Audit (das prüft nur die Website-Seiten).
-      - name: Gäste-App Web-Vorschau
-        working-directory: app
-        env:
-          APP_WEB_BASE: ${{ steps.pages.outputs.base_path }}/gast-app
-        run: |
-          npm ci
-          npx expo export --platform web
-          mkdir -p ../dist/gast-app && cp -r dist/. ../dist/gast-app/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5

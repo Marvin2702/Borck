@@ -7,6 +7,13 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
 
+# Gäste-Brücke und optionale Web-App sind kein öffentlicher Suchindex-Inhalt.
+/gast/*
+  X-Robots-Tag: noindex, nofollow
+
+/gast-app/*
+  X-Robots-Tag: noindex, nofollow
+
 # Astros gehashte Build-Assets dürfen dauerhaft gecacht werden.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable

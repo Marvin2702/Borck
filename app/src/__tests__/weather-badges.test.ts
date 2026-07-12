@@ -1,6 +1,7 @@
 // Wetter-Klassifikation (Büsum: Wind zählt!) und Badge-Regeln.
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { evaluateBadges } from '../lib/badges';
-import { classify, parseOpenMeteo } from '../lib/weather';
+import { classify, getWeather, parseOpenMeteo } from '../lib/weather';
 
 const day = (over: Partial<{ code: number; precipProb: number; windMax: number }>) => ({
   date: '2026-07-14',
@@ -34,6 +35,24 @@ describe('parseOpenMeteo', () => {
     expect(parsed).toEqual([{ date: '2026-07-14', code: 61, tmax: 18, precipProb: 80, windMax: 38 }]);
   });
   it('liefert [] bei kaputtem Payload', () => expect(parseOpenMeteo({})).toEqual([]));
+});
+
+describe('getWeather', () => {
+  it('bleibt ohne lizenzierte Wetterquelle vollständig lokal und deaktiviert', async () => {
+    const originalFetch = globalThis.fetch;
+    const fetchMock = jest.fn();
+    globalThis.fetch = fetchMock as typeof fetch;
+    jest.clearAllMocks();
+
+    try {
+      await expect(getWeather()).resolves.toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(AsyncStorage.getItem).not.toHaveBeenCalled();
+      expect(AsyncStorage.setItem).not.toHaveBeenCalled();
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
 });
 
 describe('evaluateBadges', () => {

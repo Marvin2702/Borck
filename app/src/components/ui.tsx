@@ -41,7 +41,7 @@ export function Body({ children }: PropsWithChildren) {
 }
 
 /** Kennzeichnet noch nicht gepflegte Inhalte (TODO-Platzhalter aus guestInfo). */
-export const isTodo = (s: string) => s.startsWith('TODO');
+export const isTodo = (s: string) => /\bTODO\s*:/i.test(s);
 export function TodoHint() {
   return <Text style={styles.todo}>Wird von Iris noch ergänzt — ruf uns bis dahin einfach an.</Text>;
 }

@@ -27,8 +27,12 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      // Bestätigungsseiten sind absichtlich noindex und gehören nicht in die Sitemap.
-      filter: (page) => !new URL(page).pathname.endsWith('/danke/'),
+      // Bestätigungs- und Gäste-Bereiche sind absichtlich noindex und gehören
+      // unabhängig von SITE/BASE nicht in die öffentliche Sitemap.
+      filter: (page) => {
+        const pathname = new URL(page).pathname;
+        return !pathname.endsWith('/danke/') && !/(?:^|\/)gast(?:-app)?(?:\/|$)/.test(pathname);
+      },
       i18n: {
         defaultLocale: 'de',
         locales: {

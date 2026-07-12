@@ -26,6 +26,10 @@ const tiles = [
   { href: '/einstellungen', icon: '⚙️', label: 'Einstellungen' },
 ] as const;
 
+export function generateStaticParams() {
+  return content.apartments.map(({ slug }) => ({ slug }));
+}
+
 export default function ApartmentHome() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { apartment, setApartment, plan } = useGuest();

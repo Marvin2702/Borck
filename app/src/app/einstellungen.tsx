@@ -53,7 +53,8 @@ export default function Einstellungen() {
 
       <Muted>
         Diese App speichert eure Auswahl (Wohnung, Plan, Stempel) nur lokal auf dem Gerät — keine Konten, kein
-        Tracking. Fürs Wetter fragt sie anonym die freie Open-Meteo-Vorhersage für Büsum ab.
+        Tracking. Eine externe Wetterabfrage ist derzeit deaktiviert; die App sendet dafür keine Anfrage und zeigt
+        vorerst keine Live-Wetterdaten an.
       </Muted>
     </Screen>
   );

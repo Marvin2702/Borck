@@ -18,6 +18,7 @@ export const legal = {
 <h2>2) Worum geht's hier?</h2>
 <p>Wenn du diese Website besuchst, eine Anfrage stellst oder bei mir buchst, werden personenbezogene Daten verarbeitet. Personenbezogene Daten sind alle Daten, mit denen du persönlich identifiziert werden kannst (z. B. Name, E-Mail-Adresse, IP-Adresse).</p>
 <p>Ich erkläre dir hier, welche Daten verarbeitet werden, wofür und welche Rechte du hast.</p>
+<p><strong>Prüfhinweis:</strong> Die Abschnitte zur Gäste-App, Web-Vorschau und zum Wetterdienst sind ein technischer Redaktionsentwurf. Sie ersetzen keine Rechtsberatung und geben keine Garantie für die rechtliche Vollständigkeit. Vor der öffentlichen Freischaltung müssen die Betreiberin bzw. ihre Rechtsberatung den tatsächlichen Build, die Anbieterbedingungen und die erforderlichen Rechtsgrundlagen abschließend prüfen.</p>
 
 <h2>3) Hosting &amp; Website-Betrieb</h2>
 <p>Die Produktionswebsite unter www.nordsee-buesum-fewo.de wird über <strong>Cloudflare Pages</strong> bereitgestellt. Anbieter ist Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA. Cloudflare betreibt ein weltweit verteiltes Netzwerk und verarbeitet beim Abruf unter anderem IP-Adressen, Verkehrsrouting- und Systeminformationen. Cloudflare bezeichnet sich für sogenannte Customer Logs als Auftragsverarbeiter. Weitere Informationen: <a href="https://www.cloudflare.com/policies/privacy/" target="_blank" rel="noopener">Datenschutzhinweise von Cloudflare</a>.</p>
@@ -88,7 +89,18 @@ export const legal = {
 <p><strong>Zweck:</strong> interaktive Darstellung der Lage und von Ausflugszielen<br><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer nutzerfreundlichen Anfahrts- und Umgebungsanzeige). Alternativ stehen die Orts- und Entfernungsinformationen ohne Laden der Karte als Text zur Verfügung.</p>
 <p>Verlinke ich zur Routenplanung auf einen externen Kartendienst (z. B. Google Maps), wird dieser erst nach deinem Klick in einem neuen Tab geöffnet. Ab diesem Zeitpunkt gelten die Datenschutzbestimmungen des jeweiligen Anbieters.</p>
 
-<h2>11) Empfänger / Auftragsverarbeiter</h2>
+<h2>11) Optionale Gäste-App und Web-Vorschau</h2>
+<p>Für Gäste kann eine digitale Gästemappe als native App und als Web-Vorschau unter <code>/gast-app/</code> bereitgestellt werden. Wohnungsbezogene Brückenseiten unter <code>/gast/…/</code> verlinken diese Angebote nur, wenn sie technisch freigeschaltet sind. Die Kennzeichnung als „noindex“ dient lediglich dazu, Suchmaschinen von einer Indexierung abzuhalten; sie ist keine Zugriffskontrolle. Inhalte, die nur für anwesende Gäste bestimmt sind, dürfen deshalb keine geheimen Zugangsdaten, Schlüsselbox-Codes oder andere personenbezogene Informationen im öffentlich ausgelieferten App- bzw. Website-Code enthalten.</p>
+<p>Die Gäste-App benötigt kein Benutzerkonto und verwendet nach dem derzeit vorgesehenen Stand kein eigenes Tracking. Sie speichert auf deinem Gerät bzw. in der Web-Vorschau im lokalen Browserspeicher insbesondere die gewählte Wohnung, das Abreisedatum, deine Entscheidung zur Erinnerung, abgehakte Checklistenpunkte, deinen Urlaubsplan, Erlebnis-Check-ins und Abzeichen, einen Wetter-Zwischenspeicher sowie eine noch nicht abgeschlossene Auswahlrunde. Diese Daten bleiben grundsätzlich lokal und können über die App-Einstellungen bzw. durch Löschen der App- oder Browserdaten entfernt werden. Eine Synchronisierung mit einem Gästekonto ist derzeit nicht vorgesehen.</p>
+<p>Wenn du die Abreise-Erinnerung aktiv einschaltest und die Geräteberechtigung erteilst, plant das Gerät lokal eine einmalige Benachrichtigung für 08:30 Uhr am Abreisetag. Dafür ist nach dem derzeitigen technischen Stand kein Push-Server vorgesehen und es wird kein Newsletter- oder Werbeversand ausgelöst. Ohne deine Aktivierung wird keine Erinnerung geplant; du kannst sie in der App oder über die Geräteeinstellungen wieder deaktivieren.</p>
+<p><strong>Zweck:</strong> Bereitstellung der von dir gewählten, lokal gespeicherten Gästefunktionen und einer optionalen Abreise-Erinnerung<br><strong>Rechtsgrundlage:</strong> je nach konkreter Funktion und technischer Umsetzung insbesondere Art. 6 Abs. 1 lit. b oder lit. f DSGVO; für Endgerätezugriffe und Benachrichtigungen sind die Einwilligungs- und Endgeräteanforderungen vor Freischaltung gesondert zu prüfen.</p>
+
+<h2>12) Wetterdaten über Open-Meteo</h2>
+<p>Die Remote-Wetterfunktion ist im aktuellen App- und Web-App-Build technisch deaktiviert; es wird dabei keine Verbindung zu Open-Meteo aufgebaut. Falls die Funktion später nach gesonderter Freigabe aktiviert wird, würde sie eine Drei-Tage-Vorhersage bei <strong>Open-Meteo</strong> abrufen. Übermittelt würden die festen Koordinaten des Hauses Aquamarin, die Zeitzone Europe/Berlin und die gewünschten Tageswerte (Wettercode, Höchsttemperatur, maximale Niederschlagswahrscheinlichkeit und maximale Windgeschwindigkeit). Die Funktion würde weder deinen Gerätestandort abfragen noch einen personenbezogenen API-Schlüssel verwenden. Dein Gerät würde jedoch eine direkte Verbindung zum Dienst herstellen; dabei könnten technisch notwendige Verbindungsdaten wie deine IP-Adresse, Zeitpunkt sowie Browser-/Geräteinformationen anfallen. Die Vorhersage würde für bis zu drei Stunden lokal zwischengespeichert.</p>
+<p>Nach den aktuellen Anbieterangaben wird Open-Meteo von der <strong>OpenMeteo GmbH</strong>, Hintere Schilligmatte 6, 6463 Bürglen (UR), Schweiz, betrieben. Open-Meteo gibt für den kostenlosen API-Dienst an, technisch erforderliche IP-Adressen verarbeiten zu können und Webserver-Logs mit angefragten Koordinaten nach 90 Tagen zu löschen. Weitere Informationen: <a href="https://open-meteo.com/en/terms" target="_blank" rel="noopener">Nutzungs- und Datenschutzbedingungen von Open-Meteo</a>.</p>
+<p><strong>Zweck:</strong> Anzeige einer ortsbezogenen Wettervorhersage und passende Sortierung von Ausflugsideen<br><strong>Rechtsgrundlage:</strong> voraussichtlich Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nützlichen Aufenthaltsinformationen). Anbieterrolle, Schweizer Datenübermittlung, aktuelle Bedingungen, tatsächliche Protokollierung, Speicherdauer und die abschließende Rechtsgrundlage müssen vor Freischaltung anhand des produktiven Stands geprüft werden. Zudem erlauben die aktuellen Bedingungen die kostenlose API nur für nicht kommerzielle Nutzung; vor dem Einsatz im Vermietungsangebot muss deshalb ein passender kommerzieller Tarif bzw. eine ausdrückliche Nutzungserlaubnis geklärt werden.</p>
+
+<h2>13) Empfänger / Auftragsverarbeiter</h2>
 <p>Abhängig von der aufgerufenen Umgebung, den aktivierten Funktionen und deiner Auswahl können Daten an folgende Empfänger gelangen:</p>
 <ul>
 <li>Cloudflare für Hosting und Auslieferung der Produktionswebsite</li>
@@ -97,13 +109,14 @@ export const legal = {
 <li>Web3Forms/Web3Creative nur bei aktiviertem Kontaktformular und erst beim Absenden</li>
 <li>Google nur bei konfiguriertem Google Analytics und nach deiner Einwilligung</li>
 <li>OpenStreetMap Foundation erst nach deinem aktiven Laden der interaktiven Karte</li>
+<li>Open-Meteo nur nach einer späteren, gesondert freigegebenen Aktivierung der derzeit deaktivierten Wetterfunktion</li>
 </ul>
 <p>Die datenschutzrechtlichen Rollen unterscheiden sich je Dienst und Verarbeitung. Insbesondere bezeichnet sich die OpenStreetMap Foundation für ihre Kacheldienste als eigenständig Verantwortliche. Erforderliche Auftragsverarbeitungsverträge, Unterauftragnehmer und Drittlandgarantien müssen anhand der tatsächlichen Anbieter-Konten und Einstellungen vor dem Produktivstart und anschließend bei wesentlichen Änderungen durch die Betreiberin geprüft werden.</p>
 
-<h2>12) Speicherdauer allgemein</h2>
+<h2>14) Speicherdauer allgemein</h2>
 <p>Ich speichere personenbezogene Daten nur so lange, wie es für die genannten Zwecke erforderlich ist oder solange gesetzliche Aufbewahrungspflichten bestehen (z. B. steuer- und handelsrechtliche Pflichten).</p>
 
-<h2>13) Deine Rechte</h2>
+<h2>15) Deine Rechte</h2>
 <p>Du hast jederzeit das Recht:</p>
 <ul>
 <li>Auskunft (Art. 15 DSGVO)</li>
@@ -116,7 +129,7 @@ export const legal = {
 </ul>
 <p>Außerdem hast du das Recht, dich bei einer Datenschutzaufsichtsbehörde zu beschweren (Art. 77 DSGVO). Zuständig ist in der Regel die Aufsichtsbehörde deines Aufenthaltsorts oder – für Schleswig-Holstein – der/die Landesdatenschutzbeauftragte.</p>
 
-<h2>14) Aktualität</h2>
+<h2>16) Aktualität</h2>
 <p>Ich passe diese Datenschutzerklärung an, wenn sich rechtliche Vorgaben ändern oder wenn ich Funktionen/Tools ergänze.</p>
 `,
   },

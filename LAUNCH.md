@@ -3,6 +3,10 @@
 Checkliste für den Umzug von GitHub-Pages-Staging auf
 `https://www.nordsee-buesum-fewo.de`. Stand: 12.07.2026.
 
+Diese Checkliste startet bewusst mit der Website allein. Die Gäste-App und ihre
+Web-Vorschau haben ein separates Freigabe-Gate in Abschnitt 8 und blockieren
+den Website-Go-live nicht.
+
 ## 1. Cloudflare Pages anlegen
 
 - [ ] Repository über „Connect to Git“ anbinden; Production Branch `main`.
@@ -15,12 +19,15 @@ Checkliste für den Umzug von GitHub-Pages-Staging auf
 - [ ] `PUBLIC_STAGING` in Produktion vollständig entfernen, nicht auf `false`
       oder einen leeren String setzen.
 - [ ] Für Cloudflare-Preview-Deployments `PUBLIC_STAGING=true` setzen.
+- [ ] `PUBLIC_GUEST_APP_ENABLED` für den ersten Website-Launch nicht setzen.
+      Der normale `npm run build` liefert weder `/gast-app/` noch App-Links aus.
 - [ ] Ersten Build prüfen: Der `postbuild`-Launch-Audit muss grün sein.
 
 Abnahme des Build-Artefakts:
 
-- keine indexierbare Produktionsseite enthält `noindex`; nur `/404/` und die
-  vier Danke-Seiten bleiben absichtlich ausgeschlossen;
+- keine öffentliche Marketing-/Buchungsseite enthält `noindex`; `/404/`, die
+  vier Danke-Seiten und die sieben internen `/gast/{wohnung}/`-Brückenseiten
+  bleiben absichtlich ausgeschlossen und fehlen in der Sitemap;
 - Canonical, hreflang, `og:url`, Sitemap und strukturierte Daten verwenden nur
   `https://www.nordsee-buesum-fewo.de`;
 - `_headers` und `_redirects` wurden von Cloudflare ohne Parse-Warnung erkannt;
@@ -52,7 +59,9 @@ GitHub, Repository Secrets:
 - [ ] Workflow „Trigger Cloudflare Pages rebuild“ manuell auslösen und den neuen
       Produktionsdeploy prüfen; danach übernimmt der tägliche Cron.
 
-Kein Smoobu-Secret darf mit `PUBLIC_` beginnen.
+Kein Smoobu-/Expo-Secret darf mit `PUBLIC_` beginnen. Ebenso dürfen
+Schlüsselbox-/WLAN-Codes und personenbezogene Gastdaten weder in öffentliche
+Variablen noch in statisch ausgelieferte oder committed Client-Dateien gelangen.
 
 ## 3. Domain, TLS und Weiterleitungen
 
@@ -119,6 +128,9 @@ GitHub Pages ignoriert `_redirects` und `_headers` vollständig.
       Lighthouse liefert dafür nur TBT als Lab-Proxy.
 - [ ] CSP, HSTS, Referrer-Policy, Permissions-Policy und
       X-Content-Type-Options auf der Produktionsantwort prüfen.
+- [ ] Für `/gast/*` liefert Cloudflare zusätzlich
+      `X-Robots-Tag: noindex, nofollow`; die Routen fehlen in der Sitemap und
+      sind in `robots.txt` auch für die spezifisch genannten AI-Bots gesperrt.
 - [ ] Wöchentlichen Workflow „External link audit“ einmal manuell ausführen.
 - [ ] Rich-Results-/Schema-Ausgabe zusätzlich mit Googles Testwerkzeug prüfen.
 
@@ -126,12 +138,51 @@ GitHub Pages ignoriert `_redirects` und `_headers` vollständig.
 
 - [ ] Betreiberin prüft AGB, Datenschutz, Impressum, Kurabgabe, Stornierung,
       Endreinigung und obligatorische Kosten.
+- [ ] Die neuen Datenschutzabschnitte zu Gäste-App, lokaler Speicherung,
+      Benachrichtigungen, Web-Vorschau und Open-Meteo als prüfpflichtigen
+      Entwurf rechtlich abnehmen; sie sind keine Rechtsgarantie.
 - [ ] Bewertungsstand, Quellen und Daten mit dem Google-Profil abgleichen.
 - [ ] Keine Bestpreis-, Ranking- oder Ersparnisbehauptung ohne aktuellen Nachweis.
 - [ ] Google Business Profile auf die neue kanonische Domain und den korrekten
       Buchungslink umstellen.
 
-## 8. Direkt nach dem Launch
+## 8. Separater Go-live der Gäste-App
+
+Erst beginnen, wenn die Website auf der Produktionsdomain stabil läuft:
+
+- [ ] Das bereits verknüpfte Expo-Projekt mit `cd app && eas project:info`
+      kontrollieren; kein erneutes `eas init` ausführen, solange die vorhandene
+      `projectId` zum richtigen Expo-Projekt gehört.
+- [ ] Alle Gast-Inhalte fachlich prüfen und in `app/`
+      `STRICT_TODOS=1 npm test` sowie `npm run typecheck` ausführen.
+- [ ] Sicherstellen, dass kein Build Schlüsselbox-/WLAN-Codes, Secrets oder
+      personenbezogene Gastdaten enthält. `noindex` ist keine Zugriffskontrolle.
+- [ ] Wetter bis zur Klärung deaktiviert lassen. Die aktuellen offiziellen
+      Open-Meteo-Bedingungen erlauben die Free API nur nichtkommerziell; vor
+      Freischaltung sind kommerzieller Tarif/Nutzungserlaubnis,
+      Datenschutzrolle und Schweizer Datenübermittlung zu prüfen.
+- [ ] Den ersten EAS-Preview-Build interaktiv vom lokalen Terminal starten und
+      Credentials dort einrichten. Erst anschließend einen eng geschützten
+      `EXPO_TOKEN` für nicht-interaktive CI-Builds hinterlegen.
+- [ ] Native Preview auf echten iOS-/Android-Geräten abnehmen; Datenschutz- und
+      Store-Angaben anhand der tatsächlichen Datenflüsse ausfüllen, nicht
+      pauschal „keine Datenerhebung“ behaupten.
+- [ ] Datenschutztext fachlich/rechtlich freigeben. Dann in Cloudflare den
+      Build Command auf `npm ci && npm run build:with-app` umstellen. Das
+      interne App-Flag nicht unabhängig vom Kombi-Build als Variable setzen.
+- [ ] Kombinierten Build und `npm run test:e2e:with-app` prüfen. Alle
+      `/gast-app/`-HTML-Routen müssen Meta-`noindex` tragen; Cloudflare muss für
+      `/gast-app/*` zusätzlich `X-Robots-Tag: noindex, nofollow` senden.
+- [ ] Je Wohnung die Produktions-URL `/gast/{slug}/` auf Smartphone testen:
+      HTTP 200, richtige Wohnung, freiwillige App-/Web-Links, kein automatischer
+      Scheme-Redirect. `/gast-app/` und die bekannten statischen Unterrouten
+      müssen ebenfalls HTTP 200 liefern.
+- [ ] QR-Codes erst drucken oder aushängen, nachdem diese Produktionsprüfungen
+      grün sind und der tatsächlich beworbene App-/Web-Kanal verfügbar ist.
+
+Der vollständige Ablauf steht in [docs/app-golive.md](docs/app-golive.md).
+
+## 9. Direkt nach dem Website-Launch
 
 - [ ] In den ersten 48 Stunden 404, Redirects, Formularfehler, Smoobu-Starts,
       Search-Console-Abdeckung und Core Web Vitals beobachten.
@@ -140,7 +191,7 @@ GitHub Pages ignoriert `_redirects` und `_headers` vollständig.
 - [ ] Preise, Links, Bewertungen, Rechtstexte und Weiterleitungen quartalsweise
       kontrollieren.
 
-## 9. Externe Kanäle und erste 30 Tage
+## 10. Externe Kanäle und erste 30 Tage
 
 - [ ] Google Business Profile: Website- und Buchungslink aktualisieren, aktuelle
       Fotos ergänzen, korrekte Angaben prüfen und jede Bewertung beantworten.
@@ -162,7 +213,7 @@ GitHub Pages ignoriert `_redirects` und `_headers` vollständig.
       bestätigte Direktbuchungen, Umsatz, ADR und Auslastung. Umsatz und
       Buchungen aus Smoobu bleiben die Source of Truth.
 
-## 10. Content und 90-Tage-Zyklus
+## 11. Content und 90-Tage-Zyklus
 
 - [ ] Die sechs bestehenden Reiseführer mit Iris’ Lokalwissen, eigenen Fotos,
       aktuellen Quellen und echten Aktualisierungsdaten substanziell ausbauen,
@@ -179,7 +230,7 @@ GitHub Pages ignoriert `_redirects` und `_headers` vollständig.
       Tagen Seiten/Kampagnen nur anhand nachgelagerter Anfragen, Buchungen und
       Deckungsbeitrag priorisieren.
 
-## 11. Rollback
+## 12. Rollback
 
 Rollback bei einem Fehler:
 

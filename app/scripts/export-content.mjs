@@ -177,6 +177,11 @@ const orientation = points.map((p) => ({
 
 // --- Hero-Bilder kopieren (640er WebP) + statische require()-Map ----------
 fs.mkdirSync(OUT_IMG, { recursive: true });
+// Nur von diesem Skript verwaltete Dateien entfernen. Sortierung macht den
+// Cleanup unabhängig von der Dateisystem-Reihenfolge und damit reproduzierbar.
+for (const file of fs.readdirSync(OUT_IMG).filter((name) => /^apt-[a-z0-9-]+\.webp$/i.test(name)).sort()) {
+  fs.unlinkSync(path.join(OUT_IMG, file));
+}
 const heroLines = [];
 for (const a of apartments) {
   if (!a.heroImage) continue;

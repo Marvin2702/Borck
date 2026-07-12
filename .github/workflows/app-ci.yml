@@ -9,13 +9,17 @@ on:
     paths:
       - 'app/**'
       - 'src/content/**'
+      - 'src/data/experiences.ts'
       - 'src/data/site.ts'
+      - 'public/images/**'
       - '.github/workflows/app-ci.yml'
   pull_request:
     paths:
       - 'app/**'
       - 'src/content/**'
+      - 'src/data/experiences.ts'
       - 'src/data/site.ts'
+      - 'public/images/**'
       - '.github/workflows/app-ci.yml'
 
 jobs:
@@ -25,22 +29,29 @@ jobs:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: app/package-lock.json
 
       - name: Install
         run: npm ci
 
+      - name: Dependency vulnerability audit
+        run: npm audit --audit-level=high
+
       - name: Content-Export frisch? (Website-Quellen -> content.json)
         run: |
           npm run export
-          git diff --exit-code assets/content.json src/heroImages.ts \
-            || { echo '::error::content.json veraltet — in app/ "npm run export" ausführen und committen.'; exit 1; }
+          changes="$(git status --porcelain --untracked-files=all -- assets/content.json src/heroImages.ts assets/images)"
+          if [ -n "$changes" ]; then
+            echo "$changes"
+            echo '::error::App-Export veraltet — in app/ "npm run export" ausführen und alle generierten Inhalte/Bilder committen.'
+            exit 1
+          fi
 
       - name: Typecheck
         run: npm run typecheck

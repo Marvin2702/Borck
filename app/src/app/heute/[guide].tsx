@@ -2,7 +2,11 @@
 import { Redirect, Stack, useLocalSearchParams } from 'expo-router';
 import { Blocks } from '../../components/Blocks';
 import { Screen } from '../../components/ui';
-import { guideBySlug } from '../../content';
+import { content, guideBySlug } from '../../content';
+
+export function generateStaticParams() {
+  return content.guides.map(({ slug: guide }) => ({ guide }));
+}
 
 export default function GuideDetail() {
   const { guide } = useLocalSearchParams<{ guide: string }>();

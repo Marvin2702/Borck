@@ -2,6 +2,9 @@
   "name": "app",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "overrides": {
+    "uuid": "^11.1.1"
+  },
   "dependencies": {
     "@expo-google-fonts/fraunces": "^0.4.1",
     "@expo/ui": "~57.0.4",

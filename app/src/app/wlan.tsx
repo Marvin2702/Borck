@@ -4,7 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Card, isTodo, Muted, Screen, SectionTitle, TodoHint } from '../components/ui';
+import { Body, Card, isTodo, Muted, Screen, SectionTitle, TodoHint } from '../components/ui';
 import { apartmentBySlug } from '../content';
 import { perApartment } from '../data/guestInfo';
 import { useGuest } from '../lib/store';
@@ -37,23 +37,37 @@ export default function Wlan() {
   const { apartment } = useGuest();
   const apt = apartmentBySlug(apartment ?? undefined);
   const wifi = apartment ? perApartment[apartment]?.wifi : undefined;
-  const ready = wifi && !isTodo(wifi.ssid) && !isTodo(wifi.password);
+  const publicWifi =
+    wifi?.mode === 'public-guest' &&
+    wifi.ssid.trim().length > 0 &&
+    wifi.password.trim().length > 0 &&
+    !isTodo(wifi.ssid) &&
+    !isTodo(wifi.password)
+      ? wifi
+      : undefined;
 
   return (
     <Screen>
       <SectionTitle>WLAN in {apt?.name ?? 'deiner Wohnung'}</SectionTitle>
       <Card>
-        {ready ? (
+        {wifi?.mode === 'onsite' ? (
           <>
-            <CopyField label="Netzwerk (SSID)" value={wifi.ssid} />
-            <CopyField label="Passwort" value={wifi.password} />
+            <Body>{wifi.accessHint}</Body>
+            <Muted>Netzwerkname und Passwort findest du dort direkt vor Ort.</Muted>
+          </>
+        ) : publicWifi ? (
+          <>
+            <CopyField label="Netzwerk (SSID)" value={publicWifi.ssid} />
+            <CopyField label="Passwort" value={publicWifi.password} />
             <Muted>Passwort kopieren, in den WLAN-Einstellungen einfügen — fertig.</Muted>
           </>
-        ) : (
+        ) : wifi?.mode === 'public-guest' ? (
           <>
             <TodoHint />
             <Muted>Die Zugangsdaten findest du auch ausgedruckt in der Wohnung.</Muted>
           </>
+        ) : (
+          <Muted>Wähle zuerst deine Wohnung aus, um den WLAN-Hinweis zu sehen.</Muted>
         )}
       </Card>
     </Screen>

@@ -22,7 +22,9 @@ const filters: { key: Filter; label: string }[] = [
 export default function Heute() {
   const [filter, setFilter] = useState<Filter>('alle');
   const guides = content.guides.filter((g) => matchesFilter(g, filter));
-  const tippsReady = irisTipps.some((t) => !isTodo(t.title));
+  const readyTipps = irisTipps.filter(
+    (t) => t.title.trim().length > 0 && t.text.trim().length > 0 && !isTodo(t.title) && !isTodo(t.text)
+  );
 
   return (
     <Screen>
@@ -54,17 +56,15 @@ export default function Heute() {
         </Pressable>
       ))}
 
-      {tippsReady && (
+      {readyTipps.length > 0 && (
         <>
           <SectionTitle>Iris&apos; Tipps</SectionTitle>
-          {irisTipps
-            .filter((t) => !isTodo(t.title))
-            .map((t) => (
-              <Card key={t.title}>
-                <Text style={styles.tippTitle}>{t.title}</Text>
-                <Body>{t.text}</Body>
-              </Card>
-            ))}
+          {readyTipps.map((t) => (
+            <Card key={t.title}>
+              <Text style={styles.tippTitle}>{t.title}</Text>
+              <Body>{t.text}</Body>
+            </Card>
+          ))}
         </>
       )}
     </Screen>

@@ -1,6 +1,13 @@
 # Baut die Gäste-App in der Expo-Cloud (EAS) — manuell startbar:
 # GitHub → Actions → „App Build (EAS)" → Run workflow.
-# Voraussetzung (einmalig): Repo-Secret EXPO_TOKEN
+# Vor der ersten Nutzung pro Plattform muss ein interaktiver lokaler Build
+# erfolgreich durchlaufen. Dabei werden Signing-Credentials angelegt bzw.
+# bestätigt, die der nicht-interaktive Actions-Build anschließend wiederverwendet:
+#   cd app && npm ci
+#   npx eas-cli@latest login
+#   npx eas-cli@latest build --profile preview --platform android
+# Für iOS denselben Build einmal mit --platform ios erfolgreich abschließen.
+# Erst danach das Repo-Secret EXPO_TOKEN einrichten:
 #   expo.dev → Account Settings → Access Tokens → „Create token"
 #   → GitHub → Settings → Secrets and variables → Actions → EXPO_TOKEN
 #
@@ -34,7 +41,7 @@ jobs:
         working-directory: app
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # secrets-Kontext ist in step-if nicht erlaubt — deshalb Shell-Check.
       - name: EXPO_TOKEN vorhanden?
@@ -45,9 +52,9 @@ jobs:
           fi
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: app/package-lock.json
 
@@ -60,9 +67,29 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Dependency vulnerability audit
+        run: npm audit --audit-level=high
+
+      - name: Content-Export frisch?
+        run: |
+          npm run export
+          changes="$(git status --porcelain --untracked-files=all -- assets/content.json src/heroImages.ts assets/images)"
+          if [ -n "$changes" ]; then
+            echo "$changes"
+            echo '::error::App-Export veraltet — Export lokal ausführen und alle generierten Inhalte/Bilder committen.'
+            exit 1
+          fi
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests (preview)
+        if: ${{ inputs.profile == 'preview' }}
+        run: npm test -- --runInBand
+
       - name: Platzhalter-Check (nur production streng)
         if: ${{ inputs.profile == 'production' }}
-        run: STRICT_TODOS=1 npm test
+        run: STRICT_TODOS=1 npm test -- --runInBand
 
       - name: EAS Build
         run: eas build --profile ${{ inputs.profile }} --platform ${{ inputs.platform }} --non-interactive

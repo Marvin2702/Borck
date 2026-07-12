@@ -7,7 +7,11 @@
 
 const publicValue = (value: string | undefined) => value?.trim() ?? '';
 
-const configuredGaId = publicValue(import.meta.env.PUBLIC_GA4_ID);
+// `site` wird auch vom Node-basierten App-Content-Export importiert. Dort gibt
+// es Vites `import.meta.env` nicht; optionaler Zugriff hält dieselben
+// Stammdaten in Astro, tsx und plain Node nutzbar.
+const publicEnv = import.meta.env;
+const configuredGaId = publicValue(publicEnv?.PUBLIC_GA4_ID);
 const googleAnalyticsId = /^G-[A-Z0-9]+$/i.test(configuredGaId) ? configuredGaId : '';
 
 export const site = {
@@ -77,13 +81,17 @@ export const site = {
   // Google: GA4-Mess-ID (z. B. "G-XXXXXXXXXX") und Search-Console-Verifizierung.
   // GA lädt NUR nach Einwilligung im Consent-Banner. Leer => kein Analytics, kein Banner.
   googleAnalyticsId,
-  googleSiteVerification: publicValue(import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION),
+  googleSiteVerification: publicValue(publicEnv?.PUBLIC_GOOGLE_SITE_VERIFICATION),
 
   // Web3Forms Access-Key für das Kontaktformular (statischer Versand ohne Backend).
   // Kostenlos unter https://web3forms.com (E-Mail eintragen, Key erhalten).
   // Leer => Formular nutzt mailto-Fallback. Der Access-Key ist laut Web3Forms
   // ausdrücklich öffentlich; niemals den Smoobu-API-Key als PUBLIC_* setzen.
-  formAccessKey: publicValue(import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY),
+  formAccessKey: publicValue(publicEnv?.PUBLIC_WEB3FORMS_ACCESS_KEY),
+
+  // Erst aktivieren, wenn App/Web-Vorschau gemeinsam gebaut und geprüft sind.
+  // Exakt "true" verhindert versehentliches Freischalten durch leere Werte.
+  guestAppEnabled: publicValue(publicEnv?.PUBLIC_GUEST_APP_ENABLED) === 'true',
 
   // Smoobu-Account-ID (Booking-Tool-iFrame: .../booking-tool/iframe/{userId}/{apartmentId}).
   smoobuUserId: '40536',
