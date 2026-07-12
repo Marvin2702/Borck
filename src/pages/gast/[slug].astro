@@ -9,6 +9,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
+import { withBase } from '../../i18n/utils';
 import { site } from '../../data/site';
 
 export async function getStaticPaths() {
@@ -38,9 +39,10 @@ const appLink = `hausaquamarin://wohnung/${slug}`;
       <div class="gast-actions">
         <a class="btn btn--gold btn--lg" href={appLink} data-app-open>Gäste-App öffnen</a>
         {/* TODO nach Store-Release: App-Store- & Play-Store-Badges mit echten Links ergänzen. */}
+        <a class="btn btn--ghost" href={withBase('gast-app/')}>App im Browser ansehen</a>
         <p class="gast-hint">
-          App noch nicht installiert? Bis sie im App Store verfügbar ist, helfen dir die ausgedruckten Infos in der
-          Wohnung — oder du fragst direkt:
+          App noch nicht installiert? Bis sie im App Store verfügbar ist, helfen dir die Browser-Variante oben, die
+          ausgedruckten Infos in der Wohnung — oder du fragst direkt:
         </p>
         <div class="gast-contact">
           <a class="btn btn--ghost" href={`tel:${site.phone.replace(/\s/g, '')}`}><Icon name="phone" size={16} /> {site.phoneDisplay}</a>

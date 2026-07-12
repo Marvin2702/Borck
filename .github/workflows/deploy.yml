@@ -29,6 +29,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            app/package-lock.json
 
       # Ermittelt origin (https://<user>.github.io) und base_path (/<repo>)
       - name: Setup Pages
@@ -58,6 +61,17 @@ jobs:
         env:
           BASE: ${{ steps.pages.outputs.base_path }}
           PUBLIC_STAGING: 'true'
+
+      # Klickbare Web-Vorschau der Gäste-App unter {base}/gast-app/ —
+      # bewusst NACH dem Audit (das prüft nur die Website-Seiten).
+      - name: Gäste-App Web-Vorschau
+        working-directory: app
+        env:
+          APP_WEB_BASE: ${{ steps.pages.outputs.base_path }}/gast-app
+        run: |
+          npm ci
+          npx expo export --platform web
+          mkdir -p ../dist/gast-app && cp -r dist/. ../dist/gast-app/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
