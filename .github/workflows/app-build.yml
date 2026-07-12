@@ -27,18 +27,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     defaults:
       run:
         working-directory: app
     steps:
-      - name: EXPO_TOKEN vorhanden?
-        if: ${{ secrets.EXPO_TOKEN == '' }}
-        run: |
-          echo '::error::Repo-Secret EXPO_TOKEN fehlt. expo.dev → Access Tokens → Token anlegen → GitHub-Repo-Secret EXPO_TOKEN setzen.'
-          exit 1
-
       - name: Checkout
         uses: actions/checkout@v4
+
+      # secrets-Kontext ist in step-if nicht erlaubt — deshalb Shell-Check.
+      - name: EXPO_TOKEN vorhanden?
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo '::error::Repo-Secret EXPO_TOKEN fehlt. expo.dev → Access Tokens → Token anlegen → GitHub-Repo-Secret EXPO_TOKEN setzen.'
+            exit 1
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@v4
