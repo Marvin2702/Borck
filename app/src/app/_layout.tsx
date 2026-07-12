@@ -7,13 +7,18 @@ import { Fraunces_600SemiBold, useFonts } from '@expo-google-fonts/fraunces';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { evaluateBadges } from '../lib/badges';
+import { saveSession } from '../lib/discover';
 import { colors, fonts } from '../theme';
 import {
   emptyState,
   GuestContext,
   loadState,
   persist,
+  type Checkin,
   type GuestState,
+  type PlanItem,
 } from '../lib/store';
 
 export default function RootLayout() {
@@ -50,16 +55,85 @@ export default function RootLayout() {
     });
   }, []);
 
+  const addToPlan = useCallback((items: PlanItem[]) => {
+    setState((s) => {
+      const byId = new Map(s.plan.map((p) => [p.id, p]));
+      for (const item of items) {
+        const prev = byId.get(item.id);
+        byId.set(item.id, {
+          ...item,
+          // Match/Superlike „gewinnen" gegenüber einem früheren Solo-Like.
+          source: prev?.source === 'match' ? 'match' : item.source,
+          superlike: Boolean(prev?.superlike) || item.superlike,
+          addedAt: prev?.addedAt ?? item.addedAt,
+        });
+      }
+      const plan = [...byId.values()];
+      persist.plan(plan);
+      return { ...s, plan };
+    });
+  }, []);
+
+  const removeFromPlan = useCallback((id: string) => {
+    setState((s) => {
+      const plan = s.plan.filter((p) => p.id !== id);
+      persist.plan(plan);
+      return { ...s, plan };
+    });
+  }, []);
+
+  const checkin = useCallback((id: string, weather?: Checkin['weather']) => {
+    setState((s) => {
+      const checkins = { ...s.checkins, [id]: { date: new Date().toISOString(), weather } };
+      const earned = evaluateBadges(checkins);
+      const badges = { ...s.badges };
+      for (const b of earned) if (!(b in badges)) badges[b] = new Date().toISOString();
+      persist.checkins(checkins);
+      persist.badges(badges);
+      return { ...s, checkins, badges };
+    });
+  }, []);
+
+  const setBadges = useCallback((badges: Record<string, string>) => {
+    setState((s) => {
+      persist.badges(badges);
+      return { ...s, badges };
+    });
+  }, []);
+
+  const resetVacationData = useCallback(() => {
+    setState((s) => {
+      persist.plan([]);
+      persist.checkins({});
+      persist.badges({});
+      persist.checklist([]);
+      saveSession(null);
+      return { ...s, plan: [], checkins: {}, badges: {}, checklist: [] };
+    });
+  }, []);
+
   const value = useMemo(
-    () => ({ ...state, setApartment, setDeparture, setReminder, toggleChecklist }),
-    [state, setApartment, setDeparture, setReminder, toggleChecklist]
+    () => ({
+      ...state,
+      setApartment,
+      setDeparture,
+      setReminder,
+      toggleChecklist,
+      addToPlan,
+      removeFromPlan,
+      checkin,
+      setBadges,
+      resetVacationData,
+    }),
+    [state, setApartment, setDeparture, setReminder, toggleChecklist, addToPlan, removeFromPlan, checkin, setBadges, resetVacationData]
   );
 
   // Splash bleibt, bis Font + Zustand da sind (beides lokal, <100 ms).
   if (!fontsLoaded || !hydrated) return null;
 
   return (
-    <GuestContext.Provider value={value}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <GuestContext.Provider value={value}>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -82,7 +156,13 @@ export default function RootLayout() {
         <Stack.Screen name="notfall" options={{ title: 'Notfall & Praktisches' }} />
         <Stack.Screen name="abreise" options={{ title: 'Abreise' }} />
         <Stack.Screen name="einstellungen" options={{ title: 'Einstellungen' }} />
+        <Stack.Screen name="entdecken/index" options={{ title: 'Entdecken' }} />
+        <Stack.Screen name="entdecken/swipe" options={{ title: 'Entdecken' }} />
+        <Stack.Screen name="plan" options={{ title: 'Euer Urlaubsplan' }} />
+        <Stack.Screen name="album" options={{ title: 'Sammelalbum' }} />
+        <Stack.Screen name="service" options={{ title: 'Service & Wünsche' }} />
       </Stack>
-    </GuestContext.Provider>
+      </GuestContext.Provider>
+    </GestureHandlerRootView>
   );
 }

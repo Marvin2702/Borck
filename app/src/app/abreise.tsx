@@ -4,7 +4,9 @@ import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { Action, ActionRow, Body, Card, isTodo, Muted, Screen, SectionTitle } from '../components/ui';
+import { BadgeStamp } from '../components/BadgeStamp';
 import { content } from '../content';
+import { badgeDefs } from '../data/badges';
 import { checkoutChecklist } from '../data/guestInfo';
 import { cancelCheckoutReminder, scheduleCheckoutReminder } from '../lib/notifications';
 import { useGuest } from '../lib/store';
@@ -14,7 +16,7 @@ const isISODate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s);
 
 export default function Abreise() {
   const { site } = content;
-  const { checklist, toggleChecklist, departure, setDeparture, reminder, setReminder } = useGuest();
+  const { checklist, toggleChecklist, departure, setDeparture, reminder, setReminder, badges } = useGuest();
   const [dateInput, setDateInput] = useState(departure ?? '');
   const [reminderNote, setReminderNote] = useState<string | null>(null);
   const items = checkoutChecklist.filter((c) => !isTodo(c));
@@ -84,9 +86,25 @@ export default function Abreise() {
         {reminderNote ? <Muted>{reminderNote}</Muted> : <Muted>Wir melden uns um 8:30 Uhr — ganz ohne Server, direkt vom Handy.</Muted>}
       </Card>
 
+      {Object.keys(badges).length > 0 && (
+        <>
+          <SectionTitle>Euer Urlaub in Stempeln</SectionTitle>
+          <View style={styles.stampRow}>
+            {badgeDefs
+              .filter((d) => badges[d.id])
+              .map((d, i) => (
+                <BadgeStamp key={d.id} def={d} earnedAt={badges[d.id]} index={i} />
+              ))}
+          </View>
+        </>
+      )}
+
       <SectionTitle>Hat es euch gefallen?</SectionTitle>
       <Card>
         <Body>
+          {Object.keys(badges).length > 1
+            ? `${Object.keys(badges).length} Stempel gesammelt — erzählt in eurer Bewertung davon! `
+            : ''}
           Eine Google-Bewertung hilft unserem kleinen Familienbetrieb mehr als jede Werbung — danke! 💙
         </Body>
         <ActionRow>
@@ -138,4 +156,5 @@ const styles = StyleSheet.create({
   },
   direct: { backgroundColor: colors.aqua100 },
   directStrong: { fontWeight: '700', color: colors.aqua900 },
+  stampRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

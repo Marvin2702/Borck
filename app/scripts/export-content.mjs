@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 import { site } from '../../src/data/site.ts';
+import { experiences } from '../../src/data/experiences.ts';
 
 const APP = path.dirname(fileURLToPath(new URL('.', import.meta.url)));
 const ROOT = path.resolve(APP, '..');
@@ -102,6 +103,65 @@ const guides = fs
   })
   .sort((a, b) => a.order - b.order);
 
+const hav = (a, b) => {
+  const R = 6371, dLat = ((b.lat - a.lat) * Math.PI) / 180, dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+};
+
+// --- Erlebnisse für den „Entdecken"-Swiper ---------------------------------
+// 6 Stimmungs-Kategorien (Moods) der Stimmungs-Runde; Erlebnisse tragen 1–2
+// Moods (Kategorie-Mapping + gezielte Overrides). Die Runde GEWICHTET den
+// Stapel nur — nichts wird hart weggefiltert.
+const moods = [
+  { id: 'wasser', icon: '🚢', label: 'Raus aufs Wasser', teaser: 'Kutter, Helgoland, Seehunde & Wellen' },
+  { id: 'watt', icon: '🥾', label: 'Watt & Natur', teaser: 'Weltnaturerbe, Vögel und weiter Horizont' },
+  { id: 'action', icon: '🎯', label: 'Action & Familie', teaser: 'Golf, Kart, Experimente, Seehunde füttern' },
+  { id: 'kultur', icon: '🏛️', label: 'Kultur & Bummeln', teaser: 'Museen, Hafen, Altstadt und Leckereien' },
+  { id: 'wellness', icon: '🧖', label: 'Wellness & Baden', teaser: 'Wellenbad, Sauna und Aufwärmen' },
+  { id: 'strand', icon: '🏖️', label: 'Strandtag', teaser: 'Strandkorb, Lagune, Sonnenuntergang' },
+];
+
+const categoryMood = {
+  'Natur & Strand': ['strand'],
+  'Familie': ['action'],
+  'Aktiv & Wasser': ['wasser'],
+  'Natur & Watt': ['watt'],
+  'Baden & Wellness': ['wellness'],
+  'Museen & Indoor': ['kultur'],
+  'Orte & Kultur': ['kultur'],
+  'Aktiv & Familie': ['action'],
+};
+const moodOverrides = {
+  'perlebucht-lagune': ['strand', 'action'],
+  'wassersport-schule': ['wasser', 'action'],
+  'hafen-leuchtturm': ['kultur', 'strand'],
+  'deich-radtour': ['action', 'watt'],
+  'sonnenuntergang-deich': ['strand', 'watt'],
+  'fischbroetchen-hafen': ['kultur', 'strand'],
+};
+
+const seenIds = new Set();
+const activities = experiences.map((e) => {
+  if (!e.id || seenIds.has(e.id)) throw new Error(`Erlebnis ohne eindeutige id: ${e.name}`);
+  seenIds.add(e.id);
+  const mood = moodOverrides[e.id] ?? categoryMood[e.category];
+  if (!mood) throw new Error(`Keine Mood-Zuordnung für Kategorie "${e.category}" (${e.id})`);
+  return {
+    id: e.id,
+    name: e.name,
+    icon: e.icon,
+    mood,
+    area: e.area,
+    description: e.description,
+    url: e.url,
+    indoor: e.indoor,
+    km: Math.round(hav(site.geo, { lat: e.coords[0], lng: e.coords[1] }) * 10) / 10,
+    lat: e.coords[0],
+    lng: e.coords[1],
+  };
+});
+
 // --- Orientierungspunkte (Quelle: LocationView.astro; Koordinaten stabil) --
 const points = [
   { name: 'Familienlagune Perlebucht', lat: 54.13723, lng: 8.83839 },
@@ -110,11 +170,6 @@ const points = [
   { name: 'Büsum Ortszentrum', lat: 54.1329, lng: 8.8586 },
   { name: 'Hafen & Leuchtturm', lat: 54.1206, lng: 8.8585 },
 ];
-const hav = (a, b) => {
-  const R = 6371, dLat = ((b.lat - a.lat) * Math.PI) / 180, dLng = ((b.lng - a.lng) * Math.PI) / 180;
-  const s = Math.sin(dLat / 2) ** 2 + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(s));
-};
 const orientation = points.map((p) => ({
   name: p.name,
   km: Math.round(hav(site.geo, p) * 10) / 10,
@@ -140,6 +195,8 @@ fs.writeFileSync(
 
 // --- content.json ----------------------------------------------------------
 const content = {
+  moods,
+  activities,
   site: {
     name: site.name,
     tagline: site.tagline,
@@ -163,5 +220,5 @@ const content = {
 };
 fs.writeFileSync(OUT_JSON, JSON.stringify(content, null, 2) + '\n');
 console.log(
-  `content.json: ${apartments.length} Apartments, ${guides.length} Guides, ${orientation.length} Orte · heroImages.ts + ${heroLines.length} Bilder`
+  `content.json: ${apartments.length} Apartments, ${guides.length} Guides, ${activities.length} Erlebnisse, ${orientation.length} Orte · heroImages.ts + ${heroLines.length} Bilder`
 );

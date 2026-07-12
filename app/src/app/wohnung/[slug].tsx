@@ -7,6 +7,7 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Action, ActionRow, Muted, Screen } from '../../components/ui';
+import { WeatherPill } from '../../components/WeatherPill';
 import { apartmentBySlug, content } from '../../content';
 import { heroImages } from '../../heroImages';
 import { useGuest } from '../../lib/store';
@@ -16,8 +17,10 @@ const tiles = [
   { href: '/checkin', icon: '🔑', label: 'Anreise & Check-in' },
   { href: '/wlan', icon: '📶', label: 'WLAN' },
   { href: '/mappe', icon: '📖', label: 'Gästemappe' },
-  { href: '/heute', icon: '🌊', label: 'Was machen wir heute?' },
+  { href: '/service', icon: '🛎️', label: 'Service & Wünsche' },
+  { href: '/heute', icon: '📘', label: 'Reisetipps zum Lesen' },
   { href: '/gezeiten', icon: '🌙', label: 'Ebbe & Flut' },
+  { href: '/album', icon: '🎖️', label: 'Sammelalbum' },
   { href: '/notfall', icon: '⛑️', label: 'Notfall & Praktisches' },
   { href: '/abreise', icon: '👋', label: 'Abreise' },
   { href: '/einstellungen', icon: '⚙️', label: 'Einstellungen' },
@@ -25,7 +28,7 @@ const tiles = [
 
 export default function ApartmentHome() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
-  const { apartment, setApartment } = useGuest();
+  const { apartment, setApartment, plan } = useGuest();
   const apt = apartmentBySlug(slug);
 
   // Deep-Link merken: QR gescannt => diese Wohnung wird die gespeicherte.
@@ -58,6 +61,25 @@ export default function ApartmentHome() {
         <Action label="Route" icon="🧭" url={maps} />
       </ActionRow>
       <Muted>Kein Callcenter — am anderen Ende ist Iris.</Muted>
+
+      <WeatherPill />
+
+      {/* Das Herzstück: der Aktivitäten-Swiper */}
+      <Pressable
+        onPress={() => router.push(plan.length > 0 ? '/plan' : '/entdecken')}
+        style={({ pressed }) => [styles.discover, pressed && styles.pressed]}
+      >
+        <Text style={styles.discoverIcon}>🃏</Text>
+        <View style={styles.discoverText}>
+          <Text style={styles.discoverTitle}>Was machen wir heute?</Text>
+          <Text style={styles.discoverSub}>
+            {plan.length > 0
+              ? `Euer Plan: ${plan.length} ${plan.length === 1 ? 'Idee' : 'Ideen'} — und Nachschub per Swipe`
+              : 'Swipt euch durch Büsum — wie Tinder, nur mit Watt'}
+          </Text>
+        </View>
+        <Text style={styles.discoverChevron}>›</Text>
+      </Pressable>
 
       <View style={styles.tiles}>
         {tiles.map((t) => (
@@ -96,4 +118,18 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
   tileIcon: { fontSize: 22 },
   tileLabel: { fontSize: 15, fontWeight: '600', color: colors.aqua900 },
+  discover: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.aqua900,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    minHeight: 84,
+  },
+  discoverIcon: { fontSize: 34 },
+  discoverText: { flex: 1, gap: 3 },
+  discoverTitle: { fontFamily: fonts.head, fontSize: 20, color: colors.white },
+  discoverSub: { color: 'rgba(255,255,255,0.85)', fontSize: 13, lineHeight: 18 },
+  discoverChevron: { fontSize: 30, color: colors.gold },
 });

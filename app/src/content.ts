@@ -33,6 +33,27 @@ const Apartment = z.object({
   smoobuId: z.string().nullable(),
 });
 
+const Mood = z.object({
+  id: z.string(),
+  icon: z.string(),
+  label: z.string(),
+  teaser: z.string(),
+});
+
+const Activity = z.object({
+  id: z.string(),
+  name: z.string(),
+  icon: z.string(),
+  mood: z.array(z.string()).min(1),
+  area: z.string(),
+  description: z.string(),
+  url: z.string().url(),
+  indoor: z.boolean(),
+  km: z.number().min(0).max(60),
+  lat: z.number(),
+  lng: z.number(),
+});
+
 const Guide = z.object({
   slug: z.string(),
   title: z.string(),
@@ -44,6 +65,8 @@ const Guide = z.object({
 });
 
 export const ContentSchema = z.object({
+  moods: z.array(Mood).min(4),
+  activities: z.array(Activity).min(20),
   site: z.object({
     name: z.string(),
     tagline: z.string(),
@@ -70,6 +93,8 @@ export type Content = z.infer<typeof ContentSchema>;
 export type Apartment = z.infer<typeof Apartment>;
 export type Guide = z.infer<typeof Guide>;
 export type Block = z.infer<typeof Block>;
+export type Mood = z.infer<typeof Mood>;
+export type Activity = z.infer<typeof Activity>;
 
 export const content: Content = ContentSchema.parse(raw);
 
@@ -78,6 +103,9 @@ export const apartmentBySlug = (slug: string | undefined) =>
 
 export const guideBySlug = (slug: string | undefined) =>
   content.guides.find((g) => g.slug === slug);
+
+export const activityById = (id: string | undefined) =>
+  content.activities.find((a) => a.id === id);
 
 /** Deep-Link-Parsing: akzeptiert hausaquamarin://wohnung/{slug} und
  *  https://…/gast/{slug}; liefert den Slug nur, wenn er existiert. */

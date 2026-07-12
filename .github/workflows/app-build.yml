@@ -1,0 +1,64 @@
+# Baut die Gäste-App in der Expo-Cloud (EAS) — manuell startbar:
+# GitHub → Actions → „App Build (EAS)" → Run workflow.
+# Voraussetzung (einmalig): Repo-Secret EXPO_TOKEN
+#   expo.dev → Account Settings → Access Tokens → „Create token"
+#   → GitHub → Settings → Secrets and variables → Actions → EXPO_TOKEN
+#
+# Android „preview" erzeugt eine direkt installierbare APK (Link am Ende
+# des Logs und auf expo.dev). Erster Android-Build erzeugt den Keystore
+# automatisch. iOS braucht zusätzlich den Apple-Account (interaktive
+# Erst-Einrichtung lokal: eas credentials) — bis dahin: android.
+name: App Build (EAS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Plattform'
+        type: choice
+        default: android
+        options: [android, ios, all]
+      profile:
+        description: 'Build-Profil (preview = installierbare Test-APK)'
+        type: choice
+        default: preview
+        options: [preview, production]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: EXPO_TOKEN vorhanden?
+        if: ${{ secrets.EXPO_TOKEN == '' }}
+        run: |
+          echo '::error::Repo-Secret EXPO_TOKEN fehlt. expo.dev → Access Tokens → Token anlegen → GitHub-Repo-Secret EXPO_TOKEN setzen.'
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install
+        run: npm ci
+
+      - name: Platzhalter-Check (nur production streng)
+        if: ${{ inputs.profile == 'production' }}
+        run: STRICT_TODOS=1 npm test
+
+      - name: EAS Build
+        run: eas build --profile ${{ inputs.profile }} --platform ${{ inputs.platform }} --non-interactive

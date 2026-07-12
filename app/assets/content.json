@@ -1,4 +1,410 @@
 {
+  "moods": [
+    {
+      "id": "wasser",
+      "icon": "🚢",
+      "label": "Raus aufs Wasser",
+      "teaser": "Kutter, Helgoland, Seehunde & Wellen"
+    },
+    {
+      "id": "watt",
+      "icon": "🥾",
+      "label": "Watt & Natur",
+      "teaser": "Weltnaturerbe, Vögel und weiter Horizont"
+    },
+    {
+      "id": "action",
+      "icon": "🎯",
+      "label": "Action & Familie",
+      "teaser": "Golf, Kart, Experimente, Seehunde füttern"
+    },
+    {
+      "id": "kultur",
+      "icon": "🏛️",
+      "label": "Kultur & Bummeln",
+      "teaser": "Museen, Hafen, Altstadt und Leckereien"
+    },
+    {
+      "id": "wellness",
+      "icon": "🧖",
+      "label": "Wellness & Baden",
+      "teaser": "Wellenbad, Sauna und Aufwärmen"
+    },
+    {
+      "id": "strand",
+      "icon": "🏖️",
+      "label": "Strandtag",
+      "teaser": "Strandkorb, Lagune, Sonnenuntergang"
+    }
+  ],
+  "activities": [
+    {
+      "id": "perlebucht-lagune",
+      "name": "Familienlagune Perlebucht",
+      "icon": "🏖️",
+      "mood": [
+        "strand",
+        "action"
+      ],
+      "area": "Büsum",
+      "description": "Barrierefreie, ganzjährig frei zugängliche Bade- und Strandlagune am Südstrand mit direktem Nordseeblick.",
+      "url": "https://www.familienlagune-perlebucht.de/",
+      "indoor": false,
+      "km": 0.4,
+      "lat": 54.1354887,
+      "lng": 8.8394263
+    },
+    {
+      "id": "adventure-golf",
+      "name": "Family Fairway – Adventure Golf",
+      "icon": "⛳",
+      "mood": [
+        "action"
+      ],
+      "area": "Büsum",
+      "description": "18 maritim gestaltete Adventuregolf-Bahnen mit Leuchtturm, Krabbenkutter und Seehundbank – nur wenige Minuten vom Haus.",
+      "url": "https://www.adventuregolf-buesum.de/",
+      "indoor": false,
+      "km": 0.4,
+      "lat": 54.1415273,
+      "lng": 8.8444184
+    },
+    {
+      "id": "wassersport-schule",
+      "name": "Wassersport Büsum – Kite-, Surf- & SUP-Schule",
+      "icon": "🏄",
+      "mood": [
+        "wasser",
+        "action"
+      ],
+      "area": "Büsum (Perlebucht)",
+      "description": "VDWS-lizenzierte Schule mit Kursen in Kitesurfen, Windsurfen und SUP im geschützten Sportbecken der Perlebucht.",
+      "url": "https://www.wassersport-buesum.de/",
+      "indoor": false,
+      "km": 0.4,
+      "lat": 54.1384261,
+      "lng": 8.8383051
+    },
+    {
+      "id": "wattwanderung-schutzstation",
+      "name": "Wattwanderung mit der Schutzstation Wattenmeer",
+      "icon": "🥾",
+      "mood": [
+        "watt"
+      ],
+      "area": "Büsum",
+      "description": "Geführte Wattwanderungen ins UNESCO-Weltnaturerbe mit ausgebildeten Nationalpark-Guides, direkt ab Büsum.",
+      "url": "https://www.schutzstation-wattenmeer.de/unsere-stationen/buesum/veranstaltungen-watt-erleben/",
+      "indoor": false,
+      "km": 0.6,
+      "lat": 54.1334294,
+      "lng": 8.8382073
+    },
+    {
+      "id": "meerzeit-wellenbad",
+      "name": "Meerzeit – Wellenbad & Spa",
+      "icon": "🌊",
+      "mood": [
+        "wellness"
+      ],
+      "area": "Büsum",
+      "description": "Modernes Erlebnisbad am Südstrand mit Salzwasser-Wellenbecken, Außenpools und Saunawelt – perfekt bei Schietwetter.",
+      "url": "https://www.buesum.de/meerzeit",
+      "indoor": true,
+      "km": 1.3,
+      "lat": 54.1281385,
+      "lng": 8.8569203
+    },
+    {
+      "id": "krabbenfangfahrt",
+      "name": "Krabbenfangfahrt mit dem Kutter",
+      "icon": "🦐",
+      "mood": [
+        "wasser"
+      ],
+      "area": "Büsum",
+      "description": "Rund 1,5-stündige Fangfahrt ab dem Fischerkai: Netz einholen, Fang sortieren und Nordsee-Fischerei hautnah erleben.",
+      "url": "https://www.adler-eils.de/schiffstouren/fangfahrt.html",
+      "indoor": false,
+      "km": 1.5,
+      "lat": 54.1282822,
+      "lng": 8.8624048
+    },
+    {
+      "id": "helgoland-ausflug",
+      "name": "Tagesausflug nach Helgoland",
+      "icon": "🏝️",
+      "mood": [
+        "wasser"
+      ],
+      "area": "Büsum",
+      "description": "Von April bis Oktober täglich mit der „Funny Girl\" ab Büsum zur einzigen deutschen Hochseeinsel – mit Düne und Lummenfelsen.",
+      "url": "https://www.adler-eils.de/schiffstouren/helgoland/",
+      "indoor": false,
+      "km": 1.6,
+      "lat": 54.1296434,
+      "lng": 8.865803
+    },
+    {
+      "id": "museum-am-meer",
+      "name": "museum am meer & Aquarium am Hafen",
+      "icon": "🐟",
+      "mood": [
+        "kultur"
+      ],
+      "area": "Büsum",
+      "description": "Neu eröffnetes Museum zur Krabbenfischerei und Seebad-Geschichte, verbunden mit dem Nordsee-Aquarium am Fischereihafen.",
+      "url": "https://www.museum-am-meer.de/",
+      "indoor": true,
+      "km": 1.7,
+      "lat": 54.1275877,
+      "lng": 8.8636655
+    },
+    {
+      "id": "seehundsbank-fahrt",
+      "name": "Fahrt zur Seehundsbank",
+      "icon": "🦭",
+      "mood": [
+        "wasser"
+      ],
+      "area": "Büsum",
+      "description": "Rund zweistündige Schiffstour ab dem Hafen zu einer der größten Seehundsbänke der Nordsee – je nach Tide bis zu 100 Tiere.",
+      "url": "https://www.adler-eils.de/schiffstouren/seehundsb%C3%A4nke.html",
+      "indoor": false,
+      "km": 1.7,
+      "lat": 54.1270341,
+      "lng": 8.8631939
+    },
+    {
+      "id": "phaenomania",
+      "name": "Phänomania Erlebniszentrum",
+      "icon": "🔬",
+      "mood": [
+        "action"
+      ],
+      "area": "Büsum",
+      "description": "Interaktives Mitmach-Museum mit über 230 Experimentierstationen zu Sinnen und Naturwissenschaft (saisonal März–Oktober).",
+      "url": "https://www.phaenomania-buesum.de/",
+      "indoor": true,
+      "km": 1.9,
+      "lat": 54.1285211,
+      "lng": 8.8698562
+    },
+    {
+      "id": "hafen-leuchtturm",
+      "name": "Büsumer Hafen & Altstadt mit Leuchtturm",
+      "icon": "🚨",
+      "mood": [
+        "kultur",
+        "strand"
+      ],
+      "area": "Büsum",
+      "description": "Hafen mit großer Krabbenkutterflotte, rot-weißem Leuchtturm von 1913 und spätgotischer St.-Clemens-Kirche.",
+      "url": "https://www.buesum.de/buesum-erleben/kultur-und-sehenswertes",
+      "indoor": false,
+      "km": 2,
+      "lat": 54.1220931,
+      "lng": 8.8588978
+    },
+    {
+      "id": "kartbahn-nordseering",
+      "name": "Nordseering Büsum – Kartbahn",
+      "icon": "🏎️",
+      "mood": [
+        "action"
+      ],
+      "area": "Büsum",
+      "description": "Outdoor-Kartbahn am Deich mit einer 900-m-Strecke für Erwachsene und einer 200-m-Kinderbahn.",
+      "url": "https://www.nordseering.de/",
+      "indoor": false,
+      "km": 2.1,
+      "lat": 54.1235048,
+      "lng": 8.8658055
+    },
+    {
+      "id": "kohlosseum",
+      "name": "KOHLosseum Wesselburen",
+      "icon": "🥬",
+      "mood": [
+        "kultur"
+      ],
+      "area": "Wesselburen",
+      "description": "In einer ehemaligen Sauerkrautfabrik vereint: Kohlmuseum, Bauernmarkt und Krautwerkstatt mit Vorführungen und Verkostung.",
+      "url": "https://www.kohlosseum.de/",
+      "indoor": true,
+      "km": 9.4,
+      "lat": 54.2052997,
+      "lng": 8.932442
+    },
+    {
+      "id": "kronenloch-voegel",
+      "name": "Vogelbeobachtung Kronenloch (Speicherkoog)",
+      "icon": "🦅",
+      "mood": [
+        "watt"
+      ],
+      "area": "Meldorf",
+      "description": "Naturschutzgebiet mit Beobachtungsturm und -hütten, in dem im Jahresverlauf rund 250 Vogelarten zu sehen sind.",
+      "url": "https://www.echt-dithmarschen.de/typisch/poi/beobachtungshuette-am-kronenloch-meldorfer-hafen",
+      "indoor": false,
+      "km": 10.7,
+      "lat": 54.0834572,
+      "lng": 8.9812205
+    },
+    {
+      "id": "seehundstation-friedrichskoog",
+      "name": "Seehundstation Friedrichskoog",
+      "icon": "🦭",
+      "mood": [
+        "action"
+      ],
+      "area": "Friedrichskoog",
+      "description": "Offizielle Aufzuchtstation für verwaiste Seehunde und Kegelrobben mit täglichen Fütterungen – ein Muss für Familien.",
+      "url": "https://www.seehundstation-friedrichskoog.de/",
+      "indoor": false,
+      "km": 15.3,
+      "lat": 54.0010419,
+      "lng": 8.8758812
+    },
+    {
+      "id": "landesmuseum-meldorf",
+      "name": "Dithmarscher Landesmuseum Meldorf",
+      "icon": "🏛️",
+      "mood": [
+        "kultur"
+      ],
+      "area": "Meldorf",
+      "description": "Neu gestaltete Dauerausstellung zu rund 1.200 Jahren Dithmarscher Geschichte – von der Bauernrepublik bis in die 1960er.",
+      "url": "https://www.landesmuseum-dithmarschen.de/",
+      "indoor": true,
+      "km": 15.8,
+      "lat": 54.0914354,
+      "lng": 9.0739479
+    },
+    {
+      "id": "strandkorb-tag",
+      "name": "Strandkorb-Tag am Büsumer Strand",
+      "icon": "⛱️",
+      "mood": [
+        "strand"
+      ],
+      "area": "Büsum",
+      "description": "Einen Tag lang Wind und Wellen aus dem eigenen gemieteten Strandkorb genießen – die norddeutsche Antwort auf die Sonnenliege.",
+      "url": "https://www.buesum.de/buesum-erleben/strand/strandkoerbe",
+      "indoor": false,
+      "km": 0.4,
+      "lat": 54.1384261,
+      "lng": 8.8383051
+    },
+    {
+      "id": "schlafstrandkorb",
+      "name": "Eine Nacht im Schlafstrandkorb",
+      "icon": "🌙",
+      "mood": [
+        "strand"
+      ],
+      "area": "Büsum",
+      "description": "Unter freiem Himmel am Strand einschlafen und mit Nordseerauschen aufwachen – das wohl besonderste Bett in Büsum.",
+      "url": "https://www.buesum.de/buesum-erleben/strand/schlafstrandkorb",
+      "indoor": false,
+      "km": 0.4,
+      "lat": 54.1384261,
+      "lng": 8.8383051
+    },
+    {
+      "id": "wattfuehrung-fuer-alle",
+      "name": "Wattführung „für Alle\" (barrierearm)",
+      "icon": "👣",
+      "mood": [
+        "watt"
+      ],
+      "area": "Büsum (Perlebucht)",
+      "description": "Kurze, barrierearme Wattführung an der Perlebucht – ideal mit kleinen Kindern oder für die erste Watt-Erfahrung.",
+      "url": "https://www.buesum.de/veranstaltungen/event/wattwanderung-fuer-alle",
+      "indoor": false,
+      "km": 0.6,
+      "lat": 54.1362,
+      "lng": 8.8352
+    },
+    {
+      "id": "deich-radtour",
+      "name": "Radtour auf den Deichwegen",
+      "icon": "🚲",
+      "mood": [
+        "action",
+        "watt"
+      ],
+      "area": "Büsum",
+      "description": "Ebene, endlose Deichwege mit Schafen und Weitblick – die Fahrradgarage am Haus macht den Start leicht.",
+      "url": "https://www.buesum.de/buesum-erleben/fuehrungen",
+      "indoor": false,
+      "km": 0.2,
+      "lat": 54.1392,
+      "lng": 8.843
+    },
+    {
+      "id": "promenaden-bummel",
+      "name": "Promenaden-Bummel mit Eis",
+      "icon": "🍦",
+      "mood": [
+        "kultur"
+      ],
+      "area": "Büsum",
+      "description": "Gemütlich die Deichpromenade entlangschlendern, Schiffe gucken und mit einem Eis in der Hand den Tag treiben lassen.",
+      "url": "https://www.buesum.de/buesum-erleben/strand",
+      "indoor": false,
+      "km": 0.6,
+      "lat": 54.1329,
+      "lng": 8.85
+    },
+    {
+      "id": "fischbroetchen-hafen",
+      "name": "Fischbrötchen & Krabben am Hafen",
+      "icon": "🦐",
+      "mood": [
+        "kultur",
+        "strand"
+      ],
+      "area": "Büsum",
+      "description": "Frische Nordseekrabben direkt am Fischereihafen probieren – dort, wo die Kutter sie anlanden.",
+      "url": "https://www.buesum.de/buesum-erleben/kultur-und-sehenswertes",
+      "indoor": false,
+      "km": 2,
+      "lat": 54.1220931,
+      "lng": 8.8588978
+    },
+    {
+      "id": "sonnenuntergang-deich",
+      "name": "Sonnenuntergang am Deich",
+      "icon": "🌅",
+      "mood": [
+        "strand",
+        "watt"
+      ],
+      "area": "Büsum",
+      "description": "Abends mit einer Decke auf den Deich – wenn die Sonne im Wattenmeer versinkt, ist das großes Kino und kostet nichts.",
+      "url": "https://www.buesum.de/buesum-erleben/strand",
+      "indoor": false,
+      "km": 0.2,
+      "lat": 54.1392,
+      "lng": 8.843
+    },
+    {
+      "id": "spa-meerzeit",
+      "name": "Saunatag im Spa „Meerzeit\"",
+      "icon": "🧖",
+      "mood": [
+        "wellness"
+      ],
+      "area": "Büsum",
+      "description": "Saunawelt mit Nordseeblick im Erlebnisbad Meerzeit – Aufwärmen und Runterkommen, wenn draußen der Wind pfeift.",
+      "url": "https://www.buesum.de/meerzeit",
+      "indoor": true,
+      "km": 1.3,
+      "lat": 54.1281385,
+      "lng": 8.8569203
+    }
+  ],
   "site": {
     "name": "Haus Aquamarin",
     "tagline": "Ferienapartments direkt hinter der Familienlagune · Büsum",

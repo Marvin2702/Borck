@@ -8,7 +8,7 @@ import { useGuest } from '../lib/store';
 import { colors, radius, spacing } from '../theme';
 
 export default function Einstellungen() {
-  const { apartment, setApartment, setDeparture, setReminder } = useGuest();
+  const { apartment, setApartment, setDeparture, setReminder, resetVacationData } = useGuest();
   const apt = apartmentBySlug(apartment ?? undefined);
   const { site } = content;
 
@@ -43,9 +43,17 @@ export default function Einstellungen() {
         ))}
       </Card>
 
+      <SectionTitle>Urlaubsdaten</SectionTitle>
+      <Card>
+        <Muted>Löscht Urlaubsplan, Stempel und angefangene Swipe-Runden (z. B. für den nächsten Aufenthalt).</Muted>
+        <Pressable onPress={resetVacationData} style={({ pressed }) => [styles.btn, styles.btnDanger, pressed && { opacity: 0.85 }]}>
+          <Text style={styles.btnLabel}>Urlaubsdaten zurücksetzen</Text>
+        </Pressable>
+      </Card>
+
       <Muted>
-        Diese App speichert nur deine Wohnungs-Auswahl und die Checkliste — lokal auf deinem Gerät, keine Konten,
-        kein Tracking.
+        Diese App speichert eure Auswahl (Wohnung, Plan, Stempel) nur lokal auf dem Gerät — keine Konten, kein
+        Tracking. Fürs Wetter fragt sie anonym die freie Open-Meteo-Vorhersage für Büsum ab.
       </Muted>
     </Screen>
   );
@@ -61,6 +69,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btnLabel: { color: colors.white, fontWeight: '600' },
+  btnDanger: { backgroundColor: '#a64b50' },
   linkRow: { paddingVertical: spacing.sm, minHeight: 44, justifyContent: 'center' },
   link: { color: colors.aqua700, fontWeight: '600', fontSize: 15 },
 });
