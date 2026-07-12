@@ -1,0 +1,36 @@
+// GENERIERT von scripts/generate-activity-art.mjs — nicht von Hand editieren.
+// Metro braucht statische require()-Pfade, daher diese Map.
+export const activityArt: Record<string, number> = {
+  'perlebucht-lagune': require('../../assets/activities/perlebucht-lagune.webp'),
+  'adventure-golf': require('../../assets/activities/adventure-golf.webp'),
+  'wassersport-schule': require('../../assets/activities/wassersport-schule.webp'),
+  'wattwanderung-schutzstation': require('../../assets/activities/wattwanderung-schutzstation.webp'),
+  'meerzeit-wellenbad': require('../../assets/activities/meerzeit-wellenbad.webp'),
+  'krabbenfangfahrt': require('../../assets/activities/krabbenfangfahrt.webp'),
+  'helgoland-ausflug': require('../../assets/activities/helgoland-ausflug.webp'),
+  'museum-am-meer': require('../../assets/activities/museum-am-meer.webp'),
+  'seehundsbank-fahrt': require('../../assets/activities/seehundsbank-fahrt.webp'),
+  'phaenomania': require('../../assets/activities/phaenomania.webp'),
+  'hafen-leuchtturm': require('../../assets/activities/hafen-leuchtturm.webp'),
+  'kartbahn-nordseering': require('../../assets/activities/kartbahn-nordseering.webp'),
+  'kohlosseum': require('../../assets/activities/kohlosseum.webp'),
+  'kronenloch-voegel': require('../../assets/activities/kronenloch-voegel.webp'),
+  'seehundstation-friedrichskoog': require('../../assets/activities/seehundstation-friedrichskoog.webp'),
+  'landesmuseum-meldorf': require('../../assets/activities/landesmuseum-meldorf.webp'),
+  'strandkorb-tag': require('../../assets/activities/strandkorb-tag.webp'),
+  'schlafstrandkorb': require('../../assets/activities/schlafstrandkorb.webp'),
+  'wattfuehrung-fuer-alle': require('../../assets/activities/wattfuehrung-fuer-alle.webp'),
+  'deich-radtour': require('../../assets/activities/deich-radtour.webp'),
+  'promenaden-bummel': require('../../assets/activities/promenaden-bummel.webp'),
+  'fischbroetchen-hafen': require('../../assets/activities/fischbroetchen-hafen.webp'),
+  'sonnenuntergang-deich': require('../../assets/activities/sonnenuntergang-deich.webp'),
+  'spa-meerzeit': require('../../assets/activities/spa-meerzeit.webp'),
+  'mood-wasser': require('../../assets/activities/mood-wasser.webp'),
+  'mood-watt': require('../../assets/activities/mood-watt.webp'),
+  'mood-action': require('../../assets/activities/mood-action.webp'),
+  'mood-kultur': require('../../assets/activities/mood-kultur.webp'),
+  'mood-wellness': require('../../assets/activities/mood-wellness.webp'),
+  'mood-strand': require('../../assets/activities/mood-strand.webp'),
+};
+
+export const cardScrim = require('../../assets/activities/card-scrim.webp');

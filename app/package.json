@@ -54,7 +54,8 @@
     "lint": "expo lint",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "art": "node scripts/generate-activity-art.mjs"
   },
   "private": true,
   "jest": {
