@@ -19,6 +19,9 @@ function resolveLocal(raw, htmlFile) {
   // Jede URL mit Schema ist kein lokales Ziel (http/mailto/tel, aber auch
   // Custom-App-Schemes wie hausaquamarin:// der Gäste-App-Brücke).
   if (!value || /^[a-z][a-z0-9+.-]*:/i.test(value)) return null;
+  // /gast-app/ (Web-Vorschau der Gäste-App) wird im Deploy NACH dem Audit
+  // in dist/ kopiert — als Ziel akzeptieren, nicht als Datei prüfen.
+  if (value.startsWith(`${base}/gast-app/`) || value === `${base}/gast-app`) return null;
   let pathname = value;
   if (pathname.startsWith('/')) {
     if (base && pathname.startsWith(`${base}/`)) pathname = pathname.slice(base.length);
