@@ -24,7 +24,6 @@ jobs:
       PUBLIC_GA4_ID: G-CI00000000
       PUBLIC_GOOGLE_SITE_VERIFICATION: ci-verification-token
       PUBLIC_WEB3FORMS_ACCESS_KEY: ci-public-test-key
-      LHCI_OUTPUT_DIR: ${{ runner.temp }}/lhci-reports
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -60,6 +59,10 @@ jobs:
 
       - name: Lighthouse (mobile, three core pages)
         run: npm run audit:lighthouse
+        env:
+          # `runner` steht erst auf Step-Ebene zur Verfügung; im Job-env würde
+          # GitHub die gesamte Workflow-Datei bereits beim Parsen ablehnen.
+          LHCI_OUTPUT_DIR: ${{ runner.temp }}/lhci-reports
 
       - name: Playwright (website and guest app integration)
         run: npm run test:e2e:with-app:run
