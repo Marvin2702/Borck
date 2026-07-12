@@ -1,9 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
 import Img from './Img.astro';
 import Icon from './Icon.astro';
-import { useTranslations, type Lang } from '../i18n/utils';
+import { localizedPath, useTranslations, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 
 interface Props { lang: Lang }
@@ -13,21 +14,73 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
 const title = `${t('contact.title')} · ${site.name} Büsum`;
 // Apartment-Auswahl fürs Formular (buildtime aus der Collection).
 const apartments = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
+const maxGuests = Math.max(...apartments.map((a) => a.data.persons), 1);
+const thanksHref = localizedPath('danke', lang);
+const thanksUrl = new URL(thanksHref, Astro.site ?? new URL(site.domain)).href;
+const privacyHref = localizedPath('datenschutz', 'de');
+const formUi: Record<Lang, {
+  datePair: string;
+  dateOrder: string;
+  capacity: string;
+  sending: string;
+  metaDescription: string;
+  privacyPrefix: string;
+  privacyLink: string;
+}> = {
+  de: {
+    datePair: 'Bitte wähle Anreise und Abreise gemeinsam aus.',
+    dateOrder: 'Die Abreise muss nach der Anreise liegen.',
+    capacity: 'Dieses Apartment ist für höchstens {capacity} Personen ausgelegt.',
+    sending: 'Anfrage wird gesendet …',
+    metaDescription: 'Haus Aquamarin in Büsum direkt kontaktieren: Ferienwohnung mit Reisezeitraum und Gästezahl anfragen oder Iris per Telefon, WhatsApp und E-Mail erreichen.',
+    privacyPrefix: 'Mit dem Absenden gilt unsere',
+    privacyLink: 'Datenschutzerklärung',
+  },
+  en: {
+    datePair: 'Please select both arrival and departure.',
+    dateOrder: 'Departure must be after arrival.',
+    capacity: 'This apartment accommodates a maximum of {capacity} guests.',
+    sending: 'Sending your enquiry …',
+    metaDescription: 'Contact Haus Aquamarin in Büsum directly: enquire about an apartment with dates and guest count, or reach Iris by phone, WhatsApp and email.',
+    privacyPrefix: 'When submitting, our',
+    privacyLink: 'privacy policy (German)',
+  },
+  nl: {
+    datePair: 'Kies zowel aankomst als vertrek.',
+    dateOrder: 'Het vertrek moet na de aankomst liggen.',
+    capacity: 'Dit appartement is geschikt voor maximaal {capacity} personen.',
+    sending: 'Je aanvraag wordt verstuurd …',
+    metaDescription: 'Neem rechtstreeks contact op met Haus Aquamarin in Büsum: vraag een appartement aan met reisdata en aantal gasten, of bel, app of mail Iris.',
+    privacyPrefix: 'Bij het verzenden geldt onze',
+    privacyLink: 'privacyverklaring (Duits)',
+  },
+  da: {
+    datePair: 'Vælg både ankomst og afrejse.',
+    dateOrder: 'Afrejsen skal ligge efter ankomsten.',
+    capacity: 'Denne lejlighed har plads til højst {capacity} personer.',
+    sending: 'Din forespørgsel sendes …',
+    metaDescription: 'Kontakt Haus Aquamarin i Büsum direkte: forespørg på en lejlighed med datoer og antal gæster, eller kontakt Iris via telefon, WhatsApp og e-mail.',
+    privacyPrefix: 'Ved afsendelse gælder vores',
+    privacyLink: 'privatlivspolitik (tysk)',
+  },
+};
+const f = formUi[lang];
 ---
-<BaseLayout title={title} description={t('contact.subtitle')} pageKey="kontakt">
+<BaseLayout title={title} description={f.metaDescription} pageKey="kontakt">
   <section class="section">
     <div class="container-narrow">
+      <Breadcrumbs lang={lang} items={[{ label: t('contact.title'), href: localizedPath('kontakt', lang) }]} />
       <p class="eyebrow">{t('site.tagline')}</p>
       <h1>{t('contact.title')}</h1>
       <p class="lead">{t('contact.subtitle')}</p>
 
       <div class="contact-grid">
-        <a class="contact-card" href={`tel:${site.phone.replace(/\s/g, '')}`}>
+        <a class="contact-card" href={`tel:${site.phone.replace(/\s/g, '')}`} data-track-location="contact_page">
           <span class="ci"><Icon name="phone" size={22} /></span>
           <span class="cl">{t('contact.phone')}</span>
           <strong>{site.phoneDisplay}</strong>
         </a>
-        <a class="contact-card" href={`https://wa.me/${site.whatsapp}?text=${waText}`} target="_blank" rel="noopener">
+        <a class="contact-card" href={`https://wa.me/${site.whatsapp}?text=${waText}`} target="_blank" rel="noopener" data-track-location="contact_page">
           <span class="ci"><Icon name="chat" size={22} /></span>
           <span class="cl">{t('contact.whatsapp')}</span>
           <strong>{site.phoneDisplay}</strong>
@@ -51,14 +104,21 @@ const apartments = (await getCollection('apartments')).sort((a, b) => a.data.ord
         method="POST"
         data-haskey={site.formAccessKey ? '1' : '0'}
         data-email={site.email}
+        data-language={lang}
+        data-thanks={thanksHref}
         data-success={t('form.success')}
         data-error={t('form.error')}
         data-mailtohint={`${t('form.mailtoHint')} ${site.email} · ${site.phoneDisplay}`}
+        data-date-pair={f.datePair}
+        data-date-order={f.dateOrder}
+        data-capacity={f.capacity}
+        data-sending={f.sending}
       >
         <input type="hidden" name="access_key" value={site.formAccessKey} />
         <input type="hidden" name="subject" value={`Anfrage über ${site.name} Website`} />
         <input type="hidden" name="from_name" value={site.name} />
-        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" />
+        <input type="hidden" name="redirect" value={thanksUrl} />
+        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <div class="form-head">
           <span class="form-portrait" aria-hidden="true">
             <Img src="/images/iris-mia.jpg" alt="" width={112} height={112} loading="lazy" sizes="56px" />
@@ -73,20 +133,21 @@ const apartments = (await getCollection('apartments')).sort((a, b) => a.data.ord
           <label>{t('contact.email')}<input type="email" name="email" required autocomplete="email" /></label>
         </div>
         <div class="form-row">
-          <label>{t('form.arrival')}<input type="date" name="arrival" autocomplete="off" /></label>
-          <label>{t('form.departure')}<input type="date" name="departure" autocomplete="off" /></label>
+          <label>{t('form.arrival')}<input type="date" name="arrival" autocomplete="off" data-arrival /></label>
+          <label>{t('form.departure')}<input type="date" name="departure" autocomplete="off" data-departure /></label>
         </div>
         <div class="form-row">
           <label>{t('form.apartment')}
-            <select name="apartment">
+            <select name="apartment" data-apartment-select>
               <option value="">{t('form.apartmentAny')}</option>
-              {apartments.map((a) => <option value={a.data.name}>{a.data.name}</option>)}
+              {apartments.map((a) => <option value={a.data.name} data-capacity={a.data.persons}>{a.data.name}</option>)}
             </select>
           </label>
-          <label>{t('apartments.persons')}<input type="number" name="guests" min="1" max="6" inputmode="numeric" /></label>
+          <label>{t('apartments.persons')}<input type="number" name="guests" min="1" max={maxGuests} inputmode="numeric" data-guests /></label>
         </div>
         <label>{t('form.message')}<textarea name="message" rows="4" required></textarea></label>
-        <button type="submit" class="btn btn--gold">{t('form.send')}</button>
+        <button type="submit" class="btn btn--gold" data-submit>{t('form.send')}</button>
+        <p class="form-privacy">{f.privacyPrefix} <a href={privacyHref}>{f.privacyLink}</a>.</p>
         <p class="form-status" data-form-status role="status" aria-live="polite"></p>
       </form>
 
@@ -135,8 +196,10 @@ const apartments = (await getCollection('apartments')).sort((a, b) => a.data.ord
   }
   .contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: transparent; }
   .contact-form button { justify-self: start; }
-  .hp { position: absolute; left: -9999px; }
+  .hp { display: none; }
   .form-status { margin: 0; font-weight: 600; }
+  .form-privacy { margin: -0.3rem 0 0; color: var(--text-muted); font-size: 0.8rem; }
+  .form-privacy a { color: var(--brand); }
   .form-status.is-ok { color: var(--c-deich-700); }
   .form-status.is-err { color: #a52a3a; }
   @media (max-width: 600px) {
@@ -146,11 +209,107 @@ const apartments = (await getCollection('apartments')).sort((a, b) => a.data.ord
 </style>
 
 <script>
+  const PENDING_LEAD_KEY = 'ha-pending-lead-v1';
   const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
   if (form) {
     const status = form.querySelector<HTMLElement>('[data-form-status]');
+    const arrival = form.querySelector<HTMLInputElement>('[data-arrival]');
+    const departure = form.querySelector<HTMLInputElement>('[data-departure]');
+    const apartment = form.querySelector<HTMLSelectElement>('[data-apartment-select]');
+    const guests = form.querySelector<HTMLInputElement>('[data-guests]');
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+    const submitLabel = submit?.textContent || '';
+    const defaultCapacity = Number(guests?.max || 1);
+
+    const pad = (value: number) => String(value).padStart(2, '0');
+    const today = (() => {
+      const now = new Date();
+      return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    })();
+    const addDays = (iso: string, days: number) => {
+      const [year, month, day] = iso.split('-').map(Number);
+      const date = new Date(Date.UTC(year, month - 1, day + days));
+      return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
+    };
+
+    if (arrival) arrival.min = today;
+    if (departure) departure.min = addDays(today, 1);
+
+    const selectedCapacity = () => {
+      const selected = apartment?.selectedOptions[0];
+      return Number(selected?.dataset.capacity || defaultCapacity);
+    };
+
+    const validateDates = () => {
+      if (!arrival || !departure) return true;
+      arrival.setCustomValidity('');
+      departure.setCustomValidity('');
+      if (arrival.value && !departure.value) {
+        departure.setCustomValidity(form.dataset.datePair || '');
+        return false;
+      }
+      if (!arrival.value && departure.value) {
+        arrival.setCustomValidity(form.dataset.datePair || '');
+        return false;
+      }
+      if (arrival.value && departure.value && departure.value <= arrival.value) {
+        departure.setCustomValidity(form.dataset.dateOrder || '');
+        return false;
+      }
+      return true;
+    };
+
+    const validateCapacity = () => {
+      if (!guests) return true;
+      guests.setCustomValidity('');
+      const capacity = selectedCapacity();
+      const count = Number(guests.value);
+      guests.max = String(capacity || Number(guests.max) || 1);
+      if (guests.value && capacity > 0 && count > capacity) {
+        guests.setCustomValidity((form.dataset.capacity || '').replace('{capacity}', String(capacity)));
+        return false;
+      }
+      return true;
+    };
+
+    const validate = () => {
+      const datesValid = validateDates();
+      const capacityValid = validateCapacity();
+      return datesValid && capacityValid && form.checkValidity();
+    };
+
+    arrival?.addEventListener('input', () => {
+      if (departure) departure.min = arrival.value ? addDays(arrival.value, 1) : addDays(today, 1);
+      validateDates();
+    });
+    departure?.addEventListener('input', validateDates);
+    apartment?.addEventListener('change', validateCapacity);
+    guests?.addEventListener('input', validateCapacity);
+
+    const setSubmitting = (busy: boolean) => {
+      form.dataset.submitting = busy ? '1' : '0';
+      if (!submit) return;
+      submit.disabled = busy;
+      submit.setAttribute('aria-busy', busy ? 'true' : 'false');
+      submit.textContent = busy ? (form.dataset.sending || submitLabel) : submitLabel;
+    };
+
+    const markPendingLead = () => {
+      const id = typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      try {
+        sessionStorage.setItem(PENDING_LEAD_KEY, JSON.stringify({ id, createdAt: Date.now(), method: 'web3forms' }));
+      } catch { /* Lead wird versendet; nur die anonyme Erfolgsmessung entfällt. */ }
+    };
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (form.dataset.submitting === '1') return;
+      if (!validate()) {
+        form.reportValidity();
+        return;
+      }
       const data = new FormData(form);
       // Ohne Web3Forms-Key: mailto-Fallback (öffnet das E-Mail-Programm).
       if (form.dataset.haskey !== '1') {
@@ -167,13 +326,21 @@ const apartments = (await getCollection('apartments')).sort((a, b) => a.data.ord
         return;
       }
       if (status) { status.textContent = '…'; status.className = 'form-status'; }
+      setSubmitting(true);
       try {
         const res = await fetch(form.action, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
-        if (!res.ok) throw new Error('bad');
+        const result = await res.json().catch(() => null);
+        if (!res.ok || result?.success !== true) throw new Error('submission_failed');
+        markPendingLead();
         form.reset();
+        if (departure) departure.min = addDays(today, 1);
+        validateCapacity();
         if (status) { status.textContent = form.dataset.success || ''; status.className = 'form-status is-ok'; }
+        window.location.assign(form.dataset.thanks || '/danke/');
       } catch {
         if (status) { status.textContent = form.dataset.error || ''; status.className = 'form-status is-err'; }
+      } finally {
+        setSubmitting(false);
       }
     });
   }

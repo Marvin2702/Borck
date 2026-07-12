@@ -1,7 +1,14 @@
 // =========================================================================
 // Stammdaten (Single Source of Truth) — NAP, Geo, Kontakt, Impressum.
 // Quelle: Originalseite nordsee-buesum-fewo.de (Stand 06/2026).
+// Deployment-spezifische, öffentliche IDs kommen ausschließlich aus PUBLIC_*
+// Variablen. Sie landen ohnehin im ausgelieferten HTML und sind keine Secrets.
 // =========================================================================
+
+const publicValue = (value: string | undefined) => value?.trim() ?? '';
+
+const configuredGaId = publicValue(import.meta.env.PUBLIC_GA4_ID);
+const googleAnalyticsId = /^G-[A-Z0-9]+$/i.test(configuredGaId) ? configuredGaId : '';
 
 export const site = {
   name: 'Haus Aquamarin',
@@ -69,20 +76,19 @@ export const site = {
 
   // Google: GA4-Mess-ID (z. B. "G-XXXXXXXXXX") und Search-Console-Verifizierung.
   // GA lädt NUR nach Einwilligung im Consent-Banner. Leer => kein Analytics, kein Banner.
-  googleAnalyticsId: '' as string,
-  googleSiteVerification: '' as string,
+  googleAnalyticsId,
+  googleSiteVerification: publicValue(import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION),
 
   // Web3Forms Access-Key für das Kontaktformular (statischer Versand ohne Backend).
   // Kostenlos unter https://web3forms.com (E-Mail eintragen, Key erhalten).
-  // Leer => Formular nutzt mailto-Fallback. TODO: Key eintragen.
-  formAccessKey: '' as string,
+  // Leer => Formular nutzt mailto-Fallback. Der Access-Key ist laut Web3Forms
+  // ausdrücklich öffentlich; niemals den Smoobu-API-Key als PUBLIC_* setzen.
+  formAccessKey: publicValue(import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY),
 
   // Smoobu-Account-ID (Booking-Tool-iFrame: .../booking-tool/iframe/{userId}/{apartmentId}).
   smoobuUserId: '40536',
   // Direkte Smoobu-Buchungsseite (1-Klick): + "?apartmentId={id}" für ein Apartment.
   smoobuBookingPage: 'https://booking.smoobu.com/9A40536',
-  // Optionale Sammel-/Such-Buchungsmaschine über alle Objekte (falls vorhanden).
-  smoobuGroupId: '' as string,
 } as const;
 
 export type Site = typeof site;

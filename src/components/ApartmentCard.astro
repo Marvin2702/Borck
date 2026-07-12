@@ -4,7 +4,6 @@ import { priceFrom } from '../data/prices';
 import { trApt } from '../data/apartments-i18n';
 import Img from './Img.astro';
 import Icon from './Icon.astro';
-import { site } from '../data/site';
 import type { CollectionEntry } from 'astro:content';
 import { galleryImageAlt } from '../data/gallery-alt';
 
@@ -23,11 +22,14 @@ const price = priceFrom(d.smoobu_id, d.price_from);
 const tr = trApt(apartment.id, lang);
 const view = tr?.view ?? d.view;
 const summary = tr?.summary ?? d.summary;
-// 1-Klick-Buchung: direkt zur Smoobu-Buchungsseite dieses Apartments.
-const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_id}` : href;
+// Der Buchungs-CTA bleibt in der eigenen Trust-Umgebung und springt zum
+// eingebetteten Smoobu-Kalender auf der Detailseite.
+const bookUrl = `${href}#buchung`;
 // Karten-Galerie: alle Fotos direkt auf der Karte durchblätterbar,
 // damit niemand die Seite verlassen muss, um sich zu entscheiden.
-const gallery: string[] = d.gallery?.length ? d.gallery : d.heroImage ? [d.heroImage] : [];
+// In Übersichten reichen vier Motive zur Auswahl. Die vollständige Galerie
+// bleibt auf der Detailseite; das reduziert HTML und Bild-Requests erheblich.
+const gallery: string[] = (d.gallery?.length ? d.gallery : d.heroImage ? [d.heroImage] : []).slice(0, 4);
 ---
 
 <article class="card apt" data-apt
@@ -92,7 +94,7 @@ const gallery: string[] = d.gallery?.length ? d.gallery : d.heroImage ? [d.heroI
       <div class="apt-actions">
         <a href={href} class="btn btn--ghost apt-details">{t('apartments.details')}</a>
         {/* Karten-CTA in Aqua — Gold bleibt den Seiten-Primär-CTAs vorbehalten */}
-        <a href={bookUrl} class="btn apt-book" target="_blank" rel="noopener">{t('cta.bookNow')}</a>
+        <a href={bookUrl} class="btn apt-book" data-track-event="select_apartment" data-track-apartment={apartment.id} data-track-location="card">{t('cta.bookNow')}</a>
       </div>
     </div>
   </div>

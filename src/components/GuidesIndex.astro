@@ -1,9 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
 import CtaBanner from './CtaBanner.astro';
 import ExperienceMap from './ExperienceMap.astro';
-import { localizedPath } from '../i18n/utils';
+import { localizedPath, withoutBase } from '../i18n/utils';
 import { site } from '../data/site';
 import { experiences } from '../data/experiences';
 
@@ -11,10 +12,28 @@ const guides = (await getCollection('guides')).sort((a, b) => a.data.order - b.d
 const title = `Reiseführer Büsum: Erlebnisse & Ausflugsziele · ${site.name}`;
 const description = 'Reiseführer für Büsum: die Top-Erlebnisse und Ausflugsziele im Umkreis von 20 km auf einer interaktiven Karte – Wattwandern, Seehundstation, Helgoland, Wellenbad, Kartbahn und mehr, mit Entfernung ab dem Haus.';
 const house = { name: site.name, coords: [site.geo.lat, site.geo.lng] as [number, number], address: `${site.address.street} · ${site.address.postalCode} ${site.address.city}` };
+const origin = new URL(site.domain);
+const guideListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Reiseführer Büsum',
+  numberOfItems: guides.length,
+  itemListElement: guides.map((guide, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: guide.data.title,
+    url: new URL(withoutBase(localizedPath(`reisefuehrer/${guide.id}`, 'de')), origin).href,
+  })),
+};
 ---
-<BaseLayout title={title} description={description} pageKey="reisefuehrer" noAlternates={true}>
+<BaseLayout title={title} description={description} pageKey="reisefuehrer" noAlternates={true} jsonLd={[guideListLd]}>
   <section class="section">
     <div class="container-narrow text-center">
+      <Breadcrumbs
+        lang="de"
+        align="center"
+        items={[{ label: 'Reiseführer', href: localizedPath('reisefuehrer', 'de') }]}
+      />
       <p class="eyebrow">Reiseführer · Büsum</p>
       <h1>Büsum erleben</h1>
       <p class="lead mx-auto">Die schönsten Erlebnisse und Ausflugsziele rund um Büsum – im Umkreis von 20 km, mit Entfernung ab dem Haus und Direktlink zum Anbieter.</p>

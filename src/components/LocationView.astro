@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
 import CtaBanner from './CtaBanner.astro';
 import ExperienceMap from './ExperienceMap.astro';
 import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
@@ -12,6 +13,12 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const title = `${t('location.title')} · ${site.name} Büsum`;
+const descriptions: Record<Lang, string> = {
+  de: `Lage von ${site.name} in Büsum: rund 400 Meter zur Familienlagune Perlebucht, kurze Wege zu Strand und Deich, Stellplatz am Haus und interaktive Anfahrtskarte.`,
+  en: `Location of ${site.name} in Büsum: around 400 metres from the Perlebucht family lagoon, close to the beach and dyke, on-site parking and an interactive route map.`,
+  nl: `Ligging van ${site.name} in Büsum: circa 400 meter van de familielagune Perlebucht, vlak bij strand en dijk, parkeren bij het huis en een interactieve routekaart.`,
+  da: `Beliggenhed for ${site.name} i Büsum: cirka 400 meter fra familielagunen Perlebucht, tæt på strand og dige, parkering ved huset og et interaktivt rutekort.`,
+};
 
 const house = { name: site.name, coords: [site.geo.lat, site.geo.lng] as [number, number], address: `${site.address.street} · ${site.address.postalCode} ${site.address.city}` };
 
@@ -36,9 +43,14 @@ const orient: { name: Record<Lang, string>; icon: string; coords: [number, numbe
 ];
 const orientPoints = orient.map((o) => ({ name: o.name[lang], icon: o.icon, coords: o.coords }));
 ---
-<BaseLayout title={title} description={t('location.subtitle')} pageKey="lage">
+<BaseLayout title={title} description={descriptions[lang]} pageKey="lage">
   <section class="section lage-hero">
     <div class="container-narrow text-center">
+      <Breadcrumbs
+        lang={lang}
+        align="center"
+        items={[{ label: t('location.title'), href: localizedPath('lage', lang) }]}
+      />
       <p class="eyebrow">{t('site.tagline')}</p>
       <h1>{t('location.title')}</h1>
       <p class="lead mx-auto">{t('location.subtitle')}</p>

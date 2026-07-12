@@ -5,7 +5,7 @@ import BookingWidget from './BookingWidget.astro';
 import GoodToKnow from './GoodToKnow.astro';
 import Img from './Img.astro';
 import Icon from './Icon.astro';
-import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
+import { useTranslations, localizedPath, withBase, withoutBase, type Lang } from '../i18n/utils';
 import { priceFrom } from '../data/prices';
 import { trApt, trFeature } from '../data/apartments-i18n';
 import { site } from '../data/site';
@@ -17,8 +17,8 @@ const t = useTranslations(lang);
 const d = apartment.data;
 const { Content } = await render(apartment);
 
-const origin = Astro.site ?? new URL(site.domain);
-const detailUrl = new URL(localizedPath(`apartments/${apartment.id}`, lang), origin).href;
+const origin = new URL(site.domain);
+const detailUrl = new URL(withoutBase(localizedPath(`apartments/${apartment.id}`, lang)), origin).href;
 const price = priceFrom(d.smoobu_id, d.price_from);
 // 1-Klick-Buchung: direkt zur Smoobu-Buchungsseite dieses Apartments.
 const bookUrl = d.smoobu_id ? `${site.smoobuBookingPage}?apartmentId=${d.smoobu_id}` : '#buchung';
@@ -40,15 +40,16 @@ const lbu = lightboxUi[lang];
 const title = `${apt} ${d.name} · ${site.name} Büsum`;
 const description = `${apt} ${d.name} ${inTown}: ${summary} ${d.persons} ${t('apartments.persons')}, ${view}.`;
 
-// JSON-LD: Apartment (+ Offer, falls Preis). Reguläres Schema.org.
+// JSON-LD: Apartment (+ Ab-Preis, falls vorhanden). Der statische Build kennt
+// keine datumsbezogene Verfügbarkeit und behauptet deshalb bewusst kein InStock.
 const apartmentLd: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'Apartment',
   name: `${site.name} · ${d.name}`,
   description: summary,
   url: detailUrl,
-  containedInPlace: { '@id': new URL(withBase('#lodging'), origin).href },
-  image: d.gallery.map((g) => new URL(withBase(g), origin).href),
+  containedInPlace: { '@id': new URL(withoutBase(withBase('#lodging')), origin).href },
+  image: d.gallery.map((g) => new URL(withoutBase(withBase(g)), origin).href),
   occupancy: { '@type': 'QuantitativeValue', maxValue: d.persons },
   numberOfBedrooms: d.bedrooms,
   petsAllowed: d.dogFriendly,
@@ -69,11 +70,10 @@ const apartmentLd: Record<string, unknown> = {
   ...(price
     ? {
         offers: {
-          '@type': 'Offer',
-          price,
+          '@type': 'AggregateOffer',
+          lowPrice: price,
           priceCurrency: 'EUR',
-          availability: 'https://schema.org/InStock',
-          url: detailUrl,
+          url: d.smoobu_id ? bookUrl : detailUrl,
         },
       }
     : {}),
@@ -84,8 +84,8 @@ const breadcrumbLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: t('nav.home'), item: new URL(localizedPath('', lang), origin).href },
-    { '@type': 'ListItem', position: 2, name: t('apartments.title'), item: new URL(localizedPath('apartments', lang), origin).href },
+    { '@type': 'ListItem', position: 1, name: t('nav.home'), item: new URL(withoutBase(localizedPath('', lang)), origin).href },
+    { '@type': 'ListItem', position: 2, name: t('apartments.title'), item: new URL(withoutBase(localizedPath('apartments', lang)), origin).href },
     { '@type': 'ListItem', position: 3, name: d.name, item: detailUrl },
   ],
 };
@@ -103,7 +103,7 @@ const others = (await getCollection('apartments'))
   image={d.heroImage}
   jsonLd={[apartmentLd, breadcrumbLd]}
 >
-  <article>
+  <article data-apartment-detail data-apartment-id={apartment.id}>
     <header class="apt-hero" style={`--a:${d.accent}`}>
       <div class="container apt-hero-inner">
         <a class="back" href={localizedPath('apartments', lang)}>← {t('apartments.title')}</a>
@@ -129,6 +129,9 @@ const others = (await getCollection('apartments'))
                      width={1200} height={800}
                      loading={i === 0 ? 'eager' : 'lazy'}
                      fetchpriority={i === 0 ? 'high' : undefined}
+                     widths={i === 0 ? [640, 768, 1024, 1600] : undefined}
+                     decoding={i === 0 ? 'sync' : 'async'}
+                     defer={i > 0}
                      sizes="(max-width: 820px) 100vw, 66vw" />
               </figure>
             ))}
@@ -150,7 +153,7 @@ const others = (await getCollection('apartments'))
             {d.features.map((f) => <li><Icon name="check" size={16} class="feat-ic" /> {trFeature(f, lang)}</li>)}
           </ul>
           {d.dogFriendly && <p class="dog-badge"><Icon name="paw" size={16} /> {t('usp.pets.title')}</p>}
-          <a href={bookUrl} target="_blank" rel="noopener" class="btn btn--gold" style="margin-top:1rem;width:100%;justify-content:center">
+          <a href="#buchung" class="btn btn--gold" data-track-apartment={apartment.id} data-track-location="detail_aside" style="margin-top:1rem;width:100%;justify-content:center">
             {t('cta.bookNow')}
           </a>
         </aside>
@@ -187,7 +190,7 @@ const others = (await getCollection('apartments'))
       </span>
       {/* Zum Kalender auf der Seite statt externem Smoobu-Absprung — der Anker-
           Scroll lädt das Widget über dessen IntersectionObserver gleich mit. */}
-      <a href="#buchung" class="btn btn--gold">{t('nav.book')}</a>
+      <a href="#buchung" class="btn btn--gold" data-track-apartment={apartment.id} data-track-location="sticky_cta">{t('nav.book')}</a>
     </div>
 
     <div class="lightbox" data-lightbox role="dialog" aria-modal="true" aria-label={lbu.gallery} hidden>
@@ -326,7 +329,7 @@ const others = (await getCollection('apartments'))
     activeIndex = (index + items.length) % items.length;
     const img = items[activeIndex].querySelector('img') as HTMLImageElement | null;
     if (!img) return;
-    lbImg.src = img.currentSrc || img.src;
+    lbImg.src = img.dataset.fullSrc || img.currentSrc || img.src;
     lbImg.alt = img.alt || '';
     if (lbText) lbText.textContent = img.alt || '';
     if (lbCount) lbCount.textContent = `${activeIndex + 1} / ${items.length}`;

@@ -41,6 +41,12 @@ const privacyLabel: Record<Lang, string> = {
   nl: 'Laadt kaarttegels van OpenStreetMap pas na je klik.',
   da: 'Indlæser først kortfelter fra OpenStreetMap efter dit klik.',
 };
+const mapAria: Record<Lang, string> = {
+  de: `Karte mit Zielen rund um ${home.name}`,
+  en: `Map with destinations around ${home.name}`,
+  nl: `Kaart met bestemmingen rond ${home.name}`,
+  da: `Kort med mål omkring ${home.name}`,
+};
 
 const enriched = points.map((p) => ({
   ...p,
@@ -58,7 +64,7 @@ const payload = {
 
 <p class="exp-hint text-center">{hint[lang]}</p>
 <div class="exp-map-shell">
-  <div id={mapId} class="exp-map" role="region" tabindex="-1" aria-label={`Karte mit Zielen rund um ${home.name}`}></div>
+  <div id={mapId} class="exp-map" role="region" tabindex="-1" aria-label={mapAria[lang]}></div>
   <button type="button" class="map-loader" data-map-load={mapId}>
     <span class="map-loader-icon" aria-hidden="true">⌖</span>
     <strong>{loadLabel[lang]}</strong>

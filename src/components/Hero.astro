@@ -1,12 +1,12 @@
 ---
-import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
+import { useTranslations, withBase, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 import Icon from './Icon.astro';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const bookHref = localizedPath('apartments', lang);
+const bookHref = '#verfuegbarkeit';
 const apartmentsHref = '#apartments-preview';
 // Bewertungswert mit lokalisiertem Dezimaltrennzeichen (4,6 vs. 4.6).
 const ratingStr = site.rating.value.toFixed(1).replace('.', lang === 'en' ? '.' : ',');

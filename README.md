@@ -1,87 +1,161 @@
-# Haus Aquamarin Büsum — Website (Astro)
+# Haus Aquamarin Büsum — Website
 
-Relaunch von **nordsee-buesum-fewo.de**: code-basierte, mehrsprachige (DE/EN/NL/DA)
-Premium-Seite mit Smoobu-Direktbuchung. Static Site (Astro) → schnell, SEO-stark,
-kostengünstig zu hosten, vollständig über Claude Code / Git pflegbar.
+Relaunch von **nordsee-buesum-fewo.de** als statische Astro-Website mit vier
+Sprachen (DE/EN/NL/DA), sieben Apartment-Galerien und Smoobu-Direktbuchung.
+Produktion läuft auf Cloudflare Pages; GitHub Pages bleibt ein nicht
+indexierbares Staging.
 
 ## Schnellstart
 
-Voraussetzung: **Node.js 22.12 oder neuer** (siehe `.nvmrc`).
+Voraussetzung ist **Node.js 22.12 oder neuer** (`.nvmrc` und `package.json`).
 
 ```bash
-npm install        # einmalig
-npm run dev        # lokale Vorschau:  http://localhost:4321
-npm run check      # Typ-/Template-Prüfung (läuft auch im CI vor jedem Deploy)
-npm run build      # Produktions-Build nach dist/
-npm run preview    # gebaute Seite lokal testen
+npm ci
+npm run dev
+npm run check
+npm run build
+npm run preview
 ```
 
-## Umgebungen & Env-Variablen
+`npm run build` ist absichtlich die vollständige Build-Pipeline:
 
-| Variable | Staging (GitHub Pages, `.github/workflows/deploy.yml`) | Produktion (nordsee-buesum-fewo.de) |
+1. `prebuild` lädt mit gesetztem Smoobu-Secret die aktuellen Mindestpreise.
+2. Astro erzeugt die statische Website in `dist/`.
+3. `postbuild` prüft Links, Canonicals, `noindex`, JSON-LD, Sitemap,
+   Redirects sowie JavaScript- und Bildbudgets.
+
+Ohne Smoobu-Secret bleibt der datierte Preis-Snapshot unverändert. Werte älter
+als sieben Tage werden auf der Website nicht als aktuelle „ab“-Preise gezeigt.
+
+## Umgebungen und Variablen
+
+| Variable | Produktion (Cloudflare Pages) | Staging/Preview |
 |---|---|---|
-| `SITE` | wird automatisch gesetzt (`https://marvin2702.github.io`) | `https://www.nordsee-buesum-fewo.de` |
-| `BASE` | wird automatisch gesetzt (`/Borck`) | `/` (bzw. weglassen) |
-| `PUBLIC_STAGING` | `'true'` → alle Seiten `noindex` (schützt Prod-SEO) | **NICHT setzen** → Seiten indexierbar |
-| `SMOOBU_API_KEY` | GitHub-Secret (optional) → täglicher ab-Preis-Abruf | ebenso; ohne Key bleibt `src/data/prices.json` (manuell gepflegt) |
+| `SITE` | `https://www.nordsee-buesum-fewo.de` | `https://marvin2702.github.io` bei GitHub Pages |
+| `BASE` | `/` | `/Borck` bei GitHub Pages |
+| `PUBLIC_STAGING` | **nicht setzen** | exakt `true` |
+| `REQUIRE_INDEXABLE` | `true` als unabhängiger Produktions-Guard | nicht setzen |
+| `PUBLIC_GA4_ID` | GA4-ID, z. B. `G-XXXXXXXXXX` | leer oder eigene Test-Property |
+| `PUBLIC_GOOGLE_SITE_VERIFICATION` | Search-Console-Token | leer |
+| `PUBLIC_WEB3FORMS_ACCESS_KEY` | öffentlicher Web3Forms-Key | eigener Test-Key oder leer |
+| `SMOOBU_API_KEY` | verschlüsseltes Build-Secret | GitHub-Secret optional |
+| `SMOOBU_API_SECRET` | verschlüsseltes HMAC-Secret | GitHub-Secret optional |
+| `REQUIRE_FRESH_PRICES` | optional `true` für einen harten Frische-Guard | nicht nötig |
 
-Aktivierungs-Keys in `src/data/site.ts` (leer = Feature aus): `googleAnalyticsId`
-(GA4 + Consent-Banner + Conversion-Events), `formAccessKey` (Web3Forms statt
-mailto-Fallback), `googleProfileUrl` (Link „Alle Google-Bewertungen ansehen"),
-`googleSiteVerification`, `smoobuGroupId`.
+Nur Variablen mit `PUBLIC_` werden in den Browser-Build übernommen. Smoobu-API-
+Zugangsdaten dürfen deshalb **niemals** ein `PUBLIC_`-Präfix erhalten. Der
+offizielle objektübergreifende Smoobu-Iframe nutzt direkt die öffentliche
+Account-ID und benötigt keine separate Group-ID.
 
-**Go-Live:** vollständige Checkliste in [LAUNCH.md](LAUNCH.md).
+[.env.example](.env.example) enthält alle Variablennamen ohne echte
+Zugangsdaten. Lokale Secrets nur in der von Git ignorierten `.env` oder in der
+Shell setzen.
 
-## Inhalte pflegen (ohne Programmierkenntnisse)
+`CLOUDFLARE_DEPLOY_HOOK_URL` ist kein Cloudflare-Buildwert, sondern ein
+GitHub-Actions-Secret. Der tägliche Workflow ruft damit einen privaten
+Cloudflare-Pages-Deploy-Hook auf.
 
-| Was ändern? | Datei |
+## Deployment
+
+### Produktion: Cloudflare Pages
+
+Im Cloudflare-Dashboard ein Pages-Projekt über „Connect to Git“ mit diesem
+Repository verbinden:
+
+| Einstellung | Wert |
 |---|---|
-| Ein Apartment (Text, Personen, Preis, Smoobu-ID) | `src/content/apartments/<name>.md` |
-| Gäste-Bewertungen | `src/content/reviews/*.md` (Platzhalter ersetzen!) |
-| Kontaktdaten, Adresse, Geo, Bewertungs-Aggregat | `src/data/site.ts` |
-| Texte/Übersetzungen (Menü, Buttons …) | `src/i18n/ui.ts` |
-| Reiseführer-Highlights (Lage-Seite) | `src/components/LocationView.astro` |
-| Rechtstexte | `src/components/LegalView.astro` (Originale einsetzen) |
+| Production branch | `main` |
+| Build command | `npm ci && npm run build` |
+| Build output directory | `dist` |
+| Node-Version | aus `.nvmrc` (`22`) |
 
-Eine Apartment-Datei sieht so aus — oben die Daten, unten der Beschreibungstext:
+Die Produktionsvariablen und Preview-Variablen getrennt pflegen. Insbesondere
+darf `PUBLIC_STAGING=true` nur in Preview/Staging gelten. Danach
+`www.nordsee-buesum-fewo.de` als Custom Domain anbinden.
 
-```markdown
----
-name: Türkis
-persons: 4
-view: Deichblick
-price_from: 89          # EUR/Nacht "ab"  (TODO eintragen)
-smoobu_id: "123456"     # Smoobu-Objekt-ID (TODO eintragen)
-heroImage: /images/tuerkis-1.jpg
----
-Beschreibungstext des Apartments …
-```
+Cloudflare Pages liest [public/_headers](public/_headers) und
+[public/_redirects](public/_redirects) beim Deployment ein. GitHub Pages
+ignoriert beide Dateien; dort greifen weder die Sicherheitsheader noch echte
+serverseitige 301-Antworten.
 
-## Offene TODOs vor Go-Live (vom Auftraggeber)
+Für den täglichen Preis-Rebuild unter Cloudflare einen Deploy-Hook anlegen und
+dessen URL als Repository-Secret `CLOUDFLARE_DEPLOY_HOOK_URL` speichern. Der
+Workflow `.github/workflows/cloudflare-rebuild.yml` startet ihn täglich. Der
+separate GitHub-Pages-Workflow baut das Staging ebenfalls täglich neu.
 
-Stand 11.07.2026 — erledigt sind bereits: Smoobu-IDs, Rechtstexte, ab-Preise
-(Nebensaison-Minimum in `src/data/prices.json`), Kurtaxe/Zuschläge, hreflang/SEO.
+Der Apex-Host `nordsee-buesum-fewo.de` wird per Cloudflare Bulk Redirect oder
+Redirect Rule dauerhaft (301, Pfad und Query erhalten) auf die einzige
+kanonische Variante `https://www.nordsee-buesum-fewo.de` umgeleitet.
+Domain-Level-Redirects werden von Pages-`_redirects` nicht unterstützt.
 
-- [ ] **Fotos**: 6–8 Bilder je Apartment (aktuell 2–3) nach `public/images/`, in `gallery` verlinken.
-- [ ] **Bewertungen**: `date:`/`source:` je Review in `src/content/reviews/`; Google-Stand
-      (`rating` in site.ts) abgleichen; `googleProfileUrl` eintragen.
-- [ ] **GA4-Mess-ID** anlegen → `googleAnalyticsId` (schaltet Banner + Conversion-Tracking frei).
-- [ ] **Web3Forms-Key** (kostenlos) → `formAccessKey`, sonst bleibt mailto-Fallback.
-- [ ] **SMOOBU_API_KEY** als GitHub-Secret → tagesaktuelle ab-Preise.
-- [ ] **EN/NL/DA**: native Korrekturlesung der redaktionellen Texte.
+### Staging: GitHub Pages
 
-## Deployment (Cloudflare Pages, empfohlen — kostenlos)
+`.github/workflows/deploy.yml` setzt `SITE`, `BASE=/Borck` und
+`PUBLIC_STAGING=true` fest. Dadurch tragen alle Seiten ein
+`noindex, nofollow`. Canonical, hreflang, Open Graph und strukturierte Daten
+zeigen dennoch auf die Produktionsdomain; lokale Links sowie Staging-Sitemap
+und `robots.txt` bleiben unter dem GitHub-Host und `/Borck` funktionsfähig. Diese
+Werte nicht für Produktion wiederverwenden. Die drei optionalen `PUBLIC_*`-
+Aktivierungswerte liest das Staging aus gleichnamigen GitHub Repository
+Variables; für GA4 und Web3Forms möglichst eigene Testkonfigurationen nutzen.
 
-1. Repo zu GitHub/GitLab pushen.
-2. Cloudflare Pages → „Connect to Git" → dieses Repo.
-3. Build command: `npm run build` · Output: `dist`.
-4. Custom Domain `www.nordsee-buesum-fewo.de` verbinden (DNS-Cutover).
-   **Wichtig:** 301-Redirects der alten URLs setzen (SEO-Equity).
+## Qualitätssicherung
 
-## Architektur (Kurz)
+| Befehl/Workflow | Zweck |
+|---|---|
+| `npm run check` | Astro-/TypeScript-Diagnostik |
+| `npm run audit:build` | Produktions-/Staging-SEO, JSON-LD, lokale Ziele, Redirects und Asset-Budgets |
+| `npm run audit:lighthouse` | drei mobile Lighthouse-Läufe je Startseite, Apartmentdetail und Kontakt |
+| `npm run test:e2e` | Consent, Events, Formular→Danke, Buchungswege, mobile Navigation und Screenshot-Suite |
+| `npm run audit:links` | externe Links mit Timeout, Retries und begrenzter Parallelität |
+| `quality.yml` | Produktions-Build plus Lighthouse bei Push und Pull Request |
+| `links.yml` | wöchentliche externe Linkprüfung |
+| `dependabot.yml` | monatliche npm- und GitHub-Actions-Updates |
 
-- **Astro 5**, Static Output, i18n-Routing (DE Root, EN/NL/DA mit Präfix).
-- Inhalte als **Markdown Content Collections** (`src/content.config.ts`).
-- **Smoobu**-Buchung via lazy-load iFrame (`src/components/BookingWidget.astro`).
-- **SEO**: hreflang, `LodgingBusiness`/`Apartment`/`Review`-JSON-LD, Sitemap, OG.
-  Bewusst **kein** Google-`VacationRental`-Rich-Result (invite-only).
+Budgets: LCP höchstens 2,5 s, CLS höchstens 0,1, TBT höchstens 200 ms als
+Lab-Proxy für INP, initiales eigenes JavaScript höchstens 100 KiB und einzelne
+Bilder höchstens 600 KiB. INP selbst muss nach dem Launch mit echten Felddaten
+(CrUX/Search Console) überwacht werden; ein Navigation-Lighthouse-Test erzeugt
+keine belastbare INP-Messung.
+
+Lighthouse-Berichte werden im CI 14 Tage als Artefakt gespeichert. Lokal landen
+sie standardmäßig im temporären Systemverzeichnis; mit `LHCI_OUTPUT_DIR` lässt
+sich ein anderer Ausgabeort setzen.
+
+## Inhalte pflegen
+
+| Inhalt | Datei/Ordner |
+|---|---|
+| Apartmentdaten, Ausstattung und Smoobu-ID | `src/content/apartments/*.md` |
+| Gäste-Bewertungen | `src/content/reviews/*.md` |
+| Kontaktdaten, Adresse, Geo und Bewertungsstand | `src/data/site.ts` |
+| Oberflächentexte und Übersetzungen | `src/i18n/ui.ts` |
+| Reiseführer | `src/content/guides/*.md` |
+| Rechtstexte | `src/data/legal.ts` und `src/components/LegalView.astro` |
+
+Die Bildvarianten liegen unter `public/images/`. Neue Originalbilder müssen vor
+dem Commit in die vorhandenen AVIF/WebP/JPEG-Größen überführt werden; der
+Build-Audit stoppt Einzeldateien über dem Budget.
+
+## Architektur
+
+- Astro 7, statischer Output und Content Collections
+- DE am Root; EN/NL/DA mit Sprachpräfix
+- lazy geladene Smoobu-Iframes und Karte
+- responsive lokale AVIF/WebP/JPEG-Bilder
+- Canonical, hreflang, Sitemap, Open Graph sowie `LodgingBusiness`, `Apartment`,
+  `Article`, `BreadcrumbList` und sichtbares FAQ-Markup
+- GA4/Consent Mode nur mit Deployment-Konfiguration
+
+## Rollback
+
+Bei einem fehlerhaften Produktionsdeploy zuerst in Cloudflare Pages unter
+„Deployments“ den letzten geprüften Produktionsstand auswählen und „Rollback to
+this deployment“ ausführen. Anschließend den fehlerhaften Git-Commit mit einem
+normalen Revert korrigieren und neu deployen. GitHub Pages ist wegen
+`noindex` und `/Borck` **kein** Produktions-Fallback.
+
+Nach jedem Rollback Startseite, ein Apartment, Kontaktformular, Smoobu-Kalender,
+`robots.txt`, Sitemap, Redirects und Response-Header erneut prüfen.
+
+Die vollständige Go-live- und Abnahmefolge steht in [LAUNCH.md](LAUNCH.md).

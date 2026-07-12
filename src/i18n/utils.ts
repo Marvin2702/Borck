@@ -16,6 +16,12 @@ function stripBase(pathname: string): string {
   return pathname;
 }
 
+/** Entfernt den Deployment-Base-Pfad für kanonische Produktions-URLs. */
+export function withoutBase(pathname: string): string {
+  const absolutePath = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  return stripBase(absolutePath);
+}
+
 /** Prefixt einen Root-relativen Pfad mit dem Base-Pfad (für Assets/Links). */
 export function withBase(path: string): string {
   return `${BASE}/${path.replace(/^\/+/, '')}`;
@@ -65,9 +71,9 @@ export function alternateLinks(pageKey: string, origin: string | URL) {
   const links = locales.map((lang) => ({
     lang,
     hreflang: hreflangCode(lang),
-    href: `${base}${localizedPath(pageKey, lang)}`,
+    href: `${base}${withoutBase(localizedPath(pageKey, lang))}`,
   }));
-  links.push({ lang: defaultLang, hreflang: 'x-default', href: `${base}${localizedPath(pageKey, defaultLang)}` });
+  links.push({ lang: defaultLang, hreflang: 'x-default', href: `${base}${withoutBase(localizedPath(pageKey, defaultLang))}` });
   return links;
 }
 

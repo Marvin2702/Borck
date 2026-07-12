@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { type Lang } from '../i18n/utils';
+import Breadcrumbs from './Breadcrumbs.astro';
+import { localizedPath, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 import { legal } from '../data/legal';
 
 interface Props { lang: Lang; kind: 'impressum' | 'datenschutz' | 'agb' }
-const { kind } = Astro.props as Props;
+const { lang, kind } = Astro.props as Props;
 
 const titles = {
   impressum: 'Impressum',
@@ -13,12 +14,18 @@ const titles = {
   agb: 'AGB & Buchungsbedingungen',
 };
 const title = `${titles[kind]} · ${site.name}`;
+const descriptions = {
+  impressum: `Impressum von ${site.name}: Angaben zur Betreiberin, Kontakt, Umsatzsteuer-ID und Verantwortlichkeit für die Inhalte.`,
+  datenschutz: `Datenschutzerklärung von ${site.name}: Informationen zu Hosting, Kontakt und Buchung, Cookies, Google Analytics sowie deinen Datenschutzrechten.`,
+  agb: `Buchungsbedingungen von ${site.name}: Informationen zu Preisen und Zahlung, Stornierung, An- und Abreise, Haustieren, Hausordnung und Haftung.`,
+};
 const imp = site.impressum;
 const doc = kind !== 'impressum' ? legal[kind] : null;
 ---
-<BaseLayout title={title} description={titles[kind]} pageKey={kind} noAlternates={true}>
+<BaseLayout title={title} description={descriptions[kind]} pageKey={kind} noAlternates={true}>
   <section class="section">
     <div class="container-narrow legal">
+      <Breadcrumbs lang={lang} items={[{ label: titles[kind], href: localizedPath(kind, lang) }]} />
       <h1>{titles[kind]}</h1>
 
       {kind === 'impressum' ? (

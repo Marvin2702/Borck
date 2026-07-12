@@ -1,0 +1,74 @@
+---
+import { localizedPath, withoutBase, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+export interface BreadcrumbItem {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  lang: Lang;
+  items: BreadcrumbItem[];
+  align?: 'start' | 'center';
+}
+
+const { lang, items, align = 'start' } = Astro.props;
+const homeLabels: Record<Lang, string> = {
+  de: 'Startseite',
+  en: 'Home',
+  nl: 'Startpagina',
+  da: 'Forside',
+};
+const ariaLabels: Record<Lang, string> = {
+  de: 'Brotkrümelnavigation',
+  en: 'Breadcrumb',
+  nl: 'Kruimelpad',
+  da: 'Brødkrummer',
+};
+const allItems = [
+  { label: homeLabels[lang], href: localizedPath('', lang) },
+  ...items,
+];
+const origin = new URL(site.domain);
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: allItems.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.label,
+    item: new URL(withoutBase(item.href), origin).href,
+  })),
+};
+---
+
+<nav class:list={['breadcrumbs', { 'breadcrumbs--center': align === 'center' }]} aria-label={ariaLabels[lang]}>
+  <ol>
+    {allItems.map((item, index) => {
+      const current = index === allItems.length - 1;
+      return (
+        <li>
+          {current
+            ? <span aria-current="page">{item.label}</span>
+            : <a href={item.href}>{item.label}</a>}
+        </li>
+      );
+    })}
+  </ol>
+</nav>
+<script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+
+<style>
+  .breadcrumbs { margin: 0 0 1rem; color: var(--text-muted); font-size: 0.84rem; }
+  .breadcrumbs ol {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem;
+    list-style: none; margin: 0; padding: 0;
+  }
+  .breadcrumbs--center ol { justify-content: center; }
+  .breadcrumbs li { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .breadcrumbs li:not(:last-child)::after { content: '›'; color: var(--line-strong, var(--text-muted)); }
+  .breadcrumbs a { color: var(--brand); text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
+  .breadcrumbs [aria-current='page'] { color: var(--text-muted); }
+</style>

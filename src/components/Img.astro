@@ -13,26 +13,79 @@ interface Props {
   loading?: 'lazy' | 'eager';
   fetchpriority?: 'high' | 'auto' | 'low';
   sizes?: string;
+  /** Nur angeben, wenn die entsprechenden Varianten als Dateien existieren. */
+  widths?: number[];
+  decoding?: 'async' | 'sync' | 'auto';
+  /** Streng viewportnah laden statt der großzügigen Browser-Lazy-Zone. */
+  defer?: boolean;
 }
-const { src, alt, width, height, class: cls, loading = 'lazy', fetchpriority, sizes } = Astro.props;
+const {
+  src,
+  alt,
+  width,
+  height,
+  class: cls,
+  loading = 'lazy',
+  fetchpriority,
+  sizes,
+  widths = [640, 1024, 1600],
+  decoding = 'async',
+  defer = false,
+} = Astro.props;
 const base = src.replace(/\.(jpe?g|png)$/i, '');
-const widths = [640, 1024, 1600];
 const srcset = (ext: string) => widths.map((w) => `${withBase(`${base}-${w}.${ext}`)} ${w}w`).join(', ');
 const fallbackSizes = sizes ?? '100vw';
+const fallbackSrc = withBase(`${base}.jpg`);
+const transparentPixel = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 ---
-<picture>
-  <source type="image/avif" srcset={srcset('avif')} sizes={fallbackSizes} />
-  <source type="image/webp" srcset={srcset('webp')} sizes={fallbackSizes} />
+<picture data-deferred-picture={defer ? '' : undefined}>
+  <source type="image/avif" srcset={defer ? undefined : srcset('avif')} data-srcset={defer ? srcset('avif') : undefined} sizes={fallbackSizes} />
+  <source type="image/webp" srcset={defer ? undefined : srcset('webp')} data-srcset={defer ? srcset('webp') : undefined} sizes={fallbackSizes} />
   <img
-    src={withBase(`${base}.jpg`)}
-    srcset={srcset('jpg')}
+    src={defer ? transparentPixel : fallbackSrc}
+    srcset={defer ? undefined : srcset('jpg')}
+    data-deferred-image={defer ? '' : undefined}
+    data-deferred-src={defer ? fallbackSrc : undefined}
+    data-deferred-srcset={defer ? srcset('jpg') : undefined}
+    data-full-src={withBase(`${base}-1600.jpg`)}
     sizes={fallbackSizes}
     alt={alt}
     width={width}
     height={height}
     loading={loading}
     fetchpriority={fetchpriority}
-    decoding="async"
+    decoding={decoding}
     class={cls}
   />
 </picture>
+{defer && (
+  <noscript>
+    <style is:inline set:html="picture[data-deferred-picture] { display: none !important; }"></style>
+    <img src={withBase(`${base}-1024.jpg`)} alt={alt} width={width} height={height} class={cls} />
+  </noscript>
+)}
+
+<script>
+  function loadDeferredImage(img: HTMLImageElement) {
+    const picture = img.closest('picture');
+    picture?.querySelectorAll<HTMLSourceElement>('source[data-srcset]').forEach((source) => {
+      if (source.dataset.srcset) source.srcset = source.dataset.srcset;
+      delete source.dataset.srcset;
+    });
+    if (img.dataset.deferredSrcset) img.srcset = img.dataset.deferredSrcset;
+    if (img.dataset.deferredSrc) img.src = img.dataset.deferredSrc;
+    delete img.dataset.deferredSrcset;
+    delete img.dataset.deferredSrc;
+    img.removeAttribute('data-deferred-image');
+  }
+
+  document.querySelectorAll<HTMLImageElement>('img[data-deferred-image]').forEach((img) => {
+    if (!('IntersectionObserver' in window)) { loadDeferredImage(img); return; }
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      loadDeferredImage(img);
+      observer.disconnect();
+    }, { rootMargin: '0px 0px 50px' });
+    observer.observe(img);
+  });
+</script>

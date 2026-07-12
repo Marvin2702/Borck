@@ -1,4 +1,5 @@
-// Erzeugt responsive Bildvarianten (640/1024/1600px) je Foto in AVIF, WebP und JPG
+// Erzeugt responsive Bildvarianten (640/1024/1600px) je Foto in AVIF, WebP und JPG.
+// Die sieben Detailseiten-LCPs erhalten zusätzlich 768px für mobile HiDPI-Geräte.
 // für <picture> + srcset. Nutzung: node scripts/gen-image-variants.mjs
 import sharp from 'sharp';
 import { readdir, readFile, rm } from 'node:fs/promises';
@@ -6,16 +7,26 @@ import path from 'node:path';
 
 const dir = 'public/images';
 const skip = new Set(['og-default.jpg']); // OG bleibt 1200x630-JPG
-const widths = [640, 1024, 1600];
+const defaultWidths = [640, 1024, 1600];
+const detailHeroBases = new Set([
+  'bernstein-living-terrace',
+  'opal-living',
+  'rubin-living',
+  'saphir-living',
+  'smaragd-living',
+  'topas-living-view',
+  'tuerkis-dining',
+]);
 
 let count = 0;
 for (const f of await readdir(dir)) {
   if (!/\.jpe?g$/i.test(f) || skip.has(f)) continue;
-  // bereits erzeugte Breiten-Varianten (…-640/-1024/-1600.jpg) überspringen,
+  // bereits erzeugte Breiten-Varianten (…-640/-768/-1024/-1600.jpg) überspringen,
   // aber NICHT die Quellbilder mit -1/-2/-3-Suffix (topas-2.jpg etc.)
-  if (/-(640|1024|1600)\.jpe?g$/i.test(f)) continue;
+  if (/-(640|768|1024|1600)\.jpe?g$/i.test(f)) continue;
 
   const base = f.replace(/\.jpe?g$/i, '');
+  const widths = detailHeroBases.has(base) ? [640, 768, 1024, 1600] : defaultWidths;
   const input = await readFile(path.join(dir, f));
   const made = [];
   for (const w of widths) {

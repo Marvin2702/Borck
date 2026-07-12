@@ -2,10 +2,12 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ApartmentCard from './ApartmentCard.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
 import Faq from './Faq.astro';
 import ThemeLinks from './ThemeLinks.astro';
 import Icon from './Icon.astro';
-import { useTranslations, type Lang } from '../i18n/utils';
+import BookingWidget from './BookingWidget.astro';
+import { useTranslations, localizedPath, withoutBase, type Lang } from '../i18n/utils';
 import { site } from '../data/site';
 import { trExtra, trUnit } from '../data/extras-i18n';
 
@@ -16,15 +18,35 @@ const apartments = (await getCollection('apartments')).sort((a, b) => a.data.ord
 
 const title = `${t('meta.apartmentsTitle')} · ${site.name}`;
 const description = t('meta.apartmentsDesc');
+const origin = new URL(site.domain);
+const apartmentsListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: t('apartments.title'),
+  numberOfItems: apartments.length,
+  itemListElement: apartments.map((apartment, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: apartment.data.name,
+    url: new URL(withoutBase(localizedPath(`apartments/${apartment.id}`, lang)), origin).href,
+  })),
+};
 ---
-<BaseLayout title={title} description={description} pageKey="apartments">
+<BaseLayout title={title} description={description} pageKey="apartments" jsonLd={[apartmentsListLd]}>
   <section class="section page-head">
     <div class="container-narrow text-center">
+      <Breadcrumbs
+        lang={lang}
+        align="center"
+        items={[{ label: t('apartments.title'), href: localizedPath('apartments', lang) }]}
+      />
       <p class="eyebrow">{t('site.tagline')}</p>
       <h1>{t('apartments.title')}</h1>
       <p class="lead mx-auto">{t('apartments.subtitle')}</p>
     </div>
   </section>
+
+  <BookingWidget lang={lang} mode="all" />
 
   <section class="section" style="padding-top:0">
     <div class="container">
@@ -45,7 +67,7 @@ const description = t('meta.apartmentsDesc');
       <div class="apt-grid" data-apt-grid>
         {apartments.map((a) => <ApartmentCard apartment={a} lang={lang} />)}
       </div>
-      <p class="filter-none" data-filter-none hidden>{t('filter.none')}</p>
+      <button type="button" class="filter-none" data-filter-none hidden>{t('filter.none')}</button>
     </div>
   </section>
 
@@ -96,7 +118,12 @@ const description = t('meta.apartmentsDesc');
   .filter-pill :global(svg) { flex: none; }
   .filter-pill:hover { border-color: var(--c-aqua-300); }
   .filter-pill.is-active { background: var(--brand); color: #fff; border-color: var(--brand); }
-  .filter-none { text-align: center; color: var(--text-muted); cursor: pointer; text-decoration: underline; margin-top: 1.5rem; }
+  .filter-none {
+    display: block; margin: 1.5rem auto 0; padding: 0; background: none; border: 0;
+    font: inherit; text-align: center; color: var(--text-muted); cursor: pointer;
+    text-decoration: underline;
+  }
+  .filter-none[hidden] { display: none; }
   .theme-section { padding-block: clamp(2rem, 1.5rem + 2vw, 3rem); }
   .theme-links { display: flex; flex-wrap: wrap; gap: 0.7rem; justify-content: center; margin-top: 1rem; }
   .theme-links a {

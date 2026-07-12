@@ -47,7 +47,7 @@ Fakten:
 - Sprachen der Website: Deutsch (Hauptversion), Englisch (/en/), Niederländisch (/nl/), Dänisch (/da/)
 - Google-Profil: ${site.googleProfileUrl}
 
-## Apartments (ab-Preise = Nebensaison-Minimum)
+## Apartments (aktuelle Preise und Verfügbarkeit im jeweiligen Smoobu-Kalender)
 ${aptLines.join('\n')}
 
 ## Wichtige Seiten

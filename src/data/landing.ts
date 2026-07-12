@@ -200,15 +200,24 @@ export const landingPages: Record<string, LandingPage> = {
 };
 
 /** Filtert die Apartment-Liste passend zum Landingpage-Thema. */
-export function filterApartments<T extends { data: { dogFriendly?: boolean; view: string } }>(
+export function filterApartments<T extends { data: { dogFriendly?: boolean; view: string; floor?: string } }>(
   all: T[],
   filter: LandingFilter,
 ): T[] {
-  if (filter === 'dog') return all.filter((a) => a.data.dogFriendly);
-  if (filter === 'seaview') {
-    const withView = all.filter((a) => /meer|deich|balkon/i.test(a.data.view));
-    return withView.length ? withView : all;
+  if (filter === 'dog') {
+    // Die Seite empfiehlt ausdrücklich kurze Wege und Erdgeschoss-Terrassen:
+    // passende Wohnungen deshalb zuerst, übrige hundefreundliche danach.
+    return all
+      .filter((a) => a.data.dogFriendly)
+      .sort(
+        (a, b) =>
+          Number(!/erdgeschoss/i.test(a.data.floor ?? '')) -
+          Number(!/erdgeschoss/i.test(b.data.floor ?? '')),
+      );
   }
+  // Meerblick ist nicht dasselbe wie Deich- oder Balkonblick. Keine unscharfe
+  // Regex-Ausweitung und kein Fallback auf sachlich unpassende Apartments.
+  if (filter === 'seaview') return all.filter((a) => /\bmeerblick\b/i.test(a.data.view));
   return all;
 }
 

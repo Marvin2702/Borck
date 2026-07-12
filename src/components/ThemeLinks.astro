@@ -8,6 +8,7 @@ const items = [
   { key: 'ferienwohnung-buesum-mit-hund', label: t('landing.withDog') },
   { key: 'ferienwohnung-buesum-meerblick', label: t('landing.seaView') },
   { key: 'ferienwohnung-buesum-nebensaison', label: t('landing.offSeason') },
+  ...(lang === 'de' ? [{ key: 'reisefuehrer', label: 'Büsum-Reiseführer' }] : []),
 ];
 ---
 <section class="theme-section">

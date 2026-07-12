@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from './Icon.astro';
+import { localizedPath, type Lang } from '../i18n/utils';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const txt: Record<Lang, {
+  eyebrow: string;
+  title: string;
+  text: string;
+  note: string;
+  home: string;
+  apartments: string;
+}> = {
+  de: {
+    eyebrow: 'Anfrage versendet',
+    title: 'Danke – deine Nachricht ist angekommen.',
+    text: 'Iris schaut sich deine Anfrage persönlich an und meldet sich in der Regel noch am selben Tag.',
+    note: 'Du erhältst keine automatische Buchung: Verbindlich wird der Aufenthalt erst mit der persönlichen Bestätigung.',
+    home: 'Zur Startseite',
+    apartments: 'Apartments ansehen',
+  },
+  en: {
+    eyebrow: 'Enquiry sent',
+    title: 'Thank you – your message has arrived.',
+    text: 'Iris will personally review your enquiry and usually replies the same day.',
+    note: 'This is not an automatic booking. Your stay becomes binding only after personal confirmation.',
+    home: 'Back to homepage',
+    apartments: 'View apartments',
+  },
+  nl: {
+    eyebrow: 'Aanvraag verzonden',
+    title: 'Bedankt – je bericht is aangekomen.',
+    text: 'Iris bekijkt je aanvraag persoonlijk en reageert meestal nog dezelfde dag.',
+    note: 'Dit is geen automatische boeking. Je verblijf is pas bindend na de persoonlijke bevestiging.',
+    home: 'Naar de startpagina',
+    apartments: 'Appartementen bekijken',
+  },
+  da: {
+    eyebrow: 'Forespørgsel sendt',
+    title: 'Tak – din besked er modtaget.',
+    text: 'Iris gennemgår din forespørgsel personligt og svarer som regel samme dag.',
+    note: 'Dette er ikke en automatisk booking. Opholdet er først bindende efter den personlige bekræftelse.',
+    home: 'Til forsiden',
+    apartments: 'Se lejligheder',
+  },
+};
+const c = txt[lang];
+---
+
+<BaseLayout
+  title={`${c.eyebrow} · ${site.name}`}
+  description={c.text}
+  pageKey="danke"
+  noindex
+>
+  <section class="section thanks" data-lead-thanks data-language={lang}>
+    <div class="container-narrow thanks-card">
+      <span class="thanks-icon" aria-hidden="true"><Icon name="check" size={34} /></span>
+      <p class="eyebrow">{c.eyebrow}</p>
+      <h1>{c.title}</h1>
+      <p class="lead">{c.text}</p>
+      <p class="thanks-note">{c.note}</p>
+      <div class="thanks-actions">
+        <a class="btn btn--gold" href={localizedPath('', lang)}>{c.home}</a>
+        <a class="btn btn--ghost" href={localizedPath('apartments', lang)}>{c.apartments}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .thanks { min-height: min(680px, calc(100svh - 140px)); display: grid; place-items: center; }
+  .thanks-card {
+    width: 100%; padding: clamp(1.5rem, 1rem + 3vw, 3rem); text-align: center;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  .thanks-icon {
+    display: inline-grid; place-items: center; width: 68px; height: 68px; margin-bottom: 1rem;
+    border-radius: 50%; color: #fff; background: var(--c-deich-700); box-shadow: var(--shadow-sm);
+  }
+  .thanks h1 { max-width: 20ch; margin-inline: auto; }
+  .thanks .lead { max-width: 52ch; margin-inline: auto; }
+  .thanks-note { max-width: 58ch; margin: 1.2rem auto 0; color: var(--text-muted); font-size: 0.92rem; }
+  .thanks-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.8rem; }
+  @media (max-width: 480px) {
+    .thanks-actions { display: grid; }
+    .thanks-actions .btn { width: 100%; justify-content: center; }
+  }
+</style>
+
+<script>
+  const PENDING_LEAD_KEY = 'ha-pending-lead-v1';
+  const MAX_PENDING_AGE = 30 * 60 * 1000;
+  const root = document.querySelector<HTMLElement>('[data-lead-thanks]');
+  const language = root?.dataset.language || document.documentElement.lang || 'de';
+
+  type PendingLead = { id: string; createdAt: number; method: 'web3forms' };
+
+  const readPending = (): PendingLead | null => {
+    try {
+      const raw = sessionStorage.getItem(PENDING_LEAD_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (
+        typeof parsed?.id !== 'string' ||
+        typeof parsed?.createdAt !== 'number' ||
+        parsed?.method !== 'web3forms' ||
+        Date.now() - parsed.createdAt > MAX_PENDING_AGE
+      ) {
+        sessionStorage.removeItem(PENDING_LEAD_KEY);
+        return null;
+      }
+      return parsed as PendingLead;
+    } catch { return null; }
+  };
+
+  const trackLead = () => {
+    const pending = readPending();
+    if (!pending) return;
+    const dedupeKey = `ha-lead-sent:${pending.id}`;
+    try {
+      if (sessionStorage.getItem(dedupeKey) === '1') return;
+    } catch { /* Ohne Storage bleibt haTrack weiterhin consent-gebunden. */ }
+
+    const sent = (window as any).haTrack?.('generate_lead', {
+      form_id: 'contact',
+      method: 'web3forms',
+      page_language: language,
+    });
+    if (!sent) return;
+    try {
+      sessionStorage.setItem(dedupeKey, '1');
+      sessionStorage.removeItem(PENDING_LEAD_KEY);
+    } catch { /* Das Ereignis wurde bereits genau einmal in diesem Dokument gesendet. */ }
+  };
+
+  document.addEventListener('ha:analytics-ready', trackLead);
+  queueMicrotask(trackLead);
+</script>

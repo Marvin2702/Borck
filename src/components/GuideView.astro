@@ -1,8 +1,9 @@
 ---
 import { render, getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
 import CtaBanner from './CtaBanner.astro';
-import { localizedPath, useTranslations } from '../i18n/utils';
+import { localizedPath, useTranslations, withBase, withoutBase } from '../i18n/utils';
 import { site } from '../data/site';
 import { landingPages } from '../data/landing';
 
@@ -13,8 +14,13 @@ const t = useTranslations(lang);
 const g = guide.data;
 const { Content } = await render(guide);
 
-const origin = Astro.site ?? new URL(site.domain);
-const url = new URL(localizedPath(`reisefuehrer/${guide.id}`, lang), origin).href;
+const origin = new URL(site.domain);
+const url = new URL(withoutBase(localizedPath(`reisefuehrer/${guide.id}`, lang)), origin).href;
+const aboutUrl = new URL(withoutBase(localizedPath('ueber-uns', lang)), origin).href;
+const irisId = `${aboutUrl}#iris`;
+const updatedDisplay = g.updated
+  ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${g.updated}T00:00:00Z`))
+  : null;
 
 const others = (await getCollection('guides'))
   .filter((x) => x.id !== guide.id)
@@ -26,19 +32,10 @@ const articleLd: Record<string, unknown> = {
   '@type': 'Article',
   headline: g.title,
   description: g.description,
-  ...(g.updated ? { datePublished: g.updated, dateModified: g.updated } : {}),
-  author: { '@type': 'Person', name: site.legalName },
-  publisher: { '@type': 'Organization', name: site.name },
+  ...(g.updated ? { dateModified: g.updated } : {}),
+  author: { '@type': 'Person', '@id': irisId, name: site.legalName, url: aboutUrl },
+  publisher: { '@id': new URL(withoutBase(withBase('#lodging')), origin).href },
   mainEntityOfPage: url,
-};
-const breadcrumbLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Start', item: new URL(localizedPath('', lang), origin).href },
-    { '@type': 'ListItem', position: 2, name: 'Reiseführer', item: new URL(localizedPath('reisefuehrer', lang), origin).href },
-    { '@type': 'ListItem', position: 3, name: g.title, item: url },
-  ],
 };
 ---
 <BaseLayout
@@ -46,15 +43,24 @@ const breadcrumbLd = {
   description={g.description}
   pageKey={`reisefuehrer/${guide.id}`}
   noAlternates={true}
-  jsonLd={[articleLd, breadcrumbLd]}
+  jsonLd={[articleLd]}
 >
   <article>
     <header class="section guide-hero">
       <div class="container-narrow">
-        <a class="back" href={localizedPath('reisefuehrer', lang)}>← Reiseführer</a>
+        <Breadcrumbs
+          lang={lang}
+          items={[
+            { label: 'Reiseführer', href: localizedPath('reisefuehrer', lang) },
+            { label: g.title, href: localizedPath(`reisefuehrer/${guide.id}`, lang) },
+          ]}
+        />
         <p class="eyebrow"><span aria-hidden="true">{g.icon}</span> Büsum</p>
         <h1>{g.title}</h1>
-        {g.updated && <p class="guide-updated">Aktualisiert: {g.updated}</p>}
+        <p class="guide-byline">
+          Von <a href={`${localizedPath('ueber-uns', lang)}#iris`}>{site.legalName}</a>
+          {updatedDisplay && <> · Aktualisiert am <time datetime={g.updated}>{updatedDisplay}</time></>}
+        </p>
       </div>
     </header>
 
@@ -95,8 +101,9 @@ const breadcrumbLd = {
 
 <style>
   .guide-hero { padding-bottom: 0.5rem; }
-  .back { display: inline-block; margin-bottom: 0.8rem; text-decoration: none; font-weight: 600; color: var(--brand); }
-  .guide-updated { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.4rem; }
+  .guide-byline { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.4rem; }
+  .guide-byline a { color: var(--brand); font-weight: 600; text-decoration: none; }
+  .guide-byline a:hover { text-decoration: underline; }
 
   .prose { font-size: 1.05rem; }
   .prose :global(h2) { font-family: var(--font-head); font-size: 1.5rem; margin: 1.8rem 0 0.6rem; color: var(--brand-strong); }

@@ -8,7 +8,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ConsentBanner from '../components/ConsentBanner.astro';
 import { site } from '../data/site';
-import { getLangFromUrl, useTranslations, alternateLinks, hreflangCode, withBase } from '../i18n/utils';
+import { getLangFromUrl, useTranslations, alternateLinks, hreflangCode, withBase, withoutBase } from '../i18n/utils';
 
 interface Props {
   title: string;
@@ -19,53 +19,50 @@ interface Props {
   /** Zusätzliche JSON-LD-Objekte (z. B. Apartment/Offer je Detailseite). */
   jsonLd?: Record<string, unknown>[];
   noindex?: boolean;
-  /** Bewertungen für JSON-LD (nur auf der Startseite ausgegeben). */
-  reviews?: { author: string; rating: number; body: string; date?: string }[];
   /** hreflang-Alternates unterdrücken (für einsprachige Seiten, z. B. DE-Landingpages). */
   noAlternates?: boolean;
 }
 
-const { title, description, pageKey = '', image, jsonLd = [], noindex = false, reviews = [], noAlternates = false } = Astro.props;
+const { title, description, pageKey = '', image, jsonLd = [], noindex = false, noAlternates = false } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-// Origin aus Astro-Config (passt sich Prod-Domain bzw. Staging automatisch an).
-const origin = Astro.site ?? new URL(site.domain);
+// SEO-Signale verweisen auch im noindex-Staging auf die einzige kanonische
+// Produktionsdomain; lokale Assets/Navigation bleiben separat base-aware.
+const origin = new URL(site.domain);
 // Canonical konsistent MIT Trailing-Slash (Astros Verzeichnis-Ausgabe; die Root
 // liefert der Server sonst ohne Slash -> Duplicate-Content-Risiko).
-const canonicalPath = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const productionPath = withoutBase(Astro.url.pathname);
+const canonicalPath = productionPath.endsWith('/') ? productionPath : `${productionPath}/`;
 const canonical = new URL(canonicalPath, origin).href;
-const ogImage = new URL(image ? withBase(image) : withBase('images/og-default.jpg'), origin).href;
+const defaultOgImage = new URL(withoutBase(withBase('images/og-default.jpg')), origin).href;
+const ogImage = new URL(withoutBase(image ? withBase(image) : withBase('images/og-default.jpg')), origin).href;
 const alternates = alternateLinks(pageKey, origin);
 // Staging-Deploys (z. B. GitHub Pages) NICHT indexieren – schützt Prod-SEO.
 const staging = import.meta.env.PUBLIC_STAGING === 'true';
 const robotsNoindex = noindex || staging;
 
-const isHome = pageKey === '';
 const ogLocaleMap: Record<string, string> = { de: 'de_DE', en: 'en_US', nl: 'nl_NL', da: 'da_DK' };
 const ogLocale = ogLocaleMap[lang] ?? 'de_DE';
 const localeAlternates = (['de', 'en', 'nl', 'da'] as const).filter((l) => l !== lang).map((l) => ogLocaleMap[l]);
 
-// Objekt-Ausstattung (lokalisiert) für das LodgingBusiness-Schema.
-const amenityNames: Record<string, string[]> = {
-  de: ['WLAN', 'Parkplatz', 'Fahrradgarage', 'Haustiere willkommen'],
-  en: ['Wi-Fi', 'Parking', 'Bike storage', 'Pets welcome'],
-  nl: ['Wifi', 'Parkeerplaats', 'Fietsenstalling', 'Huisdieren welkom'],
-  da: ['Wi-Fi', 'Parkering', 'Cykelparkering', 'Kæledyr velkomne'],
-};
+// Stabile, sprachunabhängige Stammdaten: Dieselbe @id darf beim Crawlen nicht
+// je nach Unterseite eine andere Beschreibung, ein anderes Bild oder andere
+// Ausstattungsnamen erhalten.
+const amenityNames = ['WLAN', 'Kostenloser Parkplatz', 'Abschließbare Fahrradgarage', 'Haustiere willkommen'];
 
 // JSON-LD: LodgingBusiness (reguläres Schema, bewusst KEIN Google-VacationRental).
 const lodging: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'LodgingBusiness',
-  '@id': new URL(withBase('#lodging'), origin).href,
+  '@id': new URL(withoutBase(withBase('#lodging')), origin).href,
   name: site.name,
-  description,
-  url: new URL(withBase(''), origin).href,
+  description: site.tagline,
+  url: new URL(withoutBase(withBase('')), origin).href,
   telephone: site.phone,
   email: site.email,
   priceRange: site.priceRange,
-  image: ogImage,
+  image: defaultOgImage,
   address: {
     '@type': 'PostalAddress',
     streetAddress: site.address.street,
@@ -78,7 +75,7 @@ const lodging: Record<string, unknown> = {
   petsAllowed: true,
   checkinTime: site.checkinTime,
   checkoutTime: site.checkoutTime,
-  amenityFeature: (amenityNames[lang] ?? amenityNames.de).map((name) => ({
+  amenityFeature: amenityNames.map((name) => ({
     '@type': 'LocationFeatureSpecification', name, value: true,
   })),
   // Knowledge-Graph-Verknüpfung: Google-Unternehmensprofil (Maps) + Social.
@@ -87,25 +84,6 @@ const lodging: Record<string, unknown> = {
     ? { sameAs: [site.facebook, site.instagram, site.googleProfileUrl].filter(Boolean) }
     : {}),
 };
-// AggregateRating + einzelne Reviews NUR auf der Startseite ausgeben (dort sind
-// die Bewertungen sichtbar) — entspricht Googles Rich-Result-Policy.
-if (isHome) {
-  lodging.aggregateRating = {
-    '@type': 'AggregateRating',
-    ratingValue: site.rating.value,
-    reviewCount: site.rating.count,
-    bestRating: 5,
-  };
-  if (reviews.length) {
-    lodging.review = reviews.map((r) => ({
-      '@type': 'Review',
-      author: { '@type': 'Person', name: r.author },
-      reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
-      reviewBody: r.body,
-      ...(r.date ? { datePublished: r.date } : {}),
-    }));
-  }
-}
 const allJsonLd = [lodging, ...jsonLd];
 ---
 
@@ -114,6 +92,23 @@ const allJsonLd = [lodging, ...jsonLd];
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    {/* Consent Mode muss vor jedem Google-Tag synchron auf denied stehen.
+        Der externe Tag selbst lädt weiterhin erst nach einer aktiven Auswahl. */}
+    {site.googleAnalyticsId && (
+      <script is:inline>
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+        window.gtag('consent', 'default', {
+          analytics_storage: 'denied',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          wait_for_update: 500,
+        });
+        window.gtag('set', 'ads_data_redaction', true);
+        window.__haConsentDefaultSet = true;
+      </script>
+    )}
     {/* LCP: Headline-Font (Fraunces) vorab laden – self-hosted, kein Google-CDN */}
     <link rel="preload" href={frauncesWoff2} as="font" type="font/woff2" crossorigin />
     <title>{title}</title>

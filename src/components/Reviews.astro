@@ -8,7 +8,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
-// Anzeige-Regel: nur die 10 neuesten 5-Sterne-Bewertungen (siehe data/reviews.ts).
+// Anzeige-Regel: die 10 neuesten verifizierten Einträge, ohne Rating-Gating.
 const entries = await getDisplayReviews();
 const reviews = await Promise.all(
   entries.map(async (r) => ({ data: r.data, Content: (await render(r)).Content }))
@@ -21,6 +21,7 @@ const fmtDate = (iso?: string) => {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(localeMap[lang], { month: 'long', year: 'numeric' });
 };
+const fmtSource = (source?: string) => source === 'Google-Bewertung' ? t('reviews.source') : (source ?? '');
 ---
 <section class="section reviews" id="bewertungen">
   <div class="container">
@@ -46,7 +47,7 @@ const fmtDate = (iso?: string) => {
           <figcaption class="review-cap">
             <strong>{data.author}</strong>
             <span>
-              {data.apartment ? `${data.apartment} · ` : ''}{data.source ?? t('reviews.source')}{fmtDate(data.date) ? ` · ${fmtDate(data.date)}` : ''}
+              {data.apartment ? `${data.apartment} · ` : ''}{fmtSource(data.source)}{data.source && fmtDate(data.date) ? ' · ' : ''}{fmtDate(data.date)}
             </span>
           </figcaption>
         </figure>

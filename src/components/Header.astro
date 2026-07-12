@@ -16,7 +16,7 @@ const nav = [
   { key: 'kontakt', label: t('nav.contact') },
 ];
 const home = localizedPath('', lang);
-const bookHref = localizedPath('apartments', lang);
+const bookHref = `${localizedPath('apartments', lang)}#verfuegbarkeit`;
 ---
 
 <header class="site-header">
@@ -135,28 +135,46 @@ const bookHref = localizedPath('apartments', lang);
       transform: translateY(-8px);
       opacity: 0;
       pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+    }
+    .site-nav.is-open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      visibility: visible;
       transition: opacity 0.18s ease, transform 0.18s ease;
     }
-    .site-nav.is-open { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .nav-link { padding: 0.6rem 0.2rem; border-bottom: 1px solid var(--line); }
     .nav-cta { margin-top: 0.6rem; justify-content: center; }
   }
 </style>
 
 <script>
-  // Mobiles Menü: echter Button mit aria-expanded (A11y).
+  // Geschlossen ist das mobile Menü auch aus Tab-Reihenfolge und A11y-Tree
+  // entfernt. Escape schließt es und gibt den Fokus an den Button zurück.
   document.querySelectorAll<HTMLButtonElement>('[data-navtoggle]').forEach((btn) => {
     const nav = document.getElementById('site-nav');
     if (!nav) return;
-    btn.addEventListener('click', () => {
-      const open = nav.classList.toggle('is-open');
+
+    const isOpen = () => nav.classList.contains('is-open');
+    const setOpen = (open: boolean) => {
+      nav.classList.toggle('is-open', open);
       btn.setAttribute('aria-expanded', String(open));
+    };
+
+    btn.addEventListener('click', () => setOpen(!isOpen()));
+    nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isOpen()) {
+        setOpen(false);
+        btn.focus();
+      }
     });
-    nav.querySelectorAll('a').forEach((a) =>
-      a.addEventListener('click', () => {
-        nav.classList.remove('is-open');
-        btn.setAttribute('aria-expanded', 'false');
-      })
-    );
+    document.addEventListener('click', (event) => {
+      if (isOpen() && event.target instanceof Node && !nav.contains(event.target) && !btn.contains(event.target)) {
+        setOpen(false);
+      }
+    });
   });
 </script>

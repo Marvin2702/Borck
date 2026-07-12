@@ -20,14 +20,15 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: |
             package-lock.json
@@ -36,7 +37,7 @@ jobs:
       # Ermittelt origin (https://<user>.github.io) und base_path (/<repo>)
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Install dependencies
         run: npm ci
@@ -44,23 +45,18 @@ jobs:
       - name: Check (astro check)
         run: npm run check
 
-      - name: Fetch Smoobu prices (optional, nur mit Secret)
-        run: node scripts/fetch-prices.mjs
-        env:
-          SMOOBU_API_KEY: ${{ secrets.SMOOBU_API_KEY }}
-
-      - name: Build
+      # npm führt prebuild (Smoobu-Preise) und postbuild (Launch-Audit) mit aus.
+      - name: Build and launch audit
         run: npm run build
         env:
           SITE: ${{ steps.pages.outputs.origin }}
           BASE: ${{ steps.pages.outputs.base_path }}
           PUBLIC_STAGING: 'true' # Staging => noindex (schützt Prod-SEO)
-
-      - name: Launch audit (links, assets, SEO)
-        run: npm run audit:build
-        env:
-          BASE: ${{ steps.pages.outputs.base_path }}
-          PUBLIC_STAGING: 'true'
+          PUBLIC_GA4_ID: ${{ vars.PUBLIC_GA4_ID }}
+          PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ vars.PUBLIC_GOOGLE_SITE_VERIFICATION }}
+          PUBLIC_WEB3FORMS_ACCESS_KEY: ${{ vars.PUBLIC_WEB3FORMS_ACCESS_KEY }}
+          SMOOBU_API_KEY: ${{ secrets.SMOOBU_API_KEY }}
+          SMOOBU_API_SECRET: ${{ secrets.SMOOBU_API_SECRET }}
 
       # Klickbare Web-Vorschau der Gäste-App unter {base}/gast-app/ —
       # bewusst NACH dem Audit (das prüft nur die Website-Seiten).
@@ -74,17 +70,18 @@ jobs:
           mkdir -p ../dist/gast-app && cp -r dist/. ../dist/gast-app/
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./dist
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

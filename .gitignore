@@ -16,6 +16,9 @@ app/dist/
 # Lighthouse-Reports
 lh*.json
 lhd.json
+.lighthouseci/
+test-results/
+playwright-report/
 
 # Logs & env
 *.log

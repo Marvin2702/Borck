@@ -1,0 +1,31 @@
+name: Trigger Cloudflare Pages rebuild
+
+on:
+  schedule:
+    # 04:17 UTC; absichtlich versetzt zum GitHub-Pages-Staging-Rebuild.
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-production-rebuild
+  cancel-in-progress: false
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}
+    steps:
+      - name: Require deploy hook secret
+        if: env.DEPLOY_HOOK_URL == ''
+        run: |
+          echo "::error::Repository secret CLOUDFLARE_DEPLOY_HOOK_URL is missing."
+          exit 1
+
+      - name: Trigger production rebuild
+        if: env.DEPLOY_HOOK_URL != ''
+        run: curl --fail --silent --show-error --retry 3 --retry-all-errors --request POST "$DEPLOY_HOOK_URL"

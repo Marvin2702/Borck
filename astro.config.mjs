@@ -11,6 +11,10 @@ const BASE = process.env.BASE || '/';
 export default defineConfig({
   site: SITE,
   base: BASE,
+  // Die kleinen komponentenweisen Stylesheets blockierten im mobilen Lab den
+  // Detailseiten-LCP. Bei diesem Projekt ist Inlining günstiger als mehrere
+  // zusätzliche CSS-Roundtrips.
+  build: { inlineStylesheets: 'always' },
   // Mehrsprachigkeit: DE = Root, EN/NL/DA mit Sprach-Präfix.
   // Architektur sprach-agnostisch — weitere Locales sind ein 1-Zeilen-Eintrag.
   i18n: {
@@ -23,6 +27,8 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
+      // Bestätigungsseiten sind absichtlich noindex und gehören nicht in die Sitemap.
+      filter: (page) => !new URL(page).pathname.endsWith('/danke/'),
       i18n: {
         defaultLocale: 'de',
         locales: {

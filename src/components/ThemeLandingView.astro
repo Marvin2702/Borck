@@ -1,11 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ApartmentCard from './ApartmentCard.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
 import CtaBanner from './CtaBanner.astro';
 import Faq from './Faq.astro';
 import { getCollection } from 'astro:content';
-import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import { useTranslations, localizedPath, withoutBase, type Lang } from '../i18n/utils';
 import { landingPages, filterApartments } from '../data/landing';
+import { site } from '../data/site';
 
 interface Props { lang: Lang; pageKey: string }
 const { lang, pageKey } = Astro.props;
@@ -14,10 +16,38 @@ const page = landingPages[pageKey];
 const c = page.content[lang];
 const all = (await getCollection('apartments')).sort((a, b) => a.data.order - b.data.order);
 const apartments = filterApartments(all, page.filter);
+// Reiseführer existieren derzeit bewusst nur auf Deutsch. Auf den deutschen
+// Themen-Seiten schließen wir den Cluster in beide Richtungen; übersetzte
+// Landings verlinken nicht auf anderssprachigen Inhalt.
+const relatedGuides = lang === 'de'
+  ? (await getCollection('guides'))
+      .filter((guide) => guide.data.relatedLanding.includes(pageKey))
+      .sort((a, b) => a.data.order - b.data.order)
+  : [];
+const origin = new URL(site.domain);
+const apartmentsListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: c.h1,
+  numberOfItems: apartments.length,
+  itemListElement: apartments.map((apartment, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: apartment.data.name,
+    url: new URL(withoutBase(localizedPath(`apartments/${apartment.id}`, lang)), origin).href,
+  })),
+};
 ---
-<BaseLayout title={c.metaTitle} description={c.metaDescription} pageKey={pageKey}>
+<BaseLayout title={c.metaTitle} description={c.metaDescription} pageKey={pageKey} jsonLd={[apartmentsListLd]}>
   <section class="section">
     <div class="container-narrow">
+      <Breadcrumbs
+        lang={lang}
+        items={[
+          { label: t('apartments.title'), href: localizedPath('apartments', lang) },
+          { label: c.h1, href: localizedPath(pageKey, lang) },
+        ]}
+      />
       <p class="eyebrow">{c.eyebrow}</p>
       <h1>{c.h1}</h1>
       {c.intro.map((p, i) => (i === 0 ? <p class="lead intro-p">{p}</p> : <p class="intro-p body-p">{p}</p>))}
@@ -36,13 +66,41 @@ const apartments = filterApartments(all, page.filter);
     </div>
   </section>
 
+  {relatedGuides.length > 0 && (
+    <section class="section related-guides">
+      <div class="container-narrow">
+        <p class="eyebrow">Passend zu deinem Urlaub</p>
+        <h2>Büsum-Tipps aus erster Hand</h2>
+        <div class="guide-grid">
+          {relatedGuides.map((guide) => (
+            <a class="guide-card card" href={localizedPath(`reisefuehrer/${guide.id}`, 'de')}>
+              <span class="guide-icon" aria-hidden="true">{guide.data.icon}</span>
+              <span>
+                <strong>{guide.data.title}</strong>
+                <small>{guide.data.teaser}</small>
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
   <Faq lang={lang} />
   <CtaBanner lang={lang} />
 </BaseLayout>
 
 <style>
   .apt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  .related-guides { padding-top: 0; }
+  .guide-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap); margin-top: 1.25rem; }
+  .guide-card { display: flex; gap: 0.9rem; align-items: flex-start; padding: 1.2rem; color: inherit; text-decoration: none; }
+  .guide-icon { flex: 0 0 auto; font-size: 1.8rem; }
+  .guide-card strong { display: block; color: var(--brand-strong); }
+  .guide-card small { display: block; margin-top: 0.3rem; color: var(--text-muted); line-height: 1.5; }
   @media (max-width: 960px) { .apt-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 600px) { .apt-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) {
+    .apt-grid, .guide-grid { grid-template-columns: 1fr; }
+  }
   .intro-p { margin-bottom: 1rem; max-width: 65ch; }
 </style>

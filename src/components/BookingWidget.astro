@@ -5,39 +5,59 @@ import { site } from '../data/site';
 
 interface Props {
   lang: Lang;
-  /** Smoobu-Objekt-ID (Apartment). Leer => Gruppen-ID, sonst Kontakt-Fallback. */
+  /** Smoobu-Objekt-ID für den Einzelkalender. */
   smoobuId?: string;
   apartmentName?: string;
+  /** `all` nutzt Smoobus offizielle Suche über alle Unterkünfte des Accounts. */
+  mode?: 'apartment' | 'all';
 }
-const { lang, smoobuId, apartmentName } = Astro.props as Props;
+const { lang, smoobuId, apartmentName, mode = 'apartment' } = Astro.props as Props;
 const t = useTranslations(lang);
 
-const effectiveId = smoobuId || site.smoobuGroupId || '';
-const hasId = effectiveId.length > 0;
+const allApartments = mode === 'all';
+const effectiveId = smoobuId || '';
+const hasWidget = Boolean(site.smoobuUserId) && (allApartments || Boolean(effectiveId));
 // Smoobu-Sprachsegment der Booking-Tool-URL (Fallback DE bei unbekannt).
 const smoobuLang = ({ de: 'de', en: 'en', nl: 'nl', da: 'da' } as Record<string, string>)[lang] ?? 'de';
 const waText = encodeURIComponent(t('contact.whatsapp.msg'));
+const directBookUrl = smoobuId ? `${site.smoobuBookingPage}?apartmentId=${smoobuId}` : site.smoobuBookingPage;
+const groupCopy: Record<Lang, { eyebrow: string; title: string; subtitle: string; frame: string }> = {
+  de: { eyebrow: 'Direkt verfügbare Wohnungen', title: 'Freies Apartment finden', subtitle: 'Reisedaten und Gäste wählen: Smoobu zeigt dir live passende Apartments und den Gesamtpreis.', frame: 'Verfügbarkeit aller Apartments' },
+  en: { eyebrow: 'Available apartments', title: 'Find a free apartment', subtitle: 'Choose dates and guests: Smoobu shows matching apartments and the total price live.', frame: 'Availability of all apartments' },
+  nl: { eyebrow: 'Beschikbare appartementen', title: 'Vind een vrij appartement', subtitle: 'Kies data en gasten: Smoobu toont live passende appartementen en de totaalprijs.', frame: 'Beschikbaarheid van alle appartementen' },
+  da: { eyebrow: 'Ledige lejligheder', title: 'Find en ledig lejlighed', subtitle: 'Vælg datoer og gæster: Smoobu viser passende lejligheder og samlet pris live.', frame: 'Ledighed for alle lejligheder' },
+};
+const heading = allApartments ? groupCopy[lang] : null;
 ---
 
-<section class="booking" id="buchung">
+<section
+  class:list={['booking', { 'booking--all': allApartments }]}
+  id={allApartments ? 'verfuegbarkeit' : 'buchung'}
+  data-booking-section
+  data-booking-mode={mode}
+>
   <div class="container-narrow booking-head">
-    <p class="eyebrow">{t('booking.title')}</p>
-    <h2>{apartmentName ? apartmentName : t('booking.title')}</h2>
-    <p class="lead">{t('booking.subtitle')}</p>
+    <p class="eyebrow">{heading?.eyebrow ?? t('booking.title')}</p>
+    <h2>{heading?.title ?? (apartmentName ? apartmentName : t('booking.title'))}</h2>
+    <p class="lead">{heading?.subtitle ?? t('booking.subtitle')}</p>
   </div>
 
   <div class="container-narrow booking-shell">
-    {hasId ? (
+    {hasWidget ? (
       <div
         class="booking-embed"
         data-id={effectiveId}
         data-user={site.smoobuUserId}
         data-lang={smoobuLang}
+        data-mode={mode}
         data-phone={site.phone.replace(/\s/g, '')}
         data-phonelabel={site.phoneDisplay}
         data-wa={`https://wa.me/${site.whatsapp}?text=${waText}`}
         data-fbtitle={t('booking.fallbackTitle')}
         data-fbtext={t('booking.fallbackText')}
+        data-frametitle={heading?.frame ?? t('booking.title')}
+        data-bookurl={directBookUrl}
+        data-booklabel={t('cta.bookNow')}
       >
         {/* Kalender-Skeleton als Ladezustand (statt nacktem Textsatz) */}
         <div class="booking-skel" aria-hidden="true">
@@ -46,6 +66,10 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
           <span class="sk sk-cal"></span>
         </div>
         <p class="booking-hint">{t('booking.placeholder')}</p>
+        <button type="button" class="btn btn--ghost booking-activate" data-booking-activate>{t('booking.fallback')}</button>
+        <noscript>
+          <a class="btn btn--gold" href={directBookUrl} target="_blank" rel="noopener">{t('cta.bookNow')} ↗</a>
+        </noscript>
       </div>
     ) : (
       <div class="booking-placeholder">
@@ -76,6 +100,7 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
   .booking-embed { display: grid; place-items: center; gap: 1rem; align-content: center; min-height: 320px; text-align: center; }
   .booking-embed[data-loaded] { display: block; place-items: stretch; }
   .booking-hint { color: var(--text-muted); font-size: 0.9rem; }
+  .booking-activate { justify-self: center; }
   /* Skeleton in Sand-Tönen: Kopfzeile, Wochentagszeile, Monatsraster */
   .booking-skel { display: grid; gap: 0.7rem; justify-items: center; width: min(100%, 420px); }
   .sk { display: block; border-radius: 8px; background: var(--c-sand-100); }
@@ -101,6 +126,7 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
   .ph-buttons { display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: center; }
   /* Smoobu-iFrame responsiv */
   .booking-shell :global(iframe) { width: 100% !important; border: 0; }
+  .booking--all .booking-shell { min-height: 420px; }
 </style>
 
 <script>
@@ -112,6 +138,8 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
     const phone = el.dataset.phone || '';
     const phoneLabel = el.dataset.phonelabel || phone;
     const wa = el.dataset.wa || '#';
+    const book = el.dataset.bookurl || '';
+    const bookLabel = el.dataset.booklabel || 'Smoobu';
     const esc = (s: string) => s.replace(/</g, '&lt;');
     const phoneIcon =
       '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.2 4.2h2.9l1.5 3.9-1.9 1.7a12.4 12.4 0 0 0 6.5 6.5l1.7-1.9 3.9 1.5v2.9a1.9 1.9 0 0 1-2.1 1.9A16.6 16.6 0 0 1 3.3 6.3a1.9 1.9 0 0 1 1.9-2.1z"/></svg>';
@@ -120,6 +148,7 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
       `<strong>${esc(el.dataset.fbtitle || '')}</strong>` +
       `<p>${esc(el.dataset.fbtext || '')}</p>` +
       '<div class="fb-btns">' +
+      (book ? `<a class="btn btn--gold" href="${book}" target="_blank" rel="noopener">${esc(bookLabel)} ↗</a>` : '') +
       `<a class="btn btn--gold" href="tel:${phone}">${phoneIcon} ${esc(phoneLabel)}</a>` +
       `<a class="btn btn--ghost" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>` +
       '</div></div>';
@@ -131,8 +160,9 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
     const id = el.dataset.id;
     const user = el.dataset.user;
     const lang = el.dataset.lang || 'de';
+    const mode = el.dataset.mode || 'apartment';
     const base = 'https://login.smoobu.com';
-    const targetId = `smoobuApartment${id}${lang}`;
+    const targetId = mode === 'all' ? `smoobuAllApartments${lang}` : `smoobuApartment${id}${lang}`;
     el.innerHTML = `<div id="${targetId}"></div>`;
     const s = document.createElement('script');
     s.src = `${base}/js/Settings/BookingToolIframe.js`;
@@ -142,7 +172,9 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
       if (window.BookingToolIframe) {
         // @ts-ignore
         window.BookingToolIframe.initialize({
-          url: `${base}/${lang}/booking-tool/iframe/${user}/${id}`,
+          url: mode === 'all'
+            ? `${base}/${lang}/booking-tool/iframe/${user}`
+            : `${base}/${lang}/booking-tool/iframe/${user}/${id}`,
           baseUrl: base,
           target: `#${targetId}`,
         });
@@ -150,7 +182,7 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
         let tries = 0;
         const ti = setInterval(() => {
           const f = el.querySelector('iframe') as HTMLIFrameElement | null;
-          if (f) { if (!f.title) f.title = 'Buchungskalender'; clearInterval(ti); }
+          if (f) { if (!f.title) f.title = el.dataset.frametitle || 'Buchungskalender'; clearInterval(ti); }
           else if (++tries > 40) clearInterval(ti);
         }, 250);
       } else {
@@ -168,18 +200,8 @@ const waText = encodeURIComponent(t('contact.whatsapp.msg'));
   document.querySelectorAll<HTMLElement>('.booking-embed').forEach((el) => {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting) { initSmoobu(el); io.disconnect(); } });
-    }, { rootMargin: '500px' });
+    }, { rootMargin: '200px' });
     io.observe(el);
+    el.querySelector('[data-booking-activate]')?.addEventListener('click', () => initSmoobu(el));
   });
-
-  // Sicherheitsnetz: Feuert der Observer nie (gedrosselte/versteckte Tabs,
-  // exotische Browser), bliebe sonst dauerhaft "Kalender wird geladen …" stehen —
-  // auch der 8-s-Kontakt-Fallback startet erst in initSmoobu. Deshalb spätestens
-  // 6 s nach Load initialisieren (LCP/CWV sind dann längst gemessen; Doppel-Init
-  // verhindert das dataset.loaded-Guard).
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.querySelectorAll<HTMLElement>('.booking-embed').forEach((el) => initSmoobu(el));
-    }, 6000);
-  }, { once: true });
 </script>

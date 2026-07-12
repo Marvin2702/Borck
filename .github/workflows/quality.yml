@@ -1,0 +1,76 @@
+name: Production quality gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SITE: https://www.nordsee-buesum-fewo.de
+      BASE: /
+      REQUIRE_INDEXABLE: 'true'
+      PUBLIC_GA4_ID: G-CI00000000
+      PUBLIC_GOOGLE_SITE_VERIFICATION: ci-verification-token
+      PUBLIC_WEB3FORMS_ACCESS_KEY: ci-public-test-key
+      LHCI_OUTPUT_DIR: ${{ runner.temp }}/lhci-reports
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dependency vulnerability audit
+        run: npm audit --audit-level=high
+
+      - name: Check Astro and TypeScript
+        run: npm run check
+
+      # PUBLIC_STAGING bleibt absichtlich ungesetzt. Der postbuild-Audit muss
+      # damit eine vollständig indexierbare Produktionsausgabe bestätigen.
+      - name: Build production output
+        run: npm run build
+
+      - name: Lighthouse (mobile, three core pages)
+        run: npm run audit:lighthouse
+
+      - name: Playwright (Consent, form, funnel and screenshots)
+        run: npm run test:e2e:run
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: ${{ runner.temp }}/lhci-reports
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Playwright reports and screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-reports
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+          retention-days: 14
