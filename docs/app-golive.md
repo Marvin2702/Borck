@@ -106,7 +106,7 @@ lokalen Weg in Abschnitt 6 — beide führen zum selben Ergebnis.
 **Teil D — APK aufs Handy:**
 1. Im fertigen (grünen) Lauf den Job **build** öffnen → im Log des Schritts
    **„EAS Build"** steht am Ende ein Link `https://expo.dev/accounts/…/builds/…`.
-   (Alternativ: auf expo.dev → euer Projekt **haus-aquamarin-gast → Builds**.)
+   (Alternativ: auf expo.dev → euer Projekt **„marvin" → Builds** (der Expo-Projektname; die App selbst heißt „Haus Aquamarin").)
 2. Diesen Build-Link am **Android-Handy** öffnen (z. B. per WhatsApp an euch
    selbst schicken) → **Install** tippen.
 3. Android fragt nach Erlaubnis für „Apps aus unbekannter Quelle" → einmalig
