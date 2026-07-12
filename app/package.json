@@ -45,7 +45,7 @@
     "marked": "^18.0.6",
     "qrcode": "^1.5.4",
     "tsx": "^4.23.0",
-    "typescript": "~6.0.3"
+    "typescript": "~7.0.2"
   },
   "scripts": {
     "start": "expo start",
