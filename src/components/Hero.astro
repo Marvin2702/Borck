@@ -51,10 +51,13 @@ const f = facts[lang];
   </div>
 </section>
 
-<div class="mobile-booking" aria-label={t('hero.cta.book')}>
+{/* Startet geparkt (SSR-Klasse): verhindert Aufblitzen vor dem ersten
+    IntersectionObserver-Callback. Ohne JS zeigt <noscript> die Leiste. */}
+<div class="mobile-booking is-parked" aria-label={t('hero.cta.book')}>
   <div><strong>{ratingStr} ★</strong><span>{f.direct}</span></div>
   <a href={bookHref} class="btn btn--gold">{t('hero.cta.book')}</a>
 </div>
+<noscript><style>.mobile-booking.is-parked { transform: none; opacity: 1; pointer-events: auto; }</style></noscript>
 
 <style>
   .hero { position: relative; overflow: hidden; isolation: isolate; min-height: min(760px, calc(100svh - 68px)); display: grid; }

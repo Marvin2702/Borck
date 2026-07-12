@@ -25,7 +25,7 @@
   --c-white: #ffffff;
   --c-gold: #c9a24b; /* dezenter Edelstein-Akzent (Flächen/Buttons) */
   --c-gold-300: #f5d887; /* Gold auf dunklen Flächen (Hero, Footer) */
-  --c-gold-700: #8f6f22; /* Gold als Text/Icon auf hellem Grund (AA ≥ 4.5:1) */
+  --c-gold-700: #806018; /* Gold als Text/Icon auf hellem Grund (AA: 5.45:1 auf Sand-50) */
 
   /* Funktionale Zuweisungen */
   --bg: var(--c-sand-50);

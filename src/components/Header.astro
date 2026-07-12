@@ -1,5 +1,5 @@
 ---
-import { useTranslations, localizedPath, type Lang } from '../i18n/utils';
+import { useTranslations, localizedPath, withBase, type Lang } from '../i18n/utils';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { site } from '../data/site';
 
@@ -22,14 +22,14 @@ const bookHref = localizedPath('apartments', lang);
 <header class="site-header">
   <div class="container header-inner">
     <a href={home} class="brand" aria-label={site.name}>
-      {/* Signet: facettierter Aquamarin (konsistent mit Favicon & ◈-Markenzeichen) */}
-      <svg class="brand-logo" width="34" height="34" viewBox="0 0 32 32" aria-hidden="true">
-        <path d="M16 3.5 26.5 12.5 16 28.5 5.5 12.5 Z" fill="#155e6e" />
-        <path d="M16 3.5 5.5 12.5 16 12.5 Z" fill="#2a8ca0" />
-        <path d="M16 3.5 26.5 12.5 16 12.5 Z" fill="#7bc0cd" />
-        <path d="M16 12.5 26.5 12.5 16 28.5 Z" fill="#0d3b44" />
-        <path d="M16 3.5 26.5 12.5" stroke="#f5d887" stroke-width="1.1" stroke-linecap="round" />
-      </svg>
+      {/* Traditionelles Logo (Häuschen mit Sonnenhut) als rundes Emblem mit
+          Goldring — Original bleibt, nur der Rahmen ist modern. */}
+      <span class="brand-badge">
+        <picture>
+          <source srcset={withBase('/images/logo.webp')} type="image/webp" />
+          <img src={withBase('/images/logo.png')} alt="" class="brand-logo" width="34" height="34" loading="eager" />
+        </picture>
+      </span>
       <span class="brand-name">{site.name}</span>
     </a>
 
@@ -66,7 +66,13 @@ const bookHref = localizedPath('apartments', lang);
     min-height: 68px;
   }
   .brand { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-  .brand-logo { height: 42px; width: auto; display: block; }
+  .brand-badge {
+    display: grid; place-items: center; flex: none;
+    width: 46px; height: 46px; border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-gold) 55%, transparent), var(--shadow-sm);
+  }
+  .brand-logo { height: 34px; width: auto; display: block; }
   .brand-name {
     font-family: var(--font-head);
     font-weight: 600;

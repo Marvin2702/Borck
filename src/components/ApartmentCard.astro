@@ -130,6 +130,12 @@ const gallery: string[] = d.gallery?.length ? d.gallery : d.heroImage ? [d.heroI
   .apt-nav:active { transform: translateY(-50%) scale(0.94); }
   .apt-nav--prev { left: 10px; }
   .apt-nav--next { right: 10px; }
+  /* Touch: 44px-Tap-Targets */
+  @media (pointer: coarse) {
+    .apt-nav { width: 44px; height: 44px; }
+  }
+  /* Fokusring innen zeichnen — außen würde ihn overflow:hidden abschneiden */
+  .apt-slide:focus-visible { outline: 2px solid #fff; outline-offset: -4px; border-radius: 6px; }
   .apt-dots {
     position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%);
     display: flex; gap: 5px; pointer-events: none;
