@@ -8,7 +8,6 @@ const app = path.join(root, 'app');
 const appDist = path.join(app, 'dist');
 const websiteDist = path.join(root, 'dist');
 const destination = path.join(websiteDist, 'gast-app');
-const contentFile = path.join(app, 'assets', 'content.json');
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 function normalizeBase(value = '') {
@@ -28,6 +27,13 @@ function run(args, env = process.env) {
 
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status ?? 1);
+}
+
+function walk(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(directory, entry.name);
+    return entry.isDirectory() ? walk(file) : [file];
+  });
 }
 
 if (!fs.existsSync(websiteDist)) {
@@ -56,20 +62,21 @@ if (!fs.existsSync(path.join(appDist, 'index.html'))) {
 fs.rmSync(destination, { recursive: true, force: true });
 fs.cpSync(appDist, destination, { recursive: true });
 
-// Expo schreibt konkrete dynamische Routen als `route/slug.html`. Zusätzliche
-// `route/slug/index.html`-Aliase machen direkte Deep Links mit abschließendem
-// Slash auch auf rein dateibasierten Hosts wie GitHub Pages zuverlässig.
-const content = JSON.parse(fs.readFileSync(contentFile, 'utf8'));
+// Expo schreibt statische Routen als `route.html` bzw. `route/slug.html`.
+// Zusätzliche `route/index.html`-Aliase machen ALLE direkten Deep Links mit
+// abschließendem Slash auch auf dateibasierten Hosts wie GitHub Pages
+// zuverlässig. Template- und interne Expo-Routen bleiben dabei außen vor.
+const routeFiles = walk(destination).filter((file) => file.endsWith('.html'));
 let aliasCount = 0;
-for (const [route, entries] of [['wohnung', content.apartments], ['heute', content.guides]]) {
-  for (const { slug } of entries) {
-    const source = path.join(destination, route, `${slug}.html`);
-    const target = path.join(destination, route, slug, 'index.html');
-    if (!fs.existsSync(source)) throw new Error(`Statische Expo-Route fehlt: ${path.relative(root, source)}`);
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.copyFileSync(source, target);
-    aliasCount += 1;
-  }
+for (const source of routeFiles) {
+  const rel = path.relative(destination, source);
+  const name = path.basename(source, '.html');
+  if (rel === 'index.html' || rel.endsWith(`${path.sep}index.html`) || /^[+_\[]/.test(name)) continue;
+
+  const target = path.join(path.dirname(source), name, 'index.html');
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.copyFileSync(source, target);
+  aliasCount += 1;
 }
 
 console.log(

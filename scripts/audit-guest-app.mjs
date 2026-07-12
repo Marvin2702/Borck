@@ -124,6 +124,14 @@ if (!fs.existsSync(appRoot)) {
     }
   }
 
+  for (const source of htmlFiles) {
+    const rel = path.relative(appRoot, source);
+    const name = path.basename(source, '.html');
+    if (rel === 'index.html' || rel.endsWith(`${path.sep}index.html`) || /^[+_\[]/.test(name)) continue;
+    const alias = path.join(path.dirname(source), name, 'index.html');
+    if (!fs.existsSync(alias)) failures.push(`${rel}: Deep-Link-Alias ${path.relative(appRoot, alias)} fehlt.`);
+  }
+
   for (const [kind, route, entries] of [
     ['Wohnung', 'wohnung', content?.apartments],
     ['Guide', 'heute', content?.guides],

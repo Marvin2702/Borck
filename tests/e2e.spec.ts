@@ -119,6 +119,11 @@ test.describe('SEO, Staging-Sicherheit und Kernseiten', () => {
     expect(guideResponse?.status()).toBe(200);
     await expect(page.getByText('Wattwandern in Büsum: Touren, Tipps und Ausrüstung')).toBeVisible();
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+
+    const milestoneResponse = await page.goto('/gast-app/meilensteine/');
+    expect(milestoneResponse?.status()).toBe(200);
+    await expect(page.getByText('Euer aktueller Aufenthalt')).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
     expect(pageErrors).toEqual([]);
     expect(consoleErrors).toEqual([]);
   });
