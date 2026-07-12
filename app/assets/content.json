@@ -1,0 +1,676 @@
+{
+  "site": {
+    "name": "Haus Aquamarin",
+    "tagline": "Ferienapartments direkt hinter der Familienlagune · Büsum",
+    "phone": "+491727952082",
+    "phoneDisplay": "+49 172 7952082",
+    "whatsapp": "491727952082",
+    "email": "iris_borck@mac.com",
+    "street": "Große Tiefe 31",
+    "postalCode": "25761",
+    "city": "Büsum",
+    "geo": {
+      "lat": 54.1376163,
+      "lng": 8.8448759
+    },
+    "checkinTime": "15:00",
+    "checkoutTime": "10:00",
+    "googleProfileUrl": "https://www.google.com/maps?cid=18045129901455022857",
+    "bookingUrl": "https://booking.smoobu.com/9A40536",
+    "websiteUrl": "https://www.nordsee-buesum-fewo.de"
+  },
+  "apartments": [
+    {
+      "slug": "tuerkis",
+      "name": "Türkis",
+      "persons": 4,
+      "bedrooms": 2,
+      "size_qm": 57,
+      "view": "Deichblick",
+      "floor": "1. Etage",
+      "features": [
+        "Balkon mit Deichblick",
+        "Offene Einbauküche mit großem Geschirrspüler",
+        "4-Zonen-Induktionskochfeld",
+        "Doppelbett 180 cm + Etagenbett",
+        "Duschbad mit Haartrockner",
+        "Flachbild-TV mit SAT",
+        "Kostenloses WLAN",
+        "PKW-Stellplatz & abschließbare Fahrradgarage"
+      ],
+      "dogFriendly": true,
+      "accent": "#208295",
+      "summary": "Küstengold für 4 Personen. Urlaub mit Deichblick.",
+      "smoobuId": "133656"
+    },
+    {
+      "slug": "saphir",
+      "name": "Saphir",
+      "persons": 4,
+      "bedrooms": 2,
+      "size_qm": 60,
+      "view": "Terrasse · Gartenblick",
+      "floor": "Erdgeschoss",
+      "features": [
+        "Eigene Terrasse (ca. 60 m²) mit Gartenblick",
+        "Offene Einbauküche mit Geschirrspüler",
+        "Induktionskochfeld & Backofen mit Mikrowelle",
+        "Doppelbett 180 cm + Etagenbett",
+        "Duschbad mit Haartrockner",
+        "Flachbild-TV mit SAT, DAB+ Radio",
+        "Kostenloses WLAN",
+        "PKW-Stellplatz & abschließbare Fahrradgarage"
+      ],
+      "dogFriendly": true,
+      "accent": "#426cab",
+      "summary": "Sonniger Wohlfühlort für 4 Personen. Deine Auszeit mit eigener Terrasse.",
+      "smoobuId": "133655"
+    },
+    {
+      "slug": "bernstein",
+      "name": "Bernstein",
+      "persons": 2,
+      "bedrooms": 1,
+      "size_qm": 35,
+      "view": "Terrasse · separater Eingang",
+      "floor": "Erdgeschoss",
+      "features": [
+        "Eigene Terrasse (ca. 35 m²)",
+        "Separater privater Eingang, Anreise rund um die Uhr",
+        "Offene Küche, 4-Zonen-Kochfeld & Mikrowelle",
+        "Doppelbett 180 cm",
+        "Duschbad mit Haartrockner",
+        "Flachbild-TV mit SAT",
+        "Kostenloses WLAN",
+        "PKW-Stellplatz & abschließbare Fahrradgarage"
+      ],
+      "dogFriendly": true,
+      "accent": "#a46d25",
+      "summary": "Ankerplatz für Barfuß-Freunde. Auszeit im Erdgeschoss mit eigener Terrasse.",
+      "smoobuId": "133660"
+    },
+    {
+      "slug": "topas",
+      "name": "Topas",
+      "persons": 5,
+      "bedrooms": 2,
+      "size_qm": 76,
+      "view": "Meerblick",
+      "floor": "2. Etage (ganz oben)",
+      "features": [
+        "Balkon mit Meerblick",
+        "Offene Einbauküche, Mini-Geschirrspüler & Mikrowelle mit Grill",
+        "Doppelbett 180 cm + 3 Einzelbetten (je 90 cm)",
+        "Duschbad mit Haartrockner",
+        "Flachbild-TV mit SAT",
+        "Kostenloses WLAN",
+        "Gartenmöbel & Sonnenschirm",
+        "PKW-Stellplatz & abschließbare Fahrradgarage"
+      ],
+      "dogFriendly": true,
+      "accent": "#9e7a23",
+      "summary": "Dein Logenplatz über der Brandung. Nordsee-Feeling für 5 Personen mit Meerblick.",
+      "smoobuId": "133657"
+    },
+    {
+      "slug": "rubin",
+      "name": "Rubin",
+      "persons": 4,
+      "bedrooms": 2,
+      "size_qm": 60,
+      "view": "Terrasse · am Deich",
+      "floor": "Erdgeschoss",
+      "features": [
+        "Eigene Terrasse (ca. 60 m²)",
+        "Offene Küche, 4-Zonen-Ceranfeld & Backofen",
+        "Doppelbett 180 cm + Etagenbett",
+        "Duschbad mit Haartrockner",
+        "Flachbild-TV mit SAT",
+        "Kostenloses WLAN",
+        "PKW-Stellplatz & abschließbare Fahrradgarage"
+      ],
+      "dogFriendly": true,
+      "accent": "#a64b50",
+      "summary": "Familien-Glück am Deich. Dein gemütlicher Ankerplatz für 4 Personen.",
+      "smoobuId": "133683"
+    },
+    {
+      "slug": "opal",
+      "name": "Opal",
+      "persons": 4,
+      "bedrooms": 2,
+      "size_qm": 55,
+      "view": "Zwei Balkone · Deichblick",
+      "floor": "1. Etage",
+      "features": [
+        "Zwei Balkone (einer mit weitem Deichblick)",
+        "Offene Einbauküche & Mini-Geschirrspüler",
+        "Doppelbett 180 cm + Etagenbett",
+        "Duschbad mit Haartrockner",
+        "Flachbild-TV mit SAT",
+        "Kostenloses WLAN",
+        "Gartenmöbel",
+        "PKW-Stellplatz & abschließbare Fahrradgarage"
+      ],
+      "dogFriendly": true,
+      "accent": "#258b86",
+      "summary": "Deich-Kino für 4 Personen. Doppeltes Balkon-Glück mit Weitblick.",
+      "smoobuId": "133658"
+    },
+    {
+      "slug": "smaragd",
+      "name": "Smaragd",
+      "persons": 2,
+      "bedrooms": 1,
+      "size_qm": 28,
+      "view": "Seitlicher Deichblick",
+      "floor": "1. Etage (Dachgeschoss)",
+      "features": [
+        "Balkon mit seitlichem Deichblick & Sonnenschirm",
+        "Autarker, separater Eingang",
+        "Küchenzeile mit Ceran-Kochfeld & Mikrowelle mit Backofenfunktion",
+        "2 Einzelbetten (90 × 200 cm)",
+        "Duschbad mit Haartrockner",
+        "Flachbild-TV mit SAT",
+        "Kostenloses WLAN",
+        "PKW-Stellplatz & abschließbare Fahrradgarage"
+      ],
+      "dogFriendly": true,
+      "accent": "#3a8357",
+      "summary": "Dein Loft unter dem Küstenhimmel. Kompaktes Urlaubsglück für 2 mit seitlichem Deichblick.",
+      "smoobuId": "133659"
+    }
+  ],
+  "guides": [
+    {
+      "slug": "wattwandern-buesum",
+      "title": "Wattwandern in Büsum: Touren, Tipps und Ausrüstung",
+      "teaser": "Das Wattenmeer beginnt direkt vor Büsum. So planst du deine geführte Wattwanderung – von den Gezeiten bis zur richtigen Ausrüstung.",
+      "icon": "🥾",
+      "order": 1,
+      "category": "outdoor",
+      "blocks": [
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Das Wattenmeer vor Büsum"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Direkt vor Büsum beginnt das Wattenmeer, seit 2009 UNESCO-Weltnaturerbe. Bei Ebbe zieht sich das Meer zurück und gibt den Meeresboden frei: eine weite Landschaft aus Prielen, Muscheln und unzähligen Wattbewohnern. Vom Haus Aquamarin sind es nur wenige Minuten bis zum Deich und zur Familienlagune Perlebucht, wo viele Touren starten."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Geführte Wattwanderungen buchen"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Ins Watt geht man am besten mit einer geführten Tour. Zertifizierte Wattführerinnen und Wattführer kennen die Gezeiten, die sicheren Wege und die kleinen Bewohner des Watts. Geführte Wattwanderungen lassen sich über die offizielle Seite der Kurverwaltung (buesum.de) sowie direkt bei den Wattführern (watterleben.de) buchen. Für Familien mit kleinen Kindern eignen sich die kürzeren Touren rund um die Perlebucht."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Tipps für deine Wattwanderung"
+            }
+          ]
+        },
+        {
+          "t": "li",
+          "spans": [
+            {
+              "text": "Gezeiten prüfen: Losgehen bei ablaufendem Wasser, nie allein bei auflaufendem."
+            }
+          ]
+        },
+        {
+          "t": "li",
+          "spans": [
+            {
+              "text": "Barfuß oder mit alten Wasserschuhen. Feste Schuhe saugen sich im Schlick fest."
+            }
+          ]
+        },
+        {
+          "t": "li",
+          "spans": [
+            {
+              "text": "Windjacke mitnehmen, an der Nordsee weht fast immer eine Brise."
+            }
+          ]
+        },
+        {
+          "t": "li",
+          "spans": [
+            {
+              "text": "Nach der Tour die Füße an den Duschen am Strand abspülen."
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Wattwandern ist ganzjährig möglich. In der Nebensaison ist das Watt besonders ruhig, die Luft klar und die Touren sind kleiner."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "strand-perlebucht-buesum",
+      "title": "Strand und Familienlagune Perlebucht in Büsum",
+      "teaser": "Sandstrand, geschützte Lagune und Promenade – nur rund 0,4 km vom Haus. So holst du das Beste aus einem Strandtag in Büsum heraus.",
+      "icon": "🌊",
+      "order": 2,
+      "category": "outdoor",
+      "blocks": [
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Strand und Perlebucht"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Der Sandstrand von Büsum liegt an der Familienlagune Perlebucht, einem geschützten Becken mit flach auslaufendem Wasser. Vom Haus Aquamarin sind es nur rund 0,4 km bis zum Deich und zur Lagune. Das ruhige Wasser der Perlebucht ist ideal für Familien mit Kindern, während die Promenade zum Bummeln und Eisessen einlädt."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Strandkorb mieten"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Zum Nordseeurlaub gehört der Strandkorb. In Büsum lassen sich Strandkörbe direkt über die Kurverwaltung (buesum.de) reservieren. Wer eine Nacht am Meer erleben möchte, bucht einen Schlafstrandkorb und übernachtet unter freiem Himmel mit Blick auf die Sterne."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Tipps für den Strandtag"
+            }
+          ]
+        },
+        {
+          "t": "li",
+          "spans": [
+            {
+              "text": "Früh kommen: An sonnigen Sommertagen sind die besten Strandkörbe schnell vergeben."
+            }
+          ]
+        },
+        {
+          "t": "li",
+          "spans": [
+            {
+              "text": "Gezeiten beachten: Bei Ebbe wird aus dem Badestrand ein weites Watt zum Spazieren."
+            }
+          ]
+        },
+        {
+          "t": "li",
+          "spans": [
+            {
+              "text": "Wind einplanen: Ein Strandmuschel- oder Windschutz macht kühlere Tage angenehm."
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Nach dem Strandtag bist du in wenigen Minuten zurück im Apartment – kurze Wege sind einer der Vorteile der Lage direkt hinter der Perlebucht."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "buesum-bei-schietwetter",
+      "title": "Büsum bei Schietwetter: Programm für graue Tage",
+      "teaser": "Regen an der Nordsee? Kein Problem. Wellenbad, Spa und Museum am Meer machen aus Schietwetter einen guten Tag.",
+      "icon": "🌧️",
+      "order": 3,
+      "category": "indoor",
+      "blocks": [
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Schietwetter gehört zur Nordsee"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "An der Nordsee wechselt das Wetter schnell, und „Schietwetter“ ist Teil des Charmes. Regnet es einmal den ganzen Tag, hat Büsum genug zu bieten, damit keine Langeweile aufkommt."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Wellenbad und Spa Meerzeit"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Das Erlebnisbad Meerzeit liegt rund 0,6 km vom Haus Aquamarin entfernt und verbindet Wellenbad, Rutschen und einen Spa-Bereich mit Saunen. Aktuelle Öffnungszeiten und Angebote findest du auf buesum.de. Ein Nachmittag im warmen Wasser ist der perfekte Kontrast zum kühlen Wind draußen."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Museum am Meer und mehr"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Das Museum am Meer erzählt von der Fischerei und der Geschichte des Ortes – ein guter Programmpunkt für einen Regentag. Danach lohnt ein Stopp im Hafen: Frische Nordseekrabben schmecken auch bei Wind und Wolken."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Gemütlich im Apartment"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Manchmal ist der beste Schietwetter-Plan gar kein Plan: Tee, ein Buch und das Rauschen des Windes vor dem Fenster. Alle Apartments im Haus Aquamarin sind beheizt und mit voll ausgestatteter Küche eingerichtet – ideal für einen ruhigen Tag drinnen."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "anreise-buesum",
+      "title": "Anreise nach Büsum: Auto, Bahn und Parken",
+      "teaser": "Mit dem Auto über die A23, mit der Bahn bis zum Ortskern – und am Haus Aquamarin ein eigener Stellplatz. So planst du deine Anreise.",
+      "icon": "🚗",
+      "order": 4,
+      "category": "praktisch",
+      "blocks": [
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Mit dem Auto"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Die bequemste Anreise führt über die Autobahn A23 bis Heide und von dort weiter über die Landstraße nach Büsum. Von Hamburg aus bist du in gut zwei Stunden an der Nordsee. Zu jedem Apartment im Haus Aquamarin gehört ein eigener PKW-Stellplatz – du musst also nicht auf Parkplatzsuche gehen."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Mit der Bahn"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Büsum hat einen eigenen Bahnhof und ist mit der Regionalbahn über Heide erreichbar. Vom Bahnhof sind es nur wenige Minuten zu Fuß in den Ort und zum Deich. Wer autofrei anreisen möchte, findet in Büsum kurze Wege: Das meiste ist bequem zu Fuß oder mit dem Rad erreichbar."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Fahrrad und Stellplatz inklusive"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Zu jedem Apartment gehört neben dem Stellplatz eine abschließbare Fahrradgarage. Eigene Räder sind hier sicher untergebracht, und die Deichwege beginnen praktisch vor der Tür. Damit ist das Auto während des Urlaubs oft überflüssig."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Gut zu wissen"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Die Familienlagune Perlebucht liegt rund 0,4 km entfernt, der Hafen etwa 2 km. Für den Aufenthalt wird die ortsübliche Kurabgabe erhoben; die Tagesgästekarte lässt sich online kaufen (tagesgaestekarte.buesum.de) und bringt Vorteile vor Ort."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "radtouren-deich-buesum",
+      "title": "Radfahren rund um Büsum: Deichwege und Touren",
+      "teaser": "Flaches Land, Deichwege vor der Tür und Wind im Rücken (meistens). Büsum ist ein Paradies für entspannte Radtouren.",
+      "icon": "🚲",
+      "order": 5,
+      "category": "outdoor",
+      "blocks": [
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Deichwege direkt am Haus"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Der Deich beginnt nur rund 0,1 km vom Haus Aquamarin entfernt. Von hier führen Wege kilometerweit an der Küste entlang – vorbei an grasenden Schafen, mit Blick auf das Wattenmeer und viel Weite. Das flache Land macht das Radeln auch für Familien und Gelegenheitsfahrer angenehm."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Touren entlang der Nordseeküste"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Rund um Büsum lässt sich das Umland gut auf zwei Rädern erkunden. Beliebt sind die Strecken am Deich in Richtung der Nachbarorte sowie Runden durch das Hinterland mit seinen Feldern und Höfen. Wer es geführt mag, findet über die Kurverwaltung (buesum.de) organisierte Rad- und Wandertouren."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Fahrradgarage inklusive"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Eigene Räder sind im Haus Aquamarin gut aufgehoben: Zu jedem Apartment gehört eine abschließbare Fahrradgarage. So stehen die Räder trocken und sicher, und morgens geht es direkt los."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Tipp"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "An der Nordsee gehört Wind dazu. Plane die Tour so, dass du auf dem Rückweg den Wind im Rücken hast – das macht den Unterschied zwischen Mühe und Genuss."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "familienurlaub-buesum",
+      "title": "Familienurlaub in Büsum: Perlebucht, Strand und mehr",
+      "teaser": "Flaches Wasser, kurze Wege und Programm bei jedem Wetter: Warum Büsum für den Urlaub mit Kindern so gut funktioniert.",
+      "icon": "👨‍👩‍👧",
+      "order": 6,
+      "category": "outdoor",
+      "blocks": [
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Die Familienlagune Perlebucht"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Büsum ist auf Familien eingestellt. Herzstück ist die Familienlagune Perlebucht mit ihrem flach auslaufenden, geschützten Wasser – ideal für kleine Kinder. Vom Haus Aquamarin sind es nur rund 0,4 km bis zum Strand, sodass auch der Weg mit Sandspielzeug und Bollerwagen kurz bleibt."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Watt und Natur erleben"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Eine kurze, geführte Wattwanderung ist für Kinder ein Abenteuer: Krebse, Muscheln und Wattwürmer gibt es überall zu entdecken. Für die ganz Kleinen eignen sich die Touren rund um die Perlebucht. Am Hafen lassen sich Fischkutter bestaunen, und mit etwas Glück gibt es frische Nordseekrabben zu probieren."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Programm bei jedem Wetter"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Regnet es, sorgt das Wellenbad Meerzeit mit Rutschen und warmem Wasser für gute Laune. Das Museum am Meer ist ein weiterer Programmpunkt für graue Stunden."
+            }
+          ]
+        },
+        {
+          "t": "h2",
+          "spans": [
+            {
+              "text": "Platz für die ganze Familie"
+            }
+          ]
+        },
+        {
+          "t": "p",
+          "spans": [
+            {
+              "text": "Im Haus Aquamarin gibt es Apartments in verschiedenen Größen – vom Studio bis zur geräumigen Familienwohnung. Babybett und Hochstuhl lassen sich dazubuchen, und Hunde sind in mehreren Wohnungen willkommen. So findet jede Familie das passende Zuhause auf Zeit."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "orientation": [
+    {
+      "name": "Familienlagune Perlebucht",
+      "km": 0.4
+    },
+    {
+      "name": "Deich & Wattenmeer",
+      "km": 0.3
+    },
+    {
+      "name": "Wellenbad Meerzeit",
+      "km": 1.3
+    },
+    {
+      "name": "Büsum Ortszentrum",
+      "km": 1
+    },
+    {
+      "name": "Hafen & Leuchtturm",
+      "km": 2.1
+    }
+  ]
+}

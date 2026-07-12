@@ -5,6 +5,14 @@ node_modules/
 dist/
 .astro/
 
+# Expo / Gäste-App (app/) — managed workflow erzeugt ios/android nie,
+# aber ein versehentlicher Prebuild darf das Repo nicht fluten.
+.expo/
+expo-env.d.ts
+app/ios/
+app/android/
+app/dist/
+
 # Lighthouse-Reports
 lh*.json
 lhd.json

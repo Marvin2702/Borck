@@ -1,0 +1,49 @@
+# CI der Gäste-App (app/): Typecheck + Tests + Export-Frische.
+# Läuft bei App-Änderungen UND bei Änderungen an den Website-Quellen, aus
+# denen die App ihren Content exportiert (Drift-Schutz).
+name: App CI (Gäste-App)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'src/content/**'
+      - 'src/data/site.ts'
+      - '.github/workflows/app-ci.yml'
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'src/content/**'
+      - 'src/data/site.ts'
+      - '.github/workflows/app-ci.yml'
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Content-Export frisch? (Website-Quellen -> content.json)
+        run: |
+          npm run export
+          git diff --exit-code assets/content.json src/heroImages.ts \
+            || { echo '::error::content.json veraltet — in app/ "npm run export" ausführen und committen.'; exit 1; }
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test

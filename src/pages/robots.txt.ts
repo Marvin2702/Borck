@@ -17,6 +17,7 @@ export const GET: APIRoute = ({ site: astroSite }) => {
   // `User-agent: *` erlaubt sie ohnehin — explizit dokumentiert die Absicht.
   const aiBots = ['GPTBot', 'OAI-SearchBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended', 'CCBot'];
   const aiSection = aiBots.map((b) => `User-agent: ${b}\nAllow: /`).join('\n\n');
-  const body = `User-agent: *\nAllow: /\n\n${aiSection}\n\nSitemap: ${sitemap}\n# AI-Kurzprofil: ${llms}\n`;
+  // /gast/ ist die QR-Brücke zur Gäste-App (noindex) — Crawler dürfen draußen bleiben.
+  const body = `User-agent: *\nAllow: /\nDisallow: ${BASE}/gast/\n\n${aiSection}\n\nSitemap: ${sitemap}\n# AI-Kurzprofil: ${llms}\n`;
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };
