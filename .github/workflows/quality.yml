@@ -27,7 +27,7 @@ jobs:
       LHCI_OUTPUT_DIR: ${{ runner.temp }}/lhci-reports
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node
         uses: actions/setup-node@v6

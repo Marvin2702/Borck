@@ -41,7 +41,7 @@ jobs:
         working-directory: app
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # secrets-Kontext ist in step-if nicht erlaubt — deshalb Shell-Check.
       - name: EXPO_TOKEN vorhanden?
@@ -59,7 +59,7 @@ jobs:
           cache-dependency-path: app/package-lock.json
 
       - name: Setup EAS
-        uses: expo/expo-github-action@v8
+        uses: expo/expo-github-action@v9
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
