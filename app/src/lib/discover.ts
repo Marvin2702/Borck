@@ -174,6 +174,9 @@ export function decideAction(
   width: number,
   height: number
 ): SwipeAction | 'reset' {
+  // Läuft in der Pan-Geste auf dem UI-Thread (Reanimated-Worklet) — ohne
+  // diese Direktive stürzt die native App beim ersten Swipe ab.
+  'worklet';
   if (dy < -0.22 * height && Math.abs(dx) < 0.3 * width) return 'super';
   if (dx > 0.32 * width || vx > 800) return 'like';
   if (dx < -0.32 * width || vx < -800) return 'nope';
