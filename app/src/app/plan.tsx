@@ -13,12 +13,15 @@ import { activityById } from '../content';
 import { badgeDefs } from '../data/badges';
 import { irisFavoriten } from '../data/guestInfo';
 import { newBadges } from '../lib/badges';
+import { activityText, badgeText } from '../i18n/content';
+import { fmtKm } from '../i18n';
 import { getWeather, todayClass } from '../lib/weather';
-import { useGuest } from '../lib/store';
+import { useGuest, useT } from '../lib/store';
 import { colors, fonts, radius, spacing } from '../theme';
 
 export default function Plan() {
   const { plan, checkins, badges, checkin, removeFromPlan } = useGuest();
+  const { t, lang } = useT();
   const [weather, setWeather] = useState<ReturnType<typeof todayClass>>(null);
   const [burst, setBurst] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
@@ -46,7 +49,7 @@ export default function Plan() {
     if (fresh.length > 0) {
       setBurst((b) => b + 1);
       const def = badgeDefs.find((d) => d.id === fresh[0]);
-      setToast(def ? `Neuer Stempel: ${def.icon} ${def.title.replace(/!$/, '')}!` : null);
+      setToast(def ? t('plan.newStamp', { icon: def.icon, title: badgeText(def, lang).title.replace(/!$/, '') }) : null);
       setTimeout(() => setToast(null), 3200);
     }
   };
@@ -55,10 +58,10 @@ export default function Plan() {
     return (
       <Screen>
         <Text style={styles.empty}>🃏</Text>
-        <SectionTitle>Noch keine Ideen im Plan</SectionTitle>
-        <Muted>Swipt euch durch Büsum — eure Likes landen hier.</Muted>
+        <SectionTitle>{t('plan.emptyTitle')}</SectionTitle>
+        <Muted>{t('plan.emptyText')}</Muted>
         <Pressable onPress={() => router.push('/entdecken')} style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]}>
-          <Text style={styles.ctaLabel}>Jetzt entdecken</Text>
+          <Text style={styles.ctaLabel}>{t('plan.emptyCta')}</Text>
         </Pressable>
       </Screen>
     );
@@ -76,7 +79,7 @@ export default function Plan() {
 
       {fits.length > 0 && weather && (
         <>
-          <SectionTitle>Heute passt</SectionTitle>
+          <SectionTitle>{t('plan.todayFits')}</SectionTitle>
           {fits.map((a) => (
             <Card key={a.id} style={styles.fitCard}>
               <RowContent id={a.id} onCheckin={doCheckin} onRemove={removeFromPlan} plan={plan} />
@@ -85,7 +88,7 @@ export default function Plan() {
         </>
       )}
 
-      <SectionTitle>Euer Plan ({open.length})</SectionTitle>
+      <SectionTitle>{t('plan.yourPlan', { n: open.length })}</SectionTitle>
       {sorted
         .filter((p) => !fits.some((f) => f.id === p.id))
         .map((p) => (
@@ -96,11 +99,11 @@ export default function Plan() {
 
       {done.length > 0 && (
         <>
-          <SectionTitle>Schon erlebt ✓</SectionTitle>
+          <SectionTitle>{t('plan.doneSection')}</SectionTitle>
           <Muted>
-            {done.length} {done.length === 1 ? 'Erlebnis' : 'Erlebnisse'} abgehakt — eure Stempel warten im{' '}
+            {done.length === 1 ? t('plan.doneText1') : t('plan.doneTextN', { n: done.length })}{' '}
             <Text style={styles.link} onPress={() => router.push('/album')}>
-              Sammelalbum →
+              {t('plan.albumLink')}
             </Text>
           </Muted>
         </>
@@ -120,10 +123,12 @@ function RowContent({
   onCheckin: (id: string) => void;
   onRemove: (id: string) => void;
 }) {
+  const { t, lang } = useT();
   const a = activityById(id);
   const item = plan.find((p) => p.id === id);
   if (!a || !item) return null;
   const maps = `https://maps.google.com/?q=${a.lat},${a.lng}`;
+  const ax = activityText(a, lang);
   return (
     <>
       <View style={styles.rowHead}>
@@ -131,26 +136,26 @@ function RowContent({
         <View style={styles.rowTitleWrap}>
           <Text style={styles.rowName}>
             {item.superlike ? '⭐ ' : ''}
-            {a.name}
+            {ax.name}
           </Text>
           <Text style={styles.rowMeta}>
-            ca. {String(a.km).replace('.', ',')} km · {a.indoor ? 'Indoor' : 'Draußen'}
-            {item.source === 'match' ? ' · 💙 Gemeinsam gewählt' : ''}
-            {irisFavoriten.includes(id) ? " · 💛 Iris' Liebling" : ''}
+            {t('common.km', { km: fmtKm(a.km, lang) })} · {a.indoor ? t('plan.indoor') : t('plan.outdoor')}
+            {item.source === 'match' ? ` · ${t('plan.match')}` : ''}
+            {irisFavoriten.includes(id) ? ` · ${t('plan.iris')}` : ''}
           </Text>
         </View>
       </View>
       <View style={styles.rowActions}>
         <Pressable onPress={() => onCheckin(id)} style={({ pressed }) => [styles.small, styles.checkBtn, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.checkLabel}>✓ Waren wir!</Text>
+          <Text style={styles.checkLabel}>{t('plan.checkin')}</Text>
         </Pressable>
         <Pressable onPress={() => Linking.openURL(a.url).catch(() => {})} style={styles.small}>
-          <Text style={styles.smallLabel}>Info ↗</Text>
+          <Text style={styles.smallLabel}>{t('plan.info')}</Text>
         </Pressable>
         <Pressable onPress={() => Linking.openURL(maps).catch(() => {})} style={styles.small}>
-          <Text style={styles.smallLabel}>Karte</Text>
+          <Text style={styles.smallLabel}>{t('plan.map')}</Text>
         </Pressable>
-        <Pressable onPress={() => onRemove(id)} style={styles.small} accessibilityLabel="Vom Plan entfernen">
+        <Pressable onPress={() => onRemove(id)} style={styles.small} accessibilityLabel={t('plan.removeA11y')}>
           <Text style={styles.removeLabel}>✕</Text>
         </Pressable>
       </View>

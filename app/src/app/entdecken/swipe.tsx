@@ -27,8 +27,9 @@ import {
   type SwipeAction,
 } from '../../lib/discover';
 import { irisFavoriten } from '../../data/guestInfo';
+import { activityText } from '../../i18n/content';
 import { getWeather, todayClass } from '../../lib/weather';
-import { useGuest, type PlanItem } from '../../lib/store';
+import { useGuest, useT, type PlanItem } from '../../lib/store';
 import { colors, fonts, radius, spacing } from '../../theme';
 
 export default function SwipeFlow() {
@@ -39,6 +40,7 @@ export default function SwipeFlow() {
   const [confirmRestart, setConfirmRestart] = useState(false);
   const undoRef = useRef<Session | null>(null);
   const { addToPlan, plan } = useGuest();
+  const { t, lang } = useT();
 
   // Neustart: Session verwerfen, zurück zur Modus-Wahl. Zwei-Tap-Bestätigung
   // statt Alert (Alert.alert ist auf Web ein No-op).
@@ -112,13 +114,10 @@ export default function SwipeFlow() {
       <FullScreen>
         <Confetti burst={burst} />
         <Text style={styles.bigIcon}>🙈</Text>
-        <Text style={styles.phaseTitle}>Nicht spicken!</Text>
-        <Muted>
-          {session.players.A.name} ist fertig. Jetzt gib das Handy an {b.name} {b.avatar} — die Auswahl bleibt
-          geheim, bis beide durch sind.
-        </Muted>
+        <Text style={styles.phaseTitle}>{t('swipe.handoverTitle')}</Text>
+        <Muted>{t('swipe.handoverText', { a: session.players.A.name, b: b.name, avatar: b.avatar })}</Muted>
         <PrimaryButton
-          label={`${b.avatar} Ich bin ${b.name} — los!`}
+          label={t('swipe.handoverCta', { b: b.name, avatar: b.avatar })}
           onPress={() => update(nextPhase(session), 0)}
         />
       </FullScreen>
@@ -167,9 +166,9 @@ export default function SwipeFlow() {
           <>
             <Text style={styles.bigIcon}>💙</Text>
             <Text style={styles.phaseTitle}>
-              {matches.length === 1 ? 'Ein Match!' : `${matches.length} Matches!`}
+              {matches.length === 1 ? t('swipe.oneMatch') : t('swipe.nMatches', { n: matches.length })}
             </Text>
-            <Muted>Das wollt ihr BEIDE:</Muted>
+            <Muted>{t('swipe.bothWant')}</Muted>
             <View style={styles.matchList}>
               {matches.map((m) => {
                 const a = activityById(m.id)!;
@@ -177,24 +176,24 @@ export default function SwipeFlow() {
                   <View key={m.id} style={[styles.matchRow, m.perfect && styles.perfectRow]}>
                     <Text style={styles.matchIcon}>{a.icon}</Text>
                     <Text style={styles.matchName}>
-                      {a.name}
-                      {m.perfect ? '  ⭐⭐ Traum-Match!' : ''}
+                      {activityText(a, lang).name}
+                      {m.perfect ? t('swipe.dreamMatch') : ''}
                     </Text>
                   </View>
                 );
               })}
             </View>
-            <PrimaryButton label="Matches in den Urlaubsplan 💙" onPress={takeMatches} />
+            <PrimaryButton label={t('swipe.takeMatches')} onPress={takeMatches} />
             <Pressable onPress={takeAll}>
-              <Text style={styles.secondary}>Alle {likesTotal} Favoriten übernehmen</Text>
+              <Text style={styles.secondary}>{t('swipe.takeAllFavs', { n: likesTotal })}</Text>
             </Pressable>
           </>
         ) : (
           <>
             <Text style={styles.bigIcon}>🌊</Text>
-            <Text style={styles.phaseTitle}>Kein Doppel-Treffer …</Text>
-            <Muted>… aber zusammen habt ihr {likesTotal} Ideen gesammelt. Auch schön!</Muted>
-            <PrimaryButton label={`Alle ${likesTotal} Ideen übernehmen`} onPress={takeAll} />
+            <Text style={styles.phaseTitle}>{t('swipe.noMatchTitle')}</Text>
+            <Muted>{t('swipe.noMatchText', { n: likesTotal })}</Muted>
+            <PrimaryButton label={t('swipe.takeAllIdeas', { n: likesTotal })} onPress={takeAll} />
           </>
         )}
         <Pressable
@@ -203,7 +202,7 @@ export default function SwipeFlow() {
             router.replace('/entdecken');
           }}
         >
-          <Text style={styles.secondary}>🔄 Nochmal spielen</Text>
+          <Text style={styles.secondary}>{t('swipe.playAgain')}</Text>
         </Pressable>
       </FullScreen>
     );
@@ -228,26 +227,26 @@ export default function SwipeFlow() {
         <Confetti burst={burst} />
         <Text style={styles.bigIcon}>{likes.length > 0 ? '🎉' : '🌊'}</Text>
         <Text style={styles.phaseTitle}>
-          {likes.length > 0 ? `${likes.length} Favoriten!` : 'Nichts dabei?'}
+          {likes.length > 0 ? t('swipe.nFavs', { n: likes.length }) : t('swipe.nothingTitle')}
         </Text>
         {likes.length > 0 ? (
           <>
-            <Muted>Euer Büsum-Plan steht — wetterschlau sortiert findet ihr ihn im Urlaubsplan.</Muted>
-            <PrimaryButton label="Zum Urlaubsplan" onPress={take} />
+            <Muted>{t('swipe.summaryText')}</Muted>
+            <PrimaryButton label={t('swipe.toPlan')} onPress={take} />
             <Pressable
               onPress={() => {
                 saveSession(null);
                 router.replace('/entdecken');
               }}
             >
-              <Text style={styles.secondary}>🔄 Nochmal spielen (ohne Übernehmen)</Text>
+              <Text style={styles.secondary}>{t('swipe.playAgainNoTake')}</Text>
             </Pressable>
           </>
         ) : (
           <>
-            <Muted>Macht nichts — in den Reisetipps und bei Iris gibt es mehr Ideen.</Muted>
+            <Muted>{t('swipe.nothingText')}</Muted>
             <PrimaryButton
-              label="Nochmal mischen"
+              label={t('swipe.reshuffle')}
               onPress={() => {
                 saveSession(null);
                 router.replace('/entdecken');
@@ -262,27 +261,31 @@ export default function SwipeFlow() {
   // ---- Mood- und Deck-Phase ---------------------------------------------------
   const progress = `${Math.min(index + 1, items.length)}/${items.length}`;
   const header =
-    session.mode === 'duo' ? `${p.avatar} ${p.name} · ${isMood ? 'Stimmung' : 'Erlebnisse'}` : isMood ? 'Eure Stimmung' : 'Erlebnisse';
+    session.mode === 'duo'
+      ? `${p.avatar} ${p.name} · ${isMood ? t('swipe.moodShort') : t('swipe.deckHeader')}`
+      : isMood
+        ? t('swipe.moodHeader')
+        : t('swipe.deckHeader');
 
   return (
     <View style={styles.screen}>
-      <Stack.Screen options={{ title: 'Entdecken', headerBackVisible: session.mode !== 'duo' }} />
+      <Stack.Screen options={{ title: t('title.discover'), headerBackVisible: session.mode !== 'duo' }} />
       <View style={styles.head}>
         <Text style={styles.headText}>{header}</Text>
         <View style={styles.headRight}>
           <Pressable
-            accessibilityLabel="Runde neu starten"
+            accessibilityLabel={t('swipe.restartA11y')}
             onPress={restart}
             style={({ pressed }) => [styles.restart, confirmRestart && styles.restartConfirm, pressed && { opacity: 0.8 }]}
           >
             <Text style={[styles.restartLabel, confirmRestart && styles.restartLabelConfirm]}>
-              {confirmRestart ? 'Wirklich neu?' : '↻ Neu'}
+              {confirmRestart ? t('swipe.restartConfirm') : t('swipe.restart')}
             </Text>
           </Pressable>
           <Text style={styles.progress}>{progress}</Text>
         </View>
       </View>
-      {isMood && <Muted>Kurze Aufwärmrunde: Was klingt nach eurem Urlaub? (Nichts wird aussortiert.)</Muted>}
+      {isMood && <Muted>{t('swipe.moodHint')}</Muted>}
       {!finishedStack && (
         <SwipeDeck
           items={items as { id: string }[] as never}
@@ -300,7 +303,7 @@ export default function SwipeFlow() {
             return (
               <ActivityCard
                 activity={a}
-                ribbon={schiet ? 'Schietwetter-Tipp' : iris ? "💛 Iris' Liebling" : undefined}
+                ribbon={schiet ? t('swipe.ribbonRain') : iris ? t('swipe.ribbonIris') : undefined}
                 ribbonTone={schiet ? 'aqua' : 'gold'}
               />
             );
@@ -310,7 +313,7 @@ export default function SwipeFlow() {
       )}
       {plan.length > 0 && !isMood && (
         <Pressable onPress={() => router.push('/plan')}>
-          <Text style={styles.planLink}>Euer Plan: {plan.length} Ideen →</Text>
+          <Text style={styles.planLink}>{t('swipe.planLink', { n: plan.length })}</Text>
         </Pressable>
       )}
     </View>

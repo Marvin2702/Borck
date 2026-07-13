@@ -10,14 +10,16 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { BadgeStamp } from '../components/BadgeStamp';
 import { Card, Muted, Screen, SectionTitle } from '../components/ui';
 import { badgeDefs } from '../data/badges';
+import { type UIKey } from '../i18n';
 import { guestLevel, nights, parseIsoDate, stayStats } from '../lib/stays';
-import { useGuest } from '../lib/store';
+import { useGuest, useT } from '../lib/store';
 import { colors, fonts, radius, spacing } from '../theme';
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
 
 export default function Meilensteine() {
-  const { arrival, departure, stays, badges, checkins, setArrival, setDeparture, addStay } = useGuest();
+  const { arrival, departure, stays, badges, setArrival, setDeparture, addStay } = useGuest();
+  const { t } = useT();
   const [from, setFrom] = useState(arrival ?? '');
   const [to, setTo] = useState(departure ?? '');
   const [note, setNote] = useState<string | null>(null);
@@ -34,25 +36,25 @@ export default function Meilensteine() {
 
   const saveCurrent = () => {
     if (!parseIsoDate(from) || !parseIsoDate(to)) {
-      setNote('Bitte beide Daten als JJJJ-MM-TT eintragen (z. B. 2026-07-10).');
+      setNote(t('milestones.invalidDates'));
       return;
     }
     if (nights(from, to) <= 0) {
-      setNote('Die Abreise muss nach der Anreise liegen.');
+      setNote(t('milestones.departureAfter'));
       return;
     }
     setArrival(from);
     setDeparture(to);
-    setNote(`Gespeichert: ${nights(from, to)} Nächte. Moin & gute Zeit!`);
+    setNote(t('milestones.saved', { n: nights(from, to) }));
   };
 
   const savePast = () => {
     if (!parseIsoDate(pastFrom) || !parseIsoDate(pastTo) || nights(pastFrom, pastTo) <= 0) {
-      setPastNote('Bitte gültigen Zeitraum eintragen (JJJJ-MM-TT, Abreise nach Anreise).');
+      setPastNote(t('milestones.invalidPast'));
       return;
     }
     addStay({ from: pastFrom, to: pastTo });
-    setPastNote(`Eingetragen: ${nights(pastFrom, pastTo)} Nächte. Schön, dass ihr wieder da wart!`);
+    setPastNote(t('milestones.pastSaved', { n: nights(pastFrom, pastTo) }));
     setPastFrom('');
     setPastTo('');
   };
@@ -63,38 +65,38 @@ export default function Meilensteine() {
       <View style={styles.statRow}>
         <View style={styles.stat}>
           <Text style={styles.statNum}>{stats.spentNights}</Text>
-          <Text style={styles.statLabel}>Nächte in Büsum {year}</Text>
+          <Text style={styles.statLabel}>{t('milestones.nightsThisYear', { year })}</Text>
         </View>
         <View style={styles.stat}>
           <Text style={styles.statNum}>{stats.plannedNights}</Text>
-          <Text style={styles.statLabel}>Nächte noch geplant</Text>
+          <Text style={styles.statLabel}>{t('milestones.nightsPlanned')}</Text>
         </View>
         <View style={styles.stat}>
           <Text style={styles.statNum}>{stats.totalStays}</Text>
-          <Text style={styles.statLabel}>{stats.totalStays === 1 ? 'Aufenthalt' : 'Aufenthalte'}</Text>
+          <Text style={styles.statLabel}>{stats.totalStays === 1 ? t('milestones.stay1') : t('milestones.stayN')}</Text>
         </View>
       </View>
 
       <Card style={styles.levelCard}>
         <Text style={styles.levelIcon}>{level.icon}</Text>
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.levelTitle}>{level.title}</Text>
+          <Text style={styles.levelTitle}>{t(`level.${level.key}` as UIKey)}</Text>
           <Muted>
-            {stats.lifetimeNights} {stats.lifetimeNights === 1 ? 'Nacht' : 'Nächte'} insgesamt
-            {level.next ? ` · ${level.next}` : ' · das höchste Level — Iris freut sich auf euch!'}
+            {stats.lifetimeNights === 1 ? t('milestones.nightsTotal1') : t('milestones.nightsTotalN', { n: stats.lifetimeNights })}
+            {level.next ? ` · ${t(`level.${level.next.key}` as UIKey, { n: level.next.n })}` : ` · ${t('milestones.maxLevel')}`}
           </Muted>
         </View>
       </Card>
 
-      <SectionTitle>Euer aktueller Aufenthalt</SectionTitle>
+      <SectionTitle>{t('milestones.currentStay')}</SectionTitle>
       <Card>
-        <Muted>Anreise und Abreise eintragen — daraus rechnet die App eure Nächte-Bilanz.</Muted>
+        <Muted>{t('milestones.currentStayText')}</Muted>
         <View style={styles.dateRow}>
           <TextInput
             style={styles.input}
             value={from}
             onChangeText={setFrom}
-            placeholder={`Anreise: ${today}`}
+            placeholder={t('milestones.arrivalPlaceholder', { date: today })}
             placeholderTextColor={colors.ink500}
             autoCapitalize="none"
             inputMode="numeric"
@@ -103,24 +105,21 @@ export default function Meilensteine() {
             style={styles.input}
             value={to}
             onChangeText={setTo}
-            placeholder="Abreise: 2026-07-19"
+            placeholder={t('milestones.departurePlaceholder')}
             placeholderTextColor={colors.ink500}
             autoCapitalize="none"
             inputMode="numeric"
           />
         </View>
         <Pressable onPress={saveCurrent} style={({ pressed }) => [styles.btn, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.btnLabel}>Aufenthalt speichern</Text>
+          <Text style={styles.btnLabel}>{t('milestones.save')}</Text>
         </Pressable>
         {note && <Muted>{note}</Muted>}
       </Card>
 
-      <SectionTitle>Eure Badges ({earned.length}/{badgeDefs.length})</SectionTitle>
+      <SectionTitle>{t('milestones.badges', { e: earned.length, total: badgeDefs.length })}</SectionTitle>
       {earned.length === 0 && (
-        <Muted>
-          Noch keine verdient — hakt Erlebnisse im Urlaubsplan ab („Waren wir!"), dann sammeln sich hier eure
-          Auszeichnungen. {Object.keys(checkins).length > 0 ? '' : 'Der Swiper ist der schnellste Weg dahin.'}
-        </Muted>
+        <Muted>{t('milestones.noBadges')}</Muted>
       )}
       <View style={styles.grid}>
         {[...earned, ...open].map((def, i) => (
@@ -128,18 +127,18 @@ export default function Meilensteine() {
         ))}
       </View>
       <Pressable onPress={() => router.push('/album')}>
-        <Text style={styles.link}>→ Zum Sammelalbum mit allen Stempeln</Text>
+        <Text style={styles.link}>{t('milestones.toAlbum')}</Text>
       </Pressable>
 
-      <SectionTitle>Früheren Aufenthalt nachtragen</SectionTitle>
+      <SectionTitle>{t('milestones.addPast')}</SectionTitle>
       <Card>
-        <Muted>Ihr wart schon mal hier? Tragt vergangene Urlaube nach — sie zählen für Bilanz und Level.</Muted>
+        <Muted>{t('milestones.addPastText')}</Muted>
         <View style={styles.dateRow}>
           <TextInput
             style={styles.input}
             value={pastFrom}
             onChangeText={setPastFrom}
-            placeholder="Von: 2025-08-02"
+            placeholder={t('milestones.fromPlaceholder')}
             placeholderTextColor={colors.ink500}
             autoCapitalize="none"
             inputMode="numeric"
@@ -148,30 +147,27 @@ export default function Meilensteine() {
             style={styles.input}
             value={pastTo}
             onChangeText={setPastTo}
-            placeholder="Bis: 2025-08-09"
+            placeholder={t('milestones.toPlaceholder')}
             placeholderTextColor={colors.ink500}
             autoCapitalize="none"
             inputMode="numeric"
           />
         </View>
         <Pressable onPress={savePast} style={({ pressed }) => [styles.btn, styles.btnGhost, pressed && { opacity: 0.85 }]}>
-          <Text style={[styles.btnLabel, styles.btnGhostLabel]}>Nachtragen</Text>
+          <Text style={[styles.btnLabel, styles.btnGhostLabel]}>{t('milestones.addPastCta')}</Text>
         </Pressable>
         {pastNote && <Muted>{pastNote}</Muted>}
         {stays.length > 0 && (
           <Muted>
-            Bisher eingetragen:{' '}
+            {t('milestones.recorded')}{' '}
             {stays
-              .map((s) => `${s.from.slice(0, 7)} (${nights(s.from, s.to)} N.)`)
+              .map((s) => `${s.from.slice(0, 7)} (${nights(s.from, s.to)})`)
               .join(' · ')}
           </Muted>
         )}
       </Card>
 
-      <Muted>
-        Direkt bei Iris gebucht zählt doppelt schön: kein Portal verdient mit — und Stammgäste sind im Haus
-        Aquamarin keine Nummer, sondern bekannte Gesichter.
-      </Muted>
+      <Muted>{t('milestones.directNote')}</Muted>
     </Screen>
   );
 }

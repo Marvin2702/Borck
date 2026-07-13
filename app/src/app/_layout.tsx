@@ -8,6 +8,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { makeT } from '../i18n';
 import { evaluateBadges } from '../lib/badges';
 import { saveSession } from '../lib/discover';
 import { nights, type Stay } from '../lib/stays';
@@ -34,6 +35,10 @@ export default function RootLayout() {
     });
   }, []);
 
+  const setLang = useCallback((lang: Parameters<typeof persist.lang>[0]) => {
+    setState((s) => ({ ...s, lang }));
+    persist.lang(lang);
+  }, []);
   const setApartment = useCallback((slug: string | null) => {
     setState((s) => ({ ...s, apartment: slug }));
     persist.apartment(slug);
@@ -141,6 +146,7 @@ export default function RootLayout() {
   const value = useMemo(
     () => ({
       ...state,
+      setLang,
       setApartment,
       setArrival,
       setDeparture,
@@ -153,8 +159,10 @@ export default function RootLayout() {
       addStay,
       resetVacationData,
     }),
-    [state, setApartment, setArrival, setDeparture, setReminder, toggleChecklist, addToPlan, removeFromPlan, checkin, setBadges, addStay, resetVacationData]
+    [state, setLang, setApartment, setArrival, setDeparture, setReminder, toggleChecklist, addToPlan, removeFromPlan, checkin, setBadges, addStay, resetVacationData]
   );
+
+  const t = makeT(state.lang);
 
   // Splash bleibt, bis Font + Zustand da sind (beides lokal, <100 ms).
   if (!fontsLoaded || !hydrated) return null;
@@ -173,23 +181,23 @@ export default function RootLayout() {
           headerBackButtonDisplayMode: 'minimal',
         }}
       >
-        <Stack.Screen name="index" options={{ title: 'Haus Aquamarin' }} />
+        <Stack.Screen name="index" options={{ title: t('title.home') }} />
         <Stack.Screen name="wohnung/[slug]" options={{ title: '' }} />
-        <Stack.Screen name="checkin" options={{ title: 'Anreise & Check-in' }} />
-        <Stack.Screen name="wlan" options={{ title: 'WLAN' }} />
-        <Stack.Screen name="mappe" options={{ title: 'Gästemappe' }} />
-        <Stack.Screen name="heute/index" options={{ title: 'Was machen wir heute?' }} />
+        <Stack.Screen name="checkin" options={{ title: t('title.checkin') }} />
+        <Stack.Screen name="wlan" options={{ title: t('title.wifi') }} />
+        <Stack.Screen name="mappe" options={{ title: t('title.mappe') }} />
+        <Stack.Screen name="heute/index" options={{ title: t('title.tips') }} />
         <Stack.Screen name="heute/[guide]" options={{ title: '' }} />
-        <Stack.Screen name="gezeiten" options={{ title: 'Ebbe & Flut' }} />
-        <Stack.Screen name="notfall" options={{ title: 'Notfall & Praktisches' }} />
-        <Stack.Screen name="abreise" options={{ title: 'Abreise' }} />
-        <Stack.Screen name="einstellungen" options={{ title: 'Einstellungen' }} />
-        <Stack.Screen name="entdecken/index" options={{ title: 'Entdecken' }} />
-        <Stack.Screen name="entdecken/swipe" options={{ title: 'Entdecken' }} />
-        <Stack.Screen name="plan" options={{ title: 'Euer Urlaubsplan' }} />
-        <Stack.Screen name="album" options={{ title: 'Sammelalbum' }} />
-        <Stack.Screen name="meilensteine" options={{ title: 'Eure Meilensteine' }} />
-        <Stack.Screen name="service" options={{ title: 'Service & Wünsche' }} />
+        <Stack.Screen name="gezeiten" options={{ title: t('title.tides') }} />
+        <Stack.Screen name="notfall" options={{ title: t('title.emergency') }} />
+        <Stack.Screen name="abreise" options={{ title: t('title.departure') }} />
+        <Stack.Screen name="einstellungen" options={{ title: t('title.settings') }} />
+        <Stack.Screen name="entdecken/index" options={{ title: t('title.discover') }} />
+        <Stack.Screen name="entdecken/swipe" options={{ title: t('title.discover') }} />
+        <Stack.Screen name="plan" options={{ title: t('title.plan') }} />
+        <Stack.Screen name="album" options={{ title: t('title.album') }} />
+        <Stack.Screen name="meilensteine" options={{ title: t('title.milestones') }} />
+        <Stack.Screen name="service" options={{ title: t('title.service') }} />
       </Stack>
       </GuestContext.Provider>
     </GestureHandlerRootView>

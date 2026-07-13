@@ -5,9 +5,11 @@
 // =========================================================================
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext } from 'react';
+import { detectLang, makeT, type Lang, type TFn } from '../i18n';
 import type { Stay } from './stays';
 
 const KEYS = {
+  lang: 'gast.lang', // 'de' | 'en' | 'nl' | 'da'
   apartment: 'gast.apartment',
   arrival: 'gast.arrival', // ISO YYYY-MM-DD (laufender Aufenthalt)
   departure: 'gast.departure', // ISO YYYY-MM-DD
@@ -32,6 +34,7 @@ export type PlanItem = {
 export type Checkin = { date: string; weather?: 'sonne' | 'wolken' | 'schietwetter' };
 
 export type GuestState = {
+  lang: Lang;
   apartment: string | null;
   arrival: string | null;
   departure: string | null;
@@ -44,6 +47,7 @@ export type GuestState = {
 };
 
 export const emptyState: GuestState = {
+  lang: 'de',
   apartment: null,
   arrival: null,
   departure: null,
@@ -55,11 +59,14 @@ export const emptyState: GuestState = {
   stays: [],
 };
 
+const isLang = (v: string | null): v is Lang => v === 'de' || v === 'en' || v === 'nl' || v === 'da';
+
 export async function loadState(): Promise<GuestState> {
   try {
-    const [apartment, arrival, departure, reminder, checklist, plan, checkins, badges, stays] =
+    const [lang, apartment, arrival, departure, reminder, checklist, plan, checkins, badges, stays] =
       await AsyncStorage.multiGet(Object.values(KEYS)).then((e) => e.map(([, v]) => v));
     return {
+      lang: isLang(lang) ? lang : detectLang(),
       apartment: apartment || null,
       arrival: arrival || null,
       departure: departure || null,
@@ -76,6 +83,7 @@ export async function loadState(): Promise<GuestState> {
 }
 
 export const persist = {
+  lang: (l: Lang) => AsyncStorage.setItem(KEYS.lang, l),
   apartment: (slug: string | null) =>
     slug ? AsyncStorage.setItem(KEYS.apartment, slug) : AsyncStorage.removeItem(KEYS.apartment),
   arrival: (iso: string | null) =>
@@ -91,6 +99,7 @@ export const persist = {
 };
 
 export type GuestContextValue = GuestState & {
+  setLang: (l: Lang) => void;
   setApartment: (slug: string | null) => void;
   setArrival: (iso: string | null) => void;
   setDeparture: (iso: string | null) => void;
@@ -109,6 +118,7 @@ export type GuestContextValue = GuestState & {
 
 export const GuestContext = createContext<GuestContextValue>({
   ...emptyState,
+  setLang: () => {},
   setApartment: () => {},
   setArrival: () => {},
   setDeparture: () => {},
@@ -123,3 +133,9 @@ export const GuestContext = createContext<GuestContextValue>({
 });
 
 export const useGuest = () => useContext(GuestContext);
+
+/** Übersetzungsfunktion + aktive Sprache — der Standard-Hook aller Screens. */
+export function useT(): { t: TFn; lang: Lang } {
+  const { lang } = useContext(GuestContext);
+  return { t: makeT(lang), lang };
+}

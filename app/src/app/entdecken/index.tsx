@@ -8,12 +8,14 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card, Muted, Screen, SectionTitle } from '../../components/ui';
 import { content } from '../../content';
 import { createSession, loadSession, saveSession, type Session } from '../../lib/discover';
-import { useGuest } from '../../lib/store';
+import { useGuest, useT } from '../../lib/store';
+import { localeTag } from '../../i18n';
 import { colors, fonts, radius, spacing } from '../../theme';
 
 export default function EntdeckenIntro() {
   const [resumable, setResumable] = useState<Session | null>(null);
   const { plan } = useGuest();
+  const { t, lang } = useT();
 
   useFocusEffect(
     useCallback(() => {
@@ -22,26 +24,25 @@ export default function EntdeckenIntro() {
   );
 
   const start = (mode: 'solo' | 'duo') => {
-    const session = createSession(mode, Math.floor(Math.random() * 1e9));
+    const names: [string, string] =
+      mode === 'duo' ? [t('discover.player1'), t('discover.player2')] : [t('discover.you'), ''];
+    const session = createSession(mode, Math.floor(Math.random() * 1e9), names);
     saveSession(session);
     router.push('/entdecken/swipe');
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>Was wollt ihr erleben?</Text>
-      <Muted>
-        Swipt euch durch {content.activities.length} Büsum-Ideen: rechts = wollen wir, links = nö, nach oben =
-        unbedingt! Erst eine kurze Stimmungs-Runde, dann die Erlebnisse.
-      </Muted>
+      <Text style={styles.title}>{t('discover.title')}</Text>
+      <Muted>{t('discover.intro', { n: content.activities.length })}</Muted>
 
       {resumable && (
         <Card style={styles.resume}>
           <Pressable onPress={() => router.push('/entdecken/swipe')}>
-            <Text style={styles.resumeTitle}>▶︎ Angefangene Runde fortsetzen</Text>
+            <Text style={styles.resumeTitle}>{t('discover.resume')}</Text>
             <Muted>
-              {resumable.mode === 'duo' ? 'Zu zweit' : 'Solo'} · gestartet{' '}
-              {new Date(resumable.startedAt).toLocaleDateString('de-DE')}
+              {resumable.mode === 'duo' ? t('discover.duoShort') : t('discover.soloShort')} ·{' '}
+              {t('discover.startedOn', { date: new Date(resumable.startedAt).toLocaleDateString(localeTag[lang]) })}
             </Muted>
           </Pressable>
           <Pressable
@@ -51,32 +52,30 @@ export default function EntdeckenIntro() {
             }}
             style={styles.discard}
           >
-            <Text style={styles.discardLabel}>✕ Verwerfen & unten neu starten</Text>
+            <Text style={styles.discardLabel}>{t('discover.discard')}</Text>
           </Pressable>
         </Card>
       )}
 
-      <SectionTitle>Wie swipt ihr?</SectionTitle>
+      <SectionTitle>{t('discover.how')}</SectionTitle>
       <Pressable onPress={() => start('duo')} style={({ pressed }) => pressed && styles.pressed}>
         <Card style={styles.duo}>
           <Text style={styles.modeIcon}>🦭🦀</Text>
-          <Text style={styles.modeTitle}>Zu zweit — das Match-Spiel</Text>
-          <Muted>
-            Erst swipst du, dann dein Gegenüber am selben Handy. Am Ende zeigt die App, was ihr BEIDE wollt.
-          </Muted>
+          <Text style={styles.modeTitle}>{t('discover.duoTitle')}</Text>
+          <Muted>{t('discover.duoText')}</Muted>
         </Card>
       </Pressable>
       <Pressable onPress={() => start('solo')} style={({ pressed }) => pressed && styles.pressed}>
         <Card>
           <Text style={styles.modeIcon}>🧭</Text>
-          <Text style={styles.modeTitle}>Solo entdecken</Text>
-          <Muted>Deine Likes werden direkt zu eurem Urlaubsplan.</Muted>
+          <Text style={styles.modeTitle}>{t('discover.soloTitle')}</Text>
+          <Muted>{t('discover.soloText')}</Muted>
         </Card>
       </Pressable>
 
       {plan.length > 0 && (
         <Pressable onPress={() => router.push('/plan')}>
-          <Muted>→ Euer Urlaubsplan hat schon {plan.length} {plan.length === 1 ? 'Idee' : 'Ideen'}</Muted>
+          <Muted>{plan.length === 1 ? t('discover.planTeaser1') : t('discover.planTeaserN', { n: plan.length })}</Muted>
         </Pressable>
       )}
     </Screen>

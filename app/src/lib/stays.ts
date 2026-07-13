@@ -80,19 +80,16 @@ export function stayStats(
   return { spentNights, plannedNights, totalStays: stays.length + (hasCurrent ? 1 : 0), lifetimeNights };
 }
 
-/** Stammgast-Level nach Lebenszeit-Nächten — kleine, ehrliche Treppe. */
-export function guestLevel(lifetimeNights: number): { icon: string; title: string; next: string | null } {
-  if (lifetimeNights >= 21)
-    return { icon: '👑', title: 'Deichgraf', next: null };
+/** Stammgast-Level nach Lebenszeit-Nächten — sprachneutral (Screen übersetzt). */
+export type GuestLevel = {
+  icon: string;
+  key: 'explorer' | 'regular' | 'deichgraf';
+  next: { key: 'nextRegular' | 'nextDeichgraf'; n: number } | null;
+};
+
+export function guestLevel(lifetimeNights: number): GuestLevel {
+  if (lifetimeNights >= 21) return { icon: '👑', key: 'deichgraf', next: null };
   if (lifetimeNights >= 7)
-    return {
-      icon: '⛱️',
-      title: 'Strandkorb-Stammgast',
-      next: `Noch ${21 - lifetimeNights} Nächte bis zum Deichgrafen 👑`,
-    };
-  return {
-    icon: '🐚',
-    title: 'Nordsee-Entdecker',
-    next: `Noch ${Math.max(1, 7 - lifetimeNights)} Nächte bis zum Strandkorb-Stammgast ⛱️`,
-  };
+    return { icon: '⛱️', key: 'regular', next: { key: 'nextDeichgraf', n: 21 - lifetimeNights } };
+  return { icon: '🐚', key: 'explorer', next: { key: 'nextRegular', n: Math.max(1, 7 - lifetimeNights) } };
 }

@@ -10,21 +10,21 @@ import { Action, ActionRow, Muted, Screen } from '../../components/ui';
 import { WeatherPill } from '../../components/WeatherPill';
 import { apartmentBySlug, content } from '../../content';
 import { heroImages } from '../../heroImages';
-import { useGuest } from '../../lib/store';
+import { useGuest, useT } from '../../lib/store';
 import { colors, fonts, radius, spacing } from '../../theme';
 
 const tiles = [
-  { href: '/checkin', icon: '🔑', label: 'Anreise & Check-in' },
-  { href: '/wlan', icon: '📶', label: 'WLAN' },
-  { href: '/mappe', icon: '📖', label: 'Gästemappe' },
-  { href: '/service', icon: '🛎️', label: 'Service & Wünsche' },
-  { href: '/heute', icon: '📘', label: 'Reisetipps zum Lesen' },
-  { href: '/gezeiten', icon: '🌙', label: 'Ebbe & Flut' },
-  { href: '/album', icon: '🎖️', label: 'Sammelalbum' },
-  { href: '/meilensteine', icon: '🏆', label: 'Eure Meilensteine' },
-  { href: '/notfall', icon: '⛑️', label: 'Notfall & Praktisches' },
-  { href: '/abreise', icon: '👋', label: 'Abreise' },
-  { href: '/einstellungen', icon: '⚙️', label: 'Einstellungen' },
+  { href: '/checkin', icon: '🔑', label: 'tile.checkin' },
+  { href: '/wlan', icon: '📶', label: 'tile.wifi' },
+  { href: '/mappe', icon: '📖', label: 'tile.mappe' },
+  { href: '/service', icon: '🛎️', label: 'tile.service' },
+  { href: '/heute', icon: '📘', label: 'tile.tips' },
+  { href: '/gezeiten', icon: '🌙', label: 'tile.tides' },
+  { href: '/album', icon: '🎖️', label: 'tile.album' },
+  { href: '/meilensteine', icon: '🏆', label: 'tile.milestones' },
+  { href: '/notfall', icon: '⛑️', label: 'tile.emergency' },
+  { href: '/abreise', icon: '👋', label: 'tile.departure' },
+  { href: '/einstellungen', icon: '⚙️', label: 'tile.settings' },
 ] as const;
 
 export function generateStaticParams() {
@@ -34,6 +34,7 @@ export function generateStaticParams() {
 export default function ApartmentHome() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { apartment, setApartment, plan } = useGuest();
+  const { t } = useT();
   const apt = apartmentBySlug(slug);
 
   // Deep-Link merken: QR gescannt => diese Wohnung wird die gespeicherte.
@@ -52,7 +53,7 @@ export default function ApartmentHome() {
       <View style={styles.hero}>
         <Image source={heroImages[apt.slug]} style={styles.heroImg} contentFit="cover" />
         <View style={[styles.heroBar, { backgroundColor: apt.accent }]}>
-          <Text style={styles.heroTitle}>Moin in {apt.name}!</Text>
+          <Text style={styles.heroTitle}>{t('home.moinIn', { name: apt.name })}</Text>
           <Text style={styles.heroSub}>
             {apt.view}
             {apt.floor ? ` · ${apt.floor}` : ''}
@@ -61,11 +62,11 @@ export default function ApartmentHome() {
       </View>
 
       <ActionRow>
-        <Action label="WhatsApp" icon="💬" url={wa} />
-        <Action label="Anrufen" icon="📞" url={`tel:${site.phone}`} />
-        <Action label="Route" icon="🧭" url={maps} />
+        <Action label={t('home.whatsapp')} icon="💬" url={wa} />
+        <Action label={t('home.call')} icon="📞" url={`tel:${site.phone}`} />
+        <Action label={t('home.route')} icon="🧭" url={maps} />
       </ActionRow>
-      <Muted>Kein Callcenter — am anderen Ende ist Iris.</Muted>
+      <Muted>{t('common.noCallcenter')}</Muted>
 
       <WeatherPill />
 
@@ -79,25 +80,27 @@ export default function ApartmentHome() {
           <Image source={require('../../../assets/images/logo.png')} style={styles.discoverLogo} contentFit="contain" />
         </View>
         <View style={styles.discoverText}>
-          <Text style={styles.discoverTitle}>Was machen wir heute?</Text>
+          <Text style={styles.discoverTitle}>{t('home.discoverTitle')}</Text>
           <Text style={styles.discoverSub}>
             {plan.length > 0
-              ? `Euer Plan: ${plan.length} ${plan.length === 1 ? 'Idee' : 'Ideen'} — und Nachschub per Swipe`
-              : 'Swipt euch durch Büsum — wie Tinder, nur mit Watt'}
+              ? plan.length === 1
+                ? t('home.discoverSubPlan1')
+                : t('home.discoverSubPlanN', { n: plan.length })
+              : t('home.discoverSub')}
           </Text>
         </View>
         <Text style={styles.discoverChevron}>›</Text>
       </Pressable>
 
       <View style={styles.tiles}>
-        {tiles.map((t) => (
+        {tiles.map((t2) => (
           <Pressable
-            key={t.href}
-            onPress={() => router.push(t.href)}
+            key={t2.href}
+            onPress={() => router.push(t2.href)}
             style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
           >
-            <Text style={styles.tileIcon}>{t.icon}</Text>
-            <Text style={styles.tileLabel}>{t.label}</Text>
+            <Text style={styles.tileIcon}>{t2.icon}</Text>
+            <Text style={styles.tileLabel}>{t(t2.label)}</Text>
           </Pressable>
         ))}
       </View>

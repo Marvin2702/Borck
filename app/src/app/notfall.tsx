@@ -3,11 +3,14 @@
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card, isTodo, Muted, Screen, TodoHint } from '../components/ui';
 import { content } from '../content';
+import { emergencyTitle } from '../i18n/content';
 import { notfall } from '../data/guestInfo';
+import { useT } from '../lib/store';
 import { colors, radius, spacing } from '../theme';
 
 export default function Notfall() {
   const { site } = content;
+  const { t, lang } = useT();
   return (
     <Screen>
       <Card>
@@ -15,7 +18,7 @@ export default function Notfall() {
           if (isTodo(n.value)) {
             return (
               <View key={n.title} style={styles.line}>
-                <Text style={styles.title}>{n.title}</Text>
+                <Text style={styles.title}>{emergencyTitle(n.tel, n.title, lang)}</Text>
                 <TodoHint />
               </View>
             );
@@ -26,7 +29,7 @@ export default function Notfall() {
               onPress={() => Linking.openURL(`tel:${n.tel}`).catch(() => {})}
               style={({ pressed }) => [styles.callRow, pressed && { opacity: 0.85 }]}
             >
-              <Text style={styles.callTitle}>{n.title}</Text>
+              <Text style={styles.callTitle}>{emergencyTitle(n.tel, n.title, lang)}</Text>
               <Text style={styles.callValue}>📞 {n.value}</Text>
             </Pressable>
           ) : (
@@ -37,9 +40,7 @@ export default function Notfall() {
           );
         })}
       </Card>
-      <Muted>
-        Und für alles andere: Iris unter {site.phoneDisplay} — im Zweifel lieber einmal zu viel anrufen.
-      </Muted>
+      <Muted>{t('emergency.other', { phone: site.phoneDisplay })}</Muted>
     </Screen>
   );
 }

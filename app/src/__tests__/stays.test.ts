@@ -54,9 +54,10 @@ describe('stayStats', () => {
 
 describe('guestLevel', () => {
   it('Treppe: Entdecker → Stammgast → Deichgraf', () => {
-    expect(guestLevel(0).title).toBe('Nordsee-Entdecker');
-    expect(guestLevel(7).title).toBe('Strandkorb-Stammgast');
-    expect(guestLevel(21).title).toBe('Deichgraf');
+    expect(guestLevel(0).key).toBe('explorer');
+    expect(guestLevel(7).key).toBe('regular');
+    expect(guestLevel(21).key).toBe('deichgraf');
     expect(guestLevel(21).next).toBeNull();
+    expect(guestLevel(19).next).toEqual({ key: 'nextDeichgraf', n: 2 });
   });
 });

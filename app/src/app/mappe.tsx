@@ -1,14 +1,17 @@
 // Digitale Gästemappe — komplett offline, Sektionen aus guestInfo.
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Body, Card, isTodo, Muted, Screen, TodoHint } from '../components/ui';
+import { Body, Card, GermanContentHint, isTodo, Muted, Screen, TodoHint } from '../components/ui';
 import { gaestemappe } from '../data/guestInfo';
+import { useT } from '../lib/store';
 import { colors, fonts, spacing } from '../theme';
 
 export default function Mappe() {
+  const { t } = useT();
   return (
     <Screen>
-      <Muted>Alles Wichtige rund um Haus und Wohnung — auch ohne Internet verfügbar.</Muted>
+      <Muted>{t('mappe.intro')}</Muted>
+      <GermanContentHint />
       {gaestemappe.map((sec) => (
         <Card key={sec.title}>
           <View style={styles.head}>
@@ -20,7 +23,7 @@ export default function Mappe() {
       ))}
       <Pressable onPress={() => router.push('/service')}>
         <Card style={styles.serviceLink}>
-          <Text style={styles.serviceText}>🛎️ Wünsche? Iris ist zwei Tipper entfernt →</Text>
+          <Text style={styles.serviceText}>{t('mappe.serviceLink')}</Text>
         </Card>
       </Pressable>
     </Screen>

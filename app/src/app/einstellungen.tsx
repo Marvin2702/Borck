@@ -1,14 +1,16 @@
 // Einstellungen: Wohnung wechseln, rechtliche Links, App-Info.
 import { router } from 'expo-router';
 import { Linking, Pressable, StyleSheet, Text } from 'react-native';
+import { LanguagePills } from '../components/LanguagePills';
 import { Card, Muted, Screen, SectionTitle } from '../components/ui';
 import { apartmentBySlug, content } from '../content';
 import { cancelCheckoutReminder } from '../lib/notifications';
-import { useGuest } from '../lib/store';
+import { useGuest, useT } from '../lib/store';
 import { colors, radius, spacing } from '../theme';
 
 export default function Einstellungen() {
   const { apartment, setApartment, setDeparture, setReminder, resetVacationData } = useGuest();
+  const { t } = useT();
   const apt = apartmentBySlug(apartment ?? undefined);
   const { site } = content;
 
@@ -22,20 +24,26 @@ export default function Einstellungen() {
 
   return (
     <Screen>
-      <SectionTitle>Deine Wohnung</SectionTitle>
+      <SectionTitle>{t('settings.apartment')}</SectionTitle>
       <Card>
-        <Muted>Aktuell gewählt: {apt ? apt.name : 'keine'}</Muted>
+        <Muted>{t('settings.current', { name: apt ? apt.name : t('common.none') })}</Muted>
         <Pressable onPress={resetApartment} style={({ pressed }) => [styles.btn, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.btnLabel}>Wohnung wechseln</Text>
+          <Text style={styles.btnLabel}>{t('settings.switch')}</Text>
         </Pressable>
       </Card>
 
-      <SectionTitle>Rechtliches</SectionTitle>
+      <SectionTitle>{t('settings.language')}</SectionTitle>
+      <Card>
+        <LanguagePills />
+        <Muted>{t('settings.languageNote')}</Muted>
+      </Card>
+
+      <SectionTitle>{t('settings.legal')}</SectionTitle>
       <Card>
         {[
-          { label: 'Impressum', url: `${site.websiteUrl}/impressum/` },
-          { label: 'Datenschutz', url: `${site.websiteUrl}/datenschutz/` },
-          { label: 'Website: Haus Aquamarin', url: site.websiteUrl },
+          { label: t('settings.imprint'), url: `${site.websiteUrl}/impressum/` },
+          { label: t('settings.privacy'), url: `${site.websiteUrl}/datenschutz/` },
+          { label: t('settings.website'), url: site.websiteUrl },
         ].map((l) => (
           <Pressable key={l.label} onPress={() => Linking.openURL(l.url).catch(() => {})} style={styles.linkRow}>
             <Text style={styles.link}>{l.label} ↗</Text>
@@ -43,23 +51,15 @@ export default function Einstellungen() {
         ))}
       </Card>
 
-      <SectionTitle>Urlaubsdaten</SectionTitle>
+      <SectionTitle>{t('settings.vacation')}</SectionTitle>
       <Card>
-        <Muted>
-          Räumt für den nächsten Aufenthalt auf: Urlaubsplan, Check-ins und angefangene Swipe-Runden werden
-          geleert. Eure Badges und die Nächte-Bilanz (Meilensteine) bleiben erhalten — der aktuelle Aufenthalt
-          wird dabei in die Bilanz übernommen.
-        </Muted>
+        <Muted>{t('settings.resetInfo')}</Muted>
         <Pressable onPress={resetVacationData} style={({ pressed }) => [styles.btn, styles.btnDanger, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.btnLabel}>Urlaubsdaten zurücksetzen</Text>
+          <Text style={styles.btnLabel}>{t('settings.reset')}</Text>
         </Pressable>
       </Card>
 
-      <Muted>
-        Diese App speichert eure Auswahl (Wohnung, Plan, Stempel) nur lokal auf dem Gerät — keine Konten, kein
-        Tracking. Eine externe Wetterabfrage ist derzeit deaktiviert; die App sendet dafür keine Anfrage und zeigt
-        vorerst keine Live-Wetterdaten an.
-      </Muted>
+      <Muted>{t('settings.privacyNote')}</Muted>
     </Screen>
   );
 }

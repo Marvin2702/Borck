@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Body, Card, isTodo, Muted, Screen, SectionTitle } from '../../components/ui';
 import { content, type Guide } from '../../content';
 import { irisTipps } from '../../data/guestInfo';
+import { useT } from '../../lib/store';
 import { colors, fonts, radius, spacing } from '../../theme';
 
 type Filter = 'alle' | 'draussen' | 'schietwetter';
@@ -13,13 +14,14 @@ type Filter = 'alle' | 'draussen' | 'schietwetter';
 export const matchesFilter = (g: Guide, f: Filter) =>
   f === 'alle' ? true : f === 'schietwetter' ? g.category !== 'outdoor' : g.category !== 'indoor';
 
-const filters: { key: Filter; label: string }[] = [
-  { key: 'alle', label: 'Alle' },
-  { key: 'draussen', label: '☀️ Draußen' },
-  { key: 'schietwetter', label: '🌧️ Schietwetter' },
-];
+const filterKeys = [
+  { key: 'alle', label: 'tips.filterAll' },
+  { key: 'draussen', label: 'tips.filterOutdoor' },
+  { key: 'schietwetter', label: 'tips.filterRain' },
+] as const;
 
 export default function Heute() {
+  const { t, lang } = useT();
   const [filter, setFilter] = useState<Filter>('alle');
   const guides = content.guides.filter((g) => matchesFilter(g, filter));
   const readyTipps = irisTipps.filter(
@@ -28,14 +30,15 @@ export default function Heute() {
 
   return (
     <Screen>
+      {lang !== 'de' && <Muted>{t('tips.germanNote')}</Muted>}
       <View style={styles.filterRow}>
-        {filters.map((f) => (
+        {filterKeys.map((f) => (
           <Pressable
             key={f.key}
             onPress={() => setFilter(f.key)}
             style={[styles.pill, filter === f.key && styles.pillActive]}
           >
-            <Text style={[styles.pillLabel, filter === f.key && styles.pillLabelActive]}>{f.label}</Text>
+            <Text style={[styles.pillLabel, filter === f.key && styles.pillLabelActive]}>{t(f.label)}</Text>
           </Pressable>
         ))}
       </View>
@@ -58,7 +61,7 @@ export default function Heute() {
 
       {readyTipps.length > 0 && (
         <>
-          <SectionTitle>Iris&apos; Tipps</SectionTitle>
+          <SectionTitle>{t('tips.iris')}</SectionTitle>
           {readyTipps.map((t) => (
             <Card key={t.title}>
               <Text style={styles.tippTitle}>{t.title}</Text>

@@ -8,6 +8,9 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import type { Activity, Mood } from '../content';
 import { activityArt, cardScrim } from '../data/activityArt';
+import { fmtKm } from '../i18n';
+import { activityText, moodText } from '../i18n/content';
+import { useT } from '../lib/store';
 import { colors, fonts, radius, spacing } from '../theme';
 
 /** Ruhige Akzentflächen je Mood (Töne aus dem Website-Farbsystem). */
@@ -58,10 +61,11 @@ export function ActivityCard({
   ribbon?: string;
   ribbonTone?: 'aqua' | 'gold';
 }) {
+  const { t, lang } = useT();
   const art = activityArt[activity.id];
   const onArt = art != null;
   const tint = moodTint[activity.mood[0]] ?? colors.aqua100;
-  const km = String(activity.km).replace('.', ',');
+  const ax = activityText(activity, lang);
   return (
     <CardShell tint={tint} icon={activity.icon} art={art}>
       {ribbon ? (
@@ -74,21 +78,23 @@ export function ActivityCard({
           <Text style={styles.icon}>{activity.icon}</Text>
         </View>
       )}
-      <Text style={[styles.name, onArt && styles.nameOnArt]}>{activity.name}</Text>
+      <Text style={[styles.name, onArt && styles.nameOnArt]}>{ax.name}</Text>
       <View style={styles.chips}>
-        <Text style={styles.chip}>ca. {km} km</Text>
-        <Text style={styles.chip}>{activity.indoor ? 'Indoor 🏠' : 'Draußen 🌤️'}</Text>
+        <Text style={styles.chip}>{t('common.km', { km: fmtKm(activity.km, lang) })}</Text>
+        <Text style={styles.chip}>{activity.indoor ? t('common.indoor') : t('common.outdoor')}</Text>
         <Text style={styles.chip}>{activity.area}</Text>
       </View>
-      <Text style={[styles.desc, onArt && styles.descOnArt]}>{activity.description}</Text>
+      <Text style={[styles.desc, onArt && styles.descOnArt]}>{ax.description}</Text>
     </CardShell>
   );
 }
 
 export function MoodCard({ mood }: { mood: Mood }) {
+  const { t, lang } = useT();
   const art = activityArt[`mood-${mood.id}`];
   const onArt = art != null;
   const tint = moodTint[mood.id] ?? colors.aqua100;
+  const mx = moodText(mood, lang);
   return (
     <CardShell tint={tint} icon={mood.icon} art={art}>
       {!onArt && (
@@ -96,9 +102,9 @@ export function MoodCard({ mood }: { mood: Mood }) {
           <Text style={styles.icon}>{mood.icon}</Text>
         </View>
       )}
-      <Text style={[styles.name, onArt && styles.nameOnArt]}>{mood.label}</Text>
-      <Text style={[styles.desc, onArt && styles.descOnArt]}>{mood.teaser}</Text>
-      <Text style={[styles.moodHint, onArt && styles.moodHintOnArt]}>Klingt das nach eurem Urlaub?</Text>
+      <Text style={[styles.name, onArt && styles.nameOnArt]}>{mx.label}</Text>
+      <Text style={[styles.desc, onArt && styles.descOnArt]}>{mx.teaser}</Text>
+      <Text style={[styles.moodHint, onArt && styles.moodHintOnArt]}>{t('swipe.moodQuestion')}</Text>
     </CardShell>
   );
 }

@@ -8,14 +8,16 @@ import { BadgeStamp } from '../components/BadgeStamp';
 import { content } from '../content';
 import { badgeDefs } from '../data/badges';
 import { checkoutChecklist } from '../data/guestInfo';
+import { checklistText } from '../i18n/content';
 import { cancelCheckoutReminder, scheduleCheckoutReminder } from '../lib/notifications';
-import { useGuest } from '../lib/store';
+import { useGuest, useT } from '../lib/store';
 import { colors, radius, spacing } from '../theme';
 
 const isISODate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s);
 
 export default function Abreise() {
   const { site } = content;
+  const { t, lang } = useT();
   const { checklist, toggleChecklist, departure, setDeparture, reminder, setReminder, badges } = useGuest();
   const [dateInput, setDateInput] = useState(departure ?? '');
   const [reminderNote, setReminderNote] = useState<string | null>(null);
@@ -29,22 +31,18 @@ export default function Abreise() {
       return;
     }
     if (!isISODate(dateInput)) {
-      setReminderNote('Bitte zuerst das Abreisedatum eintragen (JJJJ-MM-TT).');
+      setReminderNote(t('departure.dateFirst'));
       return;
     }
     setDeparture(dateInput);
     const ok = await scheduleCheckoutReminder(dateInput, site.checkoutTime);
     setReminder(ok);
-    setReminderNote(
-      ok
-        ? 'Alles klar — wir erinnern dich am Abreisetag um 8:30 Uhr.'
-        : 'Erinnerung konnte nicht gesetzt werden (Berechtigung fehlt oder Datum liegt in der Vergangenheit).'
-    );
+    setReminderNote(ok ? t('departure.reminderSet') : t('departure.reminderFail'));
   };
 
   return (
     <Screen>
-      <SectionTitle>Check-out bis {site.checkoutTime} Uhr</SectionTitle>
+      <SectionTitle>{t('departure.checkoutBy', { time: site.checkoutTime })}</SectionTitle>
       <Card>
         {items.map((item, i) => {
           const done = checklist.includes(i);
@@ -58,19 +56,19 @@ export default function Abreise() {
               style={({ pressed }) => [styles.check, pressed && { opacity: 0.85 }]}
             >
               <Text style={[styles.box, done && styles.boxDone]}>{done ? '✓' : ''}</Text>
-              <Text style={[styles.checkLabel, done && styles.checkDone]}>{item}</Text>
+              <Text style={[styles.checkLabel, done && styles.checkDone]}>{checklistText(item, lang)}</Text>
             </Pressable>
           );
         })}
       </Card>
 
-      <SectionTitle>Erinnerung am Abreisetag</SectionTitle>
+      <SectionTitle>{t('departure.reminderTitle')}</SectionTitle>
       <Card>
         <View style={styles.reminderRow}>
           <TextInput
             value={dateInput}
             onChangeText={setDateInput}
-            placeholder="Abreisedatum: 2026-08-15"
+            placeholder={t('departure.datePlaceholder')}
             placeholderTextColor={colors.ink500}
             style={styles.input}
             inputMode="numeric"
@@ -83,12 +81,12 @@ export default function Abreise() {
             thumbColor={colors.white}
           />
         </View>
-        {reminderNote ? <Muted>{reminderNote}</Muted> : <Muted>Wir melden uns um 8:30 Uhr — ganz ohne Server, direkt vom Handy.</Muted>}
+        {reminderNote ? <Muted>{reminderNote}</Muted> : <Muted>{t('departure.reminderDefault')}</Muted>}
       </Card>
 
       {Object.keys(badges).length > 0 && (
         <>
-          <SectionTitle>Euer Urlaub in Stempeln</SectionTitle>
+          <SectionTitle>{t('departure.stamps')}</SectionTitle>
           <View style={styles.stampRow}>
             {badgeDefs
               .filter((d) => badges[d.id])
@@ -99,26 +97,26 @@ export default function Abreise() {
         </>
       )}
 
-      <SectionTitle>Hat es euch gefallen?</SectionTitle>
+      <SectionTitle>{t('departure.liked')}</SectionTitle>
       <Card>
         <Body>
           {Object.keys(badges).length > 1
-            ? `${Object.keys(badges).length} Stempel gesammelt — erzählt in eurer Bewertung davon! `
+            ? t('departure.stampsInReview', { n: Object.keys(badges).length })
             : ''}
-          Eine Google-Bewertung hilft unserem kleinen Familienbetrieb mehr als jede Werbung — danke! 💙
+          {t('departure.reviewAsk')}
         </Body>
         <ActionRow>
-          <Action label="Bei Google bewerten" icon="⭐" url={site.googleProfileUrl} />
+          <Action label={t('departure.reviewCta')} icon="⭐" url={site.googleProfileUrl} />
         </ActionRow>
       </Card>
 
       <Card style={styles.direct}>
         <Body>
-          <Text style={styles.directStrong}>Bis zum nächsten Mal? </Text>
-          Direkt bei uns buchen ist immer ohne Portalgebühr — und ihr habt eure Lieblingswohnung zuerst.
+          <Text style={styles.directStrong}>{t('departure.nextTimeStrong')}</Text>
+          {t('departure.nextTimeText')}
         </Body>
         <ActionRow>
-          <Action label="Direkt buchen" icon="🏠" url={site.bookingUrl} accent={colors.gold} />
+          <Action label={t('departure.bookDirect')} icon="🏠" url={site.bookingUrl} accent={colors.gold} />
         </ActionRow>
       </Card>
     </Screen>

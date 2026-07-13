@@ -14,6 +14,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { useT } from '../lib/store';
 import { colors, fonts, radius, spacing } from '../theme';
 
 export function Screen({ children }: PropsWithChildren) {
@@ -43,7 +44,15 @@ export function Body({ children }: PropsWithChildren) {
 /** Kennzeichnet noch nicht gepflegte Inhalte (TODO-Platzhalter aus guestInfo). */
 export const isTodo = (s: string) => /\bTODO\s*:/i.test(s);
 export function TodoHint() {
-  return <Text style={styles.todo}>Wird von Iris noch ergänzt — ruf uns bis dahin einfach an.</Text>;
+  const { t } = useT();
+  return <Text style={styles.todo}>{t('common.todoHint')}</Text>;
+}
+
+/** Hinweis für nicht-deutsche Gäste: Iris-gepflegte Inhalte sind Deutsch. */
+export function GermanContentHint() {
+  const { t, lang } = useT();
+  if (lang === 'de') return null;
+  return <Text style={styles.todo}>{t('common.germanContent')}</Text>;
 }
 
 export function Row({ title, value }: { title: string; value: string }) {

@@ -8,14 +8,16 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card, Muted, Screen, SectionTitle } from '../components/ui';
 import { apartmentBySlug, content } from '../content';
 import { serviceRequests } from '../data/services';
-import { useGuest } from '../lib/store';
+import { serviceText } from '../i18n/content';
+import { useGuest, useT } from '../lib/store';
 import { colors, fonts, radius, spacing } from '../theme';
 
 export default function Service() {
   const { apartment } = useGuest();
+  const { t, lang } = useT();
   const apt = apartmentBySlug(apartment ?? undefined);
   const { site } = content;
-  const wohnung = apt ? `der Wohnung ${apt.name}` : 'einer eurer Wohnungen';
+  const wohnung = apt ? t('service.aptPrefix', { name: apt.name }) : t('service.aptFallback');
 
   const send = async (template: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
@@ -24,22 +26,23 @@ export default function Service() {
     try {
       await Linking.openURL(wa);
     } catch {
-      const mail = `mailto:${site.email}?subject=${encodeURIComponent('Anfrage aus der Gäste-App')}&body=${encodeURIComponent(text)}`;
+      const mail = `mailto:${site.email}?subject=${encodeURIComponent(t('service.mailSubject'))}&body=${encodeURIComponent(text)}`;
       Linking.openURL(mail).catch(() => {});
     }
   };
 
   return (
     <Screen>
-      <Muted>Zwei Tipper, und Iris weiß Bescheid — die Nachricht ist schon vorgeschrieben, du kannst sie noch anpassen.</Muted>
+      <Muted>{t('service.intro')}</Muted>
+      {lang !== 'de' && <Muted>{t('service.germanNote')}</Muted>}
       {serviceRequests.map((s) => (
         <Pressable key={s.id} onPress={() => send(s.template)} style={({ pressed }) => pressed && { opacity: 0.9 }}>
           <Card>
             <View style={styles.row}>
               <Text style={styles.icon}>{s.icon}</Text>
               <View style={styles.textWrap}>
-                <Text style={styles.label}>{s.label}</Text>
-                <Muted>{s.hint}</Muted>
+                <Text style={styles.label}>{serviceText(s.id, s, lang).label}</Text>
+                <Muted>{serviceText(s.id, s, lang).hint}</Muted>
               </View>
               <Text style={styles.chevron}>›</Text>
             </View>
@@ -47,7 +50,7 @@ export default function Service() {
         </Pressable>
       ))}
 
-      <SectionTitle>Alles andere</SectionTitle>
+      <SectionTitle>{t('service.other')}</SectionTitle>
       <View style={styles.contactRow}>
         <Pressable
           onPress={() => Linking.openURL(`https://wa.me/${site.whatsapp}`).catch(() => {})}
@@ -62,8 +65,8 @@ export default function Service() {
           <Text style={styles.contactLabel}>📞 {site.phoneDisplay}</Text>
         </Pressable>
       </View>
-      <Muted>Kein Callcenter — am anderen Ende ist Iris. Schlüssel-Infos findet ihr unter{' '}
-        <Text style={styles.link} onPress={() => router.push('/checkin')}>Anreise & Check-in</Text>.
+      <Muted>{t('common.noCallcenter')} {t('service.keysNote')}{' '}
+        <Text style={styles.link} onPress={() => router.push('/checkin')}>{t('title.checkin')}</Text>.
       </Muted>
     </Screen>
   );

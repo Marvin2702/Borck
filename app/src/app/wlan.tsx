@@ -4,13 +4,14 @@ import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Body, Card, isTodo, Muted, Screen, SectionTitle, TodoHint } from '../components/ui';
+import { Body, Card, GermanContentHint, isTodo, Muted, Screen, SectionTitle, TodoHint } from '../components/ui';
 import { apartmentBySlug } from '../content';
 import { perApartment } from '../data/guestInfo';
-import { useGuest } from '../lib/store';
+import { useGuest, useT } from '../lib/store';
 import { colors, radius, spacing } from '../theme';
 
 function CopyField({ label, value }: { label: string; value: string }) {
+  const { t } = useT();
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     await Clipboard.setStringAsync(value);
@@ -27,7 +28,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
         </Text>
       </View>
       <Pressable onPress={copy} style={({ pressed }) => [styles.copyBtn, pressed && { opacity: 0.8 }]}>
-        <Text style={styles.copyLabel}>{copied ? '✓ Kopiert' : 'Kopieren'}</Text>
+        <Text style={styles.copyLabel}>{copied ? t('common.copied') : t('common.copy')}</Text>
       </Pressable>
     </View>
   );
@@ -35,6 +36,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
 
 export default function Wlan() {
   const { apartment } = useGuest();
+  const { t } = useT();
   const apt = apartmentBySlug(apartment ?? undefined);
   const wifi = apartment ? perApartment[apartment]?.wifi : undefined;
   const publicWifi =
@@ -48,26 +50,27 @@ export default function Wlan() {
 
   return (
     <Screen>
-      <SectionTitle>WLAN in {apt?.name ?? 'deiner Wohnung'}</SectionTitle>
+      <SectionTitle>{t('wifi.in', { name: apt?.name ?? t('wifi.yourApt') })}</SectionTitle>
       <Card>
         {wifi?.mode === 'onsite' ? (
           <>
             <Body>{wifi.accessHint}</Body>
-            <Muted>Netzwerkname und Passwort findest du dort direkt vor Ort.</Muted>
+            <Muted>{t('wifi.onsiteNote')}</Muted>
+            <GermanContentHint />
           </>
         ) : publicWifi ? (
           <>
-            <CopyField label="Netzwerk (SSID)" value={publicWifi.ssid} />
-            <CopyField label="Passwort" value={publicWifi.password} />
-            <Muted>Passwort kopieren, in den WLAN-Einstellungen einfügen — fertig.</Muted>
+            <CopyField label={t('wifi.ssid')} value={publicWifi.ssid} />
+            <CopyField label={t('wifi.password')} value={publicWifi.password} />
+            <Muted>{t('wifi.copyNote')}</Muted>
           </>
         ) : wifi?.mode === 'public-guest' ? (
           <>
             <TodoHint />
-            <Muted>Die Zugangsdaten findest du auch ausgedruckt in der Wohnung.</Muted>
+            <Muted>{t('wifi.printed')}</Muted>
           </>
         ) : (
-          <Muted>Wähle zuerst deine Wohnung aus, um den WLAN-Hinweis zu sehen.</Muted>
+          <Muted>{t('wifi.chooseFirst')}</Muted>
         )}
       </Card>
     </Screen>

@@ -5,22 +5,23 @@
 import { Image } from 'expo-image';
 import { Redirect, router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { LanguagePills } from '../components/LanguagePills';
 import { Muted, Screen } from '../components/ui';
 import { content } from '../content';
 import { heroImages } from '../heroImages';
-import { useGuest } from '../lib/store';
+import { useGuest, useT } from '../lib/store';
 import { colors, fonts, radius, spacing } from '../theme';
 
 export default function ChooseApartment() {
   const { apartment, setApartment } = useGuest();
+  const { t } = useT();
   if (apartment) return <Redirect href={{ pathname: '/wohnung/[slug]', params: { slug: apartment } }} />;
 
   return (
     <Screen>
-      <Text style={styles.hello}>Moin & herzlich willkommen!</Text>
-      <Muted>
-        In welcher Wohnung wohnst du? Tipp: Der QR-Code in deiner Wohnung öffnet die App gleich richtig.
-      </Muted>
+      <LanguagePills compact />
+      <Text style={styles.hello}>{t('chooser.hello')}</Text>
+      <Muted>{t('chooser.which')}</Muted>
       <View style={styles.grid}>
         {content.apartments.map((a) => (
           <Pressable

@@ -18,6 +18,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { decideAction, type SwipeAction } from '../lib/discover';
+import { useT } from '../lib/store';
 import { colors, radius, spacing } from '../theme';
 
 type Props<T> = {
@@ -43,6 +44,7 @@ export function SwipeDeck<T extends { id: string }>({
   superLeft,
 }: Props<T>) {
   const { width, height } = useWindowDimensions();
+  const { t } = useT();
   const tx = useSharedValue(0);
   const ty = useSharedValue(0);
   const [busy, setBusy] = useState(false);
@@ -121,13 +123,13 @@ export function SwipeDeck<T extends { id: string }>({
             <Animated.View style={[styles.card, topStyle]}>
               {renderCard(top)}
               <Animated.View style={[styles.overlay, styles.like, likeStyle]}>
-                <Text style={styles.overlayText}>WILL ICH 💙</Text>
+                <Text style={styles.overlayText}>{t('swipe.overlayLike')}</Text>
               </Animated.View>
               <Animated.View style={[styles.overlay, styles.nope, nopeStyle]}>
-                <Text style={styles.overlayText}>NÖ 🌊</Text>
+                <Text style={styles.overlayText}>{t('swipe.overlayNope')}</Text>
               </Animated.View>
               <Animated.View style={[styles.overlay, styles.super, superStyle]}>
-                <Text style={styles.overlayText}>UNBEDINGT ⭐</Text>
+                <Text style={styles.overlayText}>{t('swipe.overlaySuper')}</Text>
               </Animated.View>
             </Animated.View>
           </GestureDetector>
@@ -136,7 +138,7 @@ export function SwipeDeck<T extends { id: string }>({
 
       <View style={styles.buttons}>
         <Pressable
-          accessibilityLabel="Nein danke"
+          accessibilityLabel={t('swipe.a11yNope')}
           onPress={() => flyOut('nope')}
           style={({ pressed }) => [styles.btn, styles.btnNope, pressed && styles.pressed]}
         >
@@ -144,7 +146,7 @@ export function SwipeDeck<T extends { id: string }>({
         </Pressable>
         {onUndo && (
           <Pressable
-            accessibilityLabel="Letzte Karte zurückholen"
+            accessibilityLabel={t('swipe.a11yUndo')}
             onPress={onUndo}
             disabled={!canUndo}
             style={({ pressed }) => [styles.btn, styles.btnUndo, !canUndo && styles.disabled, pressed && styles.pressed]}
@@ -154,7 +156,7 @@ export function SwipeDeck<T extends { id: string }>({
         )}
         {allowSuper && (
           <Pressable
-            accessibilityLabel="Unbedingt!"
+            accessibilityLabel={t('swipe.a11ySuper')}
             onPress={() => flyOut('super')}
             disabled={superLeft === 0}
             style={({ pressed }) => [styles.btn, styles.btnSuper, superLeft === 0 && styles.disabled, pressed && styles.pressed]}
@@ -163,7 +165,7 @@ export function SwipeDeck<T extends { id: string }>({
           </Pressable>
         )}
         <Pressable
-          accessibilityLabel="Gefällt uns"
+          accessibilityLabel={t('swipe.a11yLike')}
           onPress={() => flyOut('like')}
           style={({ pressed }) => [styles.btn, styles.btnLike, pressed && styles.pressed]}
         >
