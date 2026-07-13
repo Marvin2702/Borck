@@ -20,7 +20,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'adventure-golf': {
       name: 'Family Fairway – Adventure Golf',
-      description: '18 maritime-themed adventure golf lanes with lighthouse, shrimp cutter and seal bank – just minutes from the house.',
+      description: '18 maritime-themed adventure golf holes with lighthouse, shrimp cutter and seal bank – just minutes from the house.',
     },
     'wassersport-schule': {
       name: 'Watersports Büsum – Kite, Surf & SUP School',
@@ -40,7 +40,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'helgoland-ausflug': {
       name: 'Day Trip to Heligoland',
-      description: 'April to October, daily aboard the “Funny Girl” from Büsum to Germany’s only offshore island – with dune and guillemot rock.',
+      description: 'April to October, daily aboard the “Funny Girl” from Büsum to Germany’s only offshore island – with the Düne islet and its guillemot rock.',
     },
     'museum-am-meer': {
       name: 'museum am meer & Harbour Aquarium',
@@ -64,7 +64,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'kohlosseum': {
       name: 'KOHLosseum Wesselburen',
-      description: 'A former sauerkraut factory housing a cabbage museum, farmers’ market and kraut workshop with demonstrations and tastings.',
+      description: 'A former sauerkraut factory housing a cabbage museum, farmers’ market and sauerkraut workshop with demonstrations and tastings.',
     },
     'kronenloch-voegel': {
       name: 'Birdwatching at Kronenloch (Speicherkoog)',
@@ -72,7 +72,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'seehundstation-friedrichskoog': {
       name: 'Seal Centre Friedrichskoog',
-      description: 'Official rescue centre for orphaned harbour and grey seals with daily feedings – a must for families.',
+      description: 'Official rescue centre for orphaned harbour and grey seals with daily feeding times – a must for families.',
     },
     'landesmuseum-meldorf': {
       name: 'Dithmarschen State Museum Meldorf',
@@ -88,7 +88,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'wattfuehrung-fuer-alle': {
       name: 'Mudflat Tour “for Everyone” (accessible)',
-      description: 'Short, low-barrier mudflat tour at the Perlebucht – ideal with small children or for your first mudflat experience.',
+      description: 'Short, accessible mudflat tour at the Perlebucht – ideal with small children or for your first mudflat experience.',
     },
     'deich-radtour': {
       name: 'Cycling on the Dike Paths',
@@ -114,7 +114,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
   nl: {
     'perlebucht-lagune': {
       name: 'Familielagune Perlebucht',
-      description: 'Toegankelijke, het hele jaar vrij toegankelijke zwem- en strandlagune aan het zuidstrand met direct uitzicht op de Noordzee.',
+      description: 'Drempelvrije, het hele jaar vrij toegankelijke zwem- en strandlagune aan het zuidstrand met direct uitzicht op de Noordzee.',
     },
     'adventure-golf': {
       name: 'Family Fairway – Adventure Golf',
@@ -138,7 +138,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'helgoland-ausflug': {
       name: 'Dagtocht naar Helgoland',
-      description: 'Van april tot oktober dagelijks met de „Funny Girl” vanuit Büsum naar Duitslands enige hoogzee-eiland – met duin en zeekoetenrots.',
+      description: 'Van april tot oktober dagelijks met de „Funny Girl” vanuit Büsum naar Duitslands enige eiland in open zee – met duin en zeekoetenrots.',
     },
     'museum-am-meer': {
       name: 'museum am meer & aquarium aan de haven',
@@ -177,16 +177,16 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
       description: 'Nieuw ingerichte vaste tentoonstelling over zo’n 1200 jaar geschiedenis van Dithmarschen – van boerenrepubliek tot de jaren 60.',
     },
     'strandkorb-tag': {
-      name: 'Strandstoeldag aan het strand van Büsum',
-      description: 'Een hele dag wind en golven genieten vanuit je eigen gehuurde strandkorf – het Noord-Duitse antwoord op de ligstoel.',
+      name: 'Strandkorfdag aan het strand van Büsum',
+      description: 'Een hele dag genieten van wind en golven vanuit je eigen gehuurde strandkorf – het Noord-Duitse antwoord op de ligstoel.',
     },
     'schlafstrandkorb': {
       name: 'Een nacht in de slaapstrandkorf',
-      description: 'Onder de open hemel op het strand in slaap vallen en wakker worden met het ruisen van de Noordzee – hét bijzonderste bed van Büsum.',
+      description: 'Onder de blote hemel op het strand in slaap vallen en wakker worden met het ruisen van de Noordzee – hét bijzonderste bed van Büsum.',
     },
     'wattfuehrung-fuer-alle': {
-      name: 'Wadexcursie „voor iedereen” (drempelarm)',
-      description: 'Korte, drempelarme wadexcursie bij de Perlebucht – ideaal met kleine kinderen of voor je eerste wad-ervaring.',
+      name: 'Wadexcursie „voor iedereen” (goed toegankelijk)',
+      description: 'Korte, goed toegankelijke wadexcursie bij de Perlebucht – ideaal met kleine kinderen of voor je eerste wad-ervaring.',
     },
     'deich-radtour': {
       name: 'Fietstocht over de dijkpaden',
@@ -202,7 +202,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'sonnenuntergang-deich': {
       name: 'Zonsondergang op de dijk',
-      description: '’s Avonds met een deken de dijk op – als de zon in de Waddenzee zakt, is dat groots bioscoop en het kost niets.',
+      description: '’s Avonds met een deken de dijk op – als de zon in de Waddenzee zakt, is dat een groots schouwspel en het kost niets.',
     },
     'spa-meerzeit': {
       name: 'Saunadag in spa „Meerzeit”',
@@ -212,7 +212,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
   da: {
     'perlebucht-lagune': {
       name: 'Familielagunen Perlebucht',
-      description: 'Tilgængelig bade- og strandlagune ved sydstranden, gratis og åben hele året, med direkte udsigt over Nordsøen.',
+      description: 'Handicapvenlig bade- og strandlagune ved sydstranden, gratis og åben hele året, med direkte udsigt over Nordsøen.',
     },
     'adventure-golf': {
       name: 'Family Fairway – Adventure Golf',
@@ -228,7 +228,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'meerzeit-wellenbad': {
       name: 'Meerzeit – bølgebad & spa',
-      description: 'Moderne badeland ved sydstranden med saltvands-bølgebassin, udendørsbassiner og saunaverden – perfekt i dårligt vejr.',
+      description: 'Moderne badeland ved sydstranden med saltvands-bølgebassin, udendørsbassiner og saunaverden – perfekt i skidtvejr.',
     },
     'krabbenfangfahrt': {
       name: 'Rejefangsttur med kutter',
@@ -248,10 +248,10 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'phaenomania': {
       name: 'Phänomania oplevelsescenter',
-      description: 'Interaktivt gør-det-selv-museum med over 230 eksperimentstationer om sanser og naturvidenskab (sæson: marts–oktober).',
+      description: 'Interaktivt prøv-selv-museum med over 230 eksperimentstationer om sanser og naturvidenskab (sæson: marts–oktober).',
     },
     'hafen-leuchtturm': {
-      name: 'Büsum havn & gamle bydel med fyrtårn',
+      name: 'Büsum havn & den gamle bydel med fyrtårn',
       description: 'Havn med stor rejekutterflåde, det rød-hvide fyrtårn fra 1913 og den sengotiske St. Clemens-kirke.',
     },
     'kartbahn-nordseering': {
@@ -260,7 +260,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'kohlosseum': {
       name: 'KOHLosseum Wesselburen',
-      description: 'I en tidligere sauerkrautfabrik samlet: kålmuseum, bondemarked og krautværksted med demonstrationer og smagsprøver.',
+      description: 'Samlet i en tidligere surkålsfabrik: kålmuseum, bondemarked og surkålsværksted med demonstrationer og smagsprøver.',
     },
     'kronenloch-voegel': {
       name: 'Fuglekiggeri ved Kronenloch (Speicherkoog)',
@@ -268,7 +268,7 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'seehundstation-friedrichskoog': {
       name: 'Sælstationen Friedrichskoog',
-      description: 'Officiel opdrætsstation for forældreløse spættede sæler og gråsæler med daglige fodringer – et must for familier.',
+      description: 'Officiel plejestation for forældreløse spættede sæler og gråsæler med daglige fodringer – et must for familier.',
     },
     'landesmuseum-meldorf': {
       name: 'Dithmarschens landsmuseum Meldorf',
@@ -280,11 +280,11 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'schlafstrandkorb': {
       name: 'En nat i sovestrandkurven',
-      description: 'Fald i søvn under åben himmel på stranden og vågn til Nordsøens brusen – nok den mest særlige seng i Büsum.',
+      description: 'Fald i søvn under åben himmel på stranden og vågn til Nordsøens brusen – nok den mest specielle seng i Büsum.',
     },
     'wattfuehrung-fuer-alle': {
-      name: 'Vadehavstur „for alle” (tilgængelig)',
-      description: 'Kort, tilgængelig vadehavstur ved Perlebucht – ideel med små børn eller til den første oplevelse i vadehavet.',
+      name: 'Vadehavstur „for alle” (handicapvenlig)',
+      description: 'Kort, handicapvenlig vadehavstur ved Perlebucht – ideel med små børn eller til den første oplevelse i vadehavet.',
     },
     'deich-radtour': {
       name: 'Cykeltur på digestierne',
@@ -292,15 +292,15 @@ export const activityI18n: Record<XLang, Record<string, ActivityText>> = {
     },
     'promenaden-bummel': {
       name: 'Promenadetur med is',
-      description: 'Slentre hyggeligt langs digepromenaden, kigge på skibe og lade dagen glide forbi med en is i hånden.',
+      description: 'Slentr hyggeligt langs digepromenaden, kig på skibe og lad dagen glide forbi med en is i hånden.',
     },
     'fischbroetchen-hafen': {
-      name: 'Fiskeboller & rejer ved havnen',
+      name: 'Fischbrötchen & rejer ved havnen',
       description: 'Smag friske nordsørejer direkte ved fiskerihavnen – dér hvor kutterne lander dem.',
     },
     'sonnenuntergang-deich': {
       name: 'Solnedgang på diget',
-      description: 'Tag et tæppe med op på diget om aftenen – når solen synker i Vadehavet, er det stort biograf og koster ingenting.',
+      description: 'Tag et tæppe med op på diget om aftenen – når solen synker i Vadehavet, er det bedre end biografen – og det koster ingenting.',
     },
     'spa-meerzeit': {
       name: 'Saunadag i spa „Meerzeit”',
@@ -333,7 +333,7 @@ export const moodI18n: Record<XLang, Record<string, MoodText>> = {
     watt: { label: 'Vadehav & natur', teaser: 'Verdensarv, fugle og vid horisont' },
     action: { label: 'Action & familie', teaser: 'Golf, gokart, eksperimenter, sælfodring' },
     kultur: { label: 'Kultur & slentretur', teaser: 'Museer, havn, gammel bydel og lækkerier' },
-    wellness: { label: 'Wellness & badning', teaser: 'Bølgebad, sauna og opvarmning' },
+    wellness: { label: 'Wellness & badning', teaser: 'Bølgebad, sauna og varme' },
     strand: { label: 'Stranddag', teaser: 'Strandkurv, lagune, solnedgang' },
   },
 };
@@ -343,7 +343,7 @@ type BadgeText = { title: string; hint: string };
 export const badgeI18n: Record<XLang, Record<string, BadgeText>> = {
   en: {
     moin: { title: 'Moin!', hint: 'Your first activity ticked off' },
-    wattlaeufer: { title: 'Mudflat Walker', hint: 'Once into the Wadden Sea World Heritage' },
+    wattlaeufer: { title: 'Mudflat Walker', hint: 'Once into the Wadden Sea World Heritage site' },
     'seehund-spotter': { title: 'Seal Spotter', hint: 'Seen seals for real' },
     'leuchtturm-fan': { title: 'Lighthouse Fan', hint: 'Visited harbour & lighthouse' },
     wellenreiter: { title: 'Wave Rider', hint: 'Swimming, waves or board — just get wet' },
@@ -354,11 +354,11 @@ export const badgeI18n: Record<XLang, Record<string, BadgeText>> = {
   },
   nl: {
     moin: { title: 'Moin!', hint: 'Jullie eerste activiteit afgevinkt' },
-    wattlaeufer: { title: 'Wadloper', hint: 'Eén keer het werelderfgoed wad in' },
+    wattlaeufer: { title: 'Wadloper', hint: 'Eén keer het werelderfgoed wad op' },
     'seehund-spotter': { title: 'Zeehond-spotter', hint: 'Zeehonden in het echt gezien' },
     'leuchtturm-fan': { title: 'Vuurtorenfan', hint: 'Haven & vuurtoren bezocht' },
     wellenreiter: { title: 'Golfrijder', hint: 'Zwemmen, golven of plank — als je maar nat wordt' },
-    'schietwetter-held': { title: 'Slechtweer-held', hint: 'Bij echt slecht weer eropuit' },
+    'schietwetter-held': { title: 'Hondenweer-held', hint: 'Bij echt hondenweer eropuit' },
     landratte: { title: 'Ontdekker-landrot', hint: 'Een uitstapje verder dan 10 km' },
     'buesum-profi': { title: 'Büsum-pro', hint: 'Vijf activiteiten afgevinkt' },
     'iris-best': { title: 'Iris’ Best', hint: 'Drie lievelingstips van de gastvrouw beleefd' },
@@ -381,24 +381,24 @@ type ServiceText = { label: string; hint: string };
 export const serviceI18n: Record<XLang, Record<string, ServiceText>> = {
   en: {
     'late-checkout': { label: 'Ask for late check-out', hint: 'Sleep in — Iris will check what’s possible' },
-    waesche: { label: 'Fresh towels / linens', hint: 'Replenishment on request' },
+    waesche: { label: 'Fresh towels / bed linen', hint: 'Fresh supplies for a fee (see the guest manual)' },
     broetchen: { label: 'Bread roll question', hint: 'Where to get breakfast rolls nearby' },
     problem: { label: 'Report a problem', hint: 'Something broken or not working?' },
     nochmal: { label: 'Book again', hint: 'Ask about your favourite dates directly' },
   },
   nl: {
     'late-checkout': { label: 'Late check-out aanvragen', hint: 'Uitslapen — Iris kijkt wat er mogelijk is' },
-    waesche: { label: 'Verse handdoeken / beddengoed', hint: 'Aanvulling op verzoek' },
-    broetchen: { label: 'Broodjesvraag', hint: 'Waar haal je ’s ochtends verse broodjes' },
+    waesche: { label: 'Verse handdoeken / beddengoed', hint: 'Aanvulling tegen vergoeding (zie gastenmap)' },
+    broetchen: { label: 'Broodjesvraag', hint: 'Waar haal je ’s ochtends verse broodjes?' },
     problem: { label: 'Probleem melden', hint: 'Iets kapot of werkt iets niet?' },
     nochmal: { label: 'Nog eens boeken', hint: 'Vraag direct naar jullie favoriete data' },
   },
   da: {
     'late-checkout': { label: 'Spørg om sen check-out', hint: 'Sov længe — Iris ser, hvad der kan lade sig gøre' },
-    waesche: { label: 'Friske håndklæder / sengetøj', hint: 'Genopfyldning efter ønske' },
+    waesche: { label: 'Friske håndklæder / sengetøj', hint: 'Suppleres mod gebyr (se gæstemappen)' },
     broetchen: { label: 'Rundstykke-spørgsmål', hint: 'Hvor du finder friske morgenbrød i nærheden' },
-    problem: { label: 'Meld et problem', hint: 'Er noget i stykker eller virker ikke?' },
-    nochmal: { label: 'Book igen', hint: 'Spørg direkte til jeres yndlingsdatoer' },
+    problem: { label: 'Meld et problem', hint: 'Er noget i stykker, eller virker noget ikke?' },
+    nochmal: { label: 'Book igen', hint: 'Spørg direkte efter jeres ønskedatoer' },
   },
 };
 
@@ -423,7 +423,7 @@ export const checklistI18n: Record<XLang, Record<string, string>> = {
     'Müll in die Tonnen gebracht': 'Affald bragt til containerne',
     'Fenster geschlossen, Heizung runtergedreht': 'Vinduer lukket, varmen skruet ned',
     'Kühlschrank geleert': 'Køleskab tømt',
-    'Alle Schlüssel zurück (inkl. Fahrradgarage)': 'Alle nøgler tilbage (inkl. cykelgarage)',
+    'Alle Schlüssel zurück (inkl. Fahrradgarage)': 'Alle nøgler afleveret (inkl. cykelgarage)',
   },
 };
 
@@ -432,7 +432,7 @@ export const emergencyI18n: Record<XLang, Record<string, string>> = {
   en: {
     '112': 'Emergency (fire/ambulance)',
     '110': 'Police',
-    '116117': 'On-call medical service',
+    '116117': 'Out-of-hours medical service',
     '055119240': 'Poison control (North)',
   },
   nl: {
